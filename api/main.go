@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"database/sql"
+
 	"github.com/joho/godotenv"
 )
 
@@ -51,12 +53,25 @@ func search(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func auth(w http.ResponseWriter, req *http.Request) {
+func (env *Env) register(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	username := req.URL.Query().Get("username")
+	email := req.URL.Query().Get("email")
+	password := req.URL.Query().Get("password")
+
+	addUser(env.db, username, email, password)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
+
+type Env struct {
+	db *sql.DB
+}
+
 func main() {
 
 	err := godotenv.Load()
@@ -64,10 +79,37 @@ func main() {
 		log.Fatal("Error loading .env variables")
 	}
 
+	driver := "mysql"
+	connectionString := "mies:secret@(127.0.0.1:3306)/test?parseTime=true"
+
+	db, err := sql.Open(driver, connectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	env := &Env{db: db}
+
+	{ // Create a new table
+		query := `
+		    CREATE TABLE users (
+			id INT AUTO_INCREMENT,
+			username TEXT NOT NULL,
+			password TEXT NOT NULL,
+			created_at DATETIME,
+			PRIMARY KEY (id)
+		    );`
+
+		if _, err := db.Exec(query); err != nil {
+			log.Fatal(err)
+		}
+	}
 	http.HandleFunc("/hello", logging(hello))
 	http.HandleFunc("/headers", logging(headers))
 	http.HandleFunc("/search", logging(search))
-	http.HandleFunc("/auth", logging(auth))
+	http.HandleFunc("/register", logging(env.register))
 	fmt.Printf("running server on port %s \n", port)
 	http.ListenAndServe(port, nil)
 }
