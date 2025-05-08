@@ -1,0 +1,17 @@
+services:
+  test:
+    image: mysql:8.0
+    container_name: test
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: test
+      MYSQL_USER: mies
+      MYSQL_PASSWORD: mies
+    ports:
+      - "3306:3306"
+    volumes:
+      - test:/var/lib/mysql
+
+volumes:
+  test:
