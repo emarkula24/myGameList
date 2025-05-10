@@ -49,26 +49,11 @@ func main() {
 
 	env := &utils.Env{DB: db}
 
-	{ // Create a new table
-		query := `
-		    CREATE TABLE users (
-			id INT AUTO_INCREMENT,
-			username TEXT NOT NULL,
-			password TEXT NOT NULL,
-			created_at DATETIME,
-			PRIMARY KEY (id)
-		    );`
-
-		if _, err := db.Exec(query); err != nil {
-			log.Fatal(err)
-		}
-	}
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 	router.HandleFunc("/search", handler.Search).Methods("GET")
-	router.HandleFunc("/register/", handler.Register(env)).Methods("POST")
-
+	router.HandleFunc("/register", handler.Register(env)).Methods("POST")
 	fmt.Printf("running server on port %s \n", port)
 
-	http.ListenAndServe(port, nil)
+	http.ListenAndServe(port, router)
 }
