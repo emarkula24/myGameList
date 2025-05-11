@@ -1,8 +1,8 @@
 export interface Location {
-    address: string;
-    addressName: string;
+        address: string;
+        addressName: string;
 }
 
 export interface HeaderElementProps {
-    location: Location;
+        location: Location;
 }
