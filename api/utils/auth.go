@@ -1,8 +1,7 @@
 package utils
 
 import (
-	"fmt"
-
+	"example.com/mygamelist/errorutils"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,7 +27,7 @@ func VerifyToken(tokenString string) error {
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("invalid token")
+		return errorutils.ErrInvalidToken
 	}
 
 	return nil

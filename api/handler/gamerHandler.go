@@ -12,7 +12,7 @@ func Search(w http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query().Get("query")
 	resp, err := http.Get("https://www.giantbomb.com/api/search/?api_key=" + apiKey + "&format=json&query=" + query + "&resources=game")
 	if err != nil {
-		http.Error(w, "failed fetching from giantbom", http.StatusInternalServerError)
+		http.Error(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 	}
 
 	defer resp.Body.Close()

@@ -2,8 +2,11 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 
+	"example.com/mygamelist/errorutils"
 	"example.com/mygamelist/service"
 	"example.com/mygamelist/utils"
 )
@@ -30,15 +33,26 @@ func Register(env *utils.Env) http.HandlerFunc {
 			return
 		}
 
-		_, err := service.RegisterUser(env.DB, regReq.Username, regReq.Email, regReq.Password)
+		userId, err := service.RegisterUser(env.DB, regReq.Username, regReq.Email, regReq.Password)
 		if err != nil {
-			http.Error(w, "Error adding user: "+err.Error(), http.StatusInternalServerError)
+			switch {
+			case errors.Is(err, errorutils.ErrUserExists):
+				errorutils.WriteJSONError(w, "User already exists", http.StatusBadRequest)
+			default:
+				log.Printf("Failed to register user: %s", err)
+				http.Error(w, "Error adding user: "+err.Error(), http.StatusInternalServerError)
+			}
 			return
+		}
+		type RegisterResponse struct {
+			UserID int64 `json:"user_id"`
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(RegisterResponse{UserID: userId})
 	}
+
 }
 
 type LoginRequest struct {
@@ -48,19 +62,31 @@ type LoginRequest struct {
 
 func Login(env *utils.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+
 		var loginReq LoginRequest
 		decoder := json.NewDecoder(req.Body)
 		decoder.DisallowUnknownFields()
+
 		if err := decoder.Decode(&loginReq); err != nil {
-			http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+			errorutils.WriteJSONError(w, "invalid JSON", http.StatusBadRequest)
 			return
 		}
 		jwtToken, err := service.LoginUser(env.DB, loginReq.Username, loginReq.Password)
 		if err != nil {
-			http.Error(w, "Authentication failed: "+err.Error(), http.StatusUnauthorized)
+			switch {
+			case errors.Is(err, errorutils.ErrPasswordMatch):
+				errorutils.WriteJSONError(w, "incorrect password", http.StatusUnauthorized)
+			default:
+				errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+			}
+			return
+		}
+
+		type LoginResponse struct {
+			AccessToken string `json:"accessToken"`
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{"accessToken": jwtToken})
+		json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken})
 	}
 }
