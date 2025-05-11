@@ -46,7 +46,7 @@ function Register() {
                                 <input name="password" value={registerFormData.password} onChange={handleChange} type='password' placeholder='Enter Password' />
                                 <label className='Label'>Confirm Password:</label>
                                 <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm Password' />
-                                <button onClick={registerUser} type='submit' >Register</button>
+                                <button onClick={registerUser} type="submit" >Register</button>
                         </form>
                 </>
         )

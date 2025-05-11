@@ -50,6 +50,7 @@ func LoginUser(db *sql.DB, username, password string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"exp":      expirationTime,
+		"issuer":   "mygamelist-back",
 	})
 
 	tokenString, err := token.SignedString(secretKey)

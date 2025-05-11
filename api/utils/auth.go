@@ -20,7 +20,7 @@ func VerifyToken(tokenString string) error {
 	var secretKey = []byte("secret-key")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodES256.Alg()}))
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 	if err != nil {
 		return err
