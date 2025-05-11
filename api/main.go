@@ -53,6 +53,7 @@ func main() {
 	router.Use(loggingMiddleware)
 	router.HandleFunc("/search", handler.Search).Methods("GET")
 	router.HandleFunc("/register", handler.Register(env)).Methods("POST")
+	router.HandleFunc("/login", handler.Login(env)).Methods("POST")
 	fmt.Printf("running server on port %s \n", port)
 
 	http.ListenAndServe(port, router)

@@ -75,8 +75,10 @@ func Login(env *utils.Env) http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, errorutils.ErrPasswordMatch):
+				log.Printf("Failed to login user: %s", err)
 				errorutils.WriteJSONError(w, "incorrect password", http.StatusUnauthorized)
 			default:
+				log.Printf("Failed to login user: %s", err)
 				errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
 			}
 			return

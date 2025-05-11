@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"example.com/mygamelist/errorutils"
 	"example.com/mygamelist/repository"
@@ -39,17 +40,22 @@ func LoginUser(db *sql.DB, username, password string) (string, error) {
 	var secretKey = []byte("secret-key")
 	hashedPassword, err := repository.PasswordByUsername(db, username, password)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to retrieve users password: %w", err)
 	}
 	if !utils.CheckPasswordHash(hashedPassword, password) {
 		return "", errorutils.ErrPasswordMatch
 	}
+	expirationTime := time.Now().Add(24 * time.Hour).Unix()
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
+		"exp":      expirationTime,
 	})
 
 	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to sign jwt token: %w", err)
+	}
 
 	return tokenString, err
 
