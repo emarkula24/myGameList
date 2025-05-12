@@ -14,7 +14,14 @@ func SelectUserByUsername(db *sql.DB, username string) (bool, error) {
 	}
 	return exists, nil
 }
-
+func SelectUserIdByUsername(db *sql.DB, username string) (int, error) {
+	var userId int
+	query := `SELECT user_id FROM users where username=?`
+	if err := db.QueryRow(query, username).Scan(&userId); err != nil {
+		return 0, fmt.Errorf("failed to retrieve userID from user %s: %w", username, err)
+	}
+	return userId, nil
+}
 func InsertUser(db *sql.DB, username, email, hashedPassword string) (int64, error) {
 
 	createdAt := time.Now()
@@ -38,4 +45,27 @@ func PasswordByUsername(db *sql.DB, username, password string) (string, error) {
 		return "", fmt.Errorf("failed to retrieve password: %w", err)
 	}
 	return userPassword, nil
+}
+
+func InsertRefreshToken(db *sql.DB, userId int, refreshToken string, jti string) error {
+	query := `
+		INSERT INTO refreshtokens (user_id, refresh_token, jti)
+		VALUES (?, ?, ?)
+		ON DUPLICATE KEY UPDATE
+			refresh_token = VALUES(refresh_token),
+			jti = VALUES(jti)
+	`
+	_, err := db.Exec(query, userId, refreshToken, jti)
+	return err
+}
+
+func RefreshTokenById(db *sql.DB, userId int) (string, string, error) {
+	var token, jti string
+	query := `SELECT refresh_token, jti from refreshtokens WHERE user_id = ?`
+	err := db.QueryRow(query, userId).Scan(&token, &jti)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to retrieve refresh token: %w", err)
+	}
+
+	return token, jti, nil
 }

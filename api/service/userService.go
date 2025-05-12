@@ -36,8 +36,8 @@ func RegisterUser(db *sql.DB, username, email, password string) (int64, error) {
 }
 
 func LoginUser(db *sql.DB, username, password string) (string, error) {
-
 	var secretKey = []byte("secret-key")
+	expirationTime := time.Now().Add(15 * time.Minute).Unix()
 	hashedPassword, err := repository.PasswordByUsername(db, username, password)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve users password: %w", err)
@@ -45,19 +45,26 @@ func LoginUser(db *sql.DB, username, password string) (string, error) {
 	if !utils.CheckPasswordHash(hashedPassword, password) {
 		return "", errorutils.ErrPasswordMatch
 	}
-	expirationTime := time.Now().Add(24 * time.Hour).Unix()
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"exp":      expirationTime,
-		"issuer":   "mygamelist-back",
 	})
 
 	tokenString, err := token.SignedString(secretKey)
-	if err != nil {
-		return "", fmt.Errorf("failed to sign jwt token: %w", err)
-	}
 
 	return tokenString, err
 
+}
+
+func StoreRefreshToken(db *sql.DB, username, refreshToken, jti string) error {
+	userId, err := repository.SelectUserIdByUsername(db, username)
+	if err != nil {
+		return err
+	}
+	err = repository.InsertRefreshToken(db, userId, refreshToken, jti)
+	if err != nil {
+		return fmt.Errorf("failed to insert refreshtoken: %w", err)
+	}
+
+	return nil
 }

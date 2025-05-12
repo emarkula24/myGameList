@@ -23,7 +23,7 @@ func WriteJSONError(w http.ResponseWriter, message string, code int) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	json.NewEncoder(w).Encode(map[string]any{
 		"error": message,
 		"code":  code,
 	})
