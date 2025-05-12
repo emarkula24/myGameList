@@ -40,14 +40,14 @@ func VerifyToken(tokenString string) error {
 
 func GenerateRefreshToken(username string) (string, string, error) {
 	var secretKey = []byte("secret-key")
-	expirationTime := time.Now().Add(15 * time.Minute).Unix()
+	expirationTime := time.Now().Add(7 * 24 * time.Hour).Unix()
 	jti := fmt.Sprintf("%s-%d", username, time.Now().UnixNano())
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": username,
-		"exp":      expirationTime,
-		"issuer":   "mygamelist-back",
-		"jti":      jti,
+		"username":  username,
+		"ExpiresAt": expirationTime,
+		"Issuer":    "mygamelist-back",
+		"jti":       jti,
 	})
 
 	tokenString, err := token.SignedString(secretKey)

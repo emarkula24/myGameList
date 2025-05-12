@@ -134,9 +134,9 @@ func Refresh(env *utils.Env) http.HandlerFunc {
 
 		tokenStr := cookie.Value
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			return []byte("secret-key"), nil
-		})
+		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 		if err != nil {
 			http.Error(w, "invalid refresh token", http.StatusUnauthorized)
 			return
@@ -169,7 +169,7 @@ func Refresh(env *utils.Env) http.HandlerFunc {
 			switch {
 			case token.Valid:
 				var secretKey = []byte("secret-key")
-				expirationTime := time.Now().Add(15 * time.Minute).Unix()
+				expirationTime := time.Now().Add(5 * time.Minute).Unix()
 				token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 					"username": refreshReq.Username,
 					"exp":      expirationTime,

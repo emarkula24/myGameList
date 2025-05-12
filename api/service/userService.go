@@ -37,7 +37,7 @@ func RegisterUser(db *sql.DB, username, email, password string) (int64, error) {
 
 func LoginUser(db *sql.DB, username, password string) (string, error) {
 	var secretKey = []byte("secret-key")
-	expirationTime := time.Now().Add(15 * time.Minute).Unix()
+	expirationTime := time.Now().Add(5 * time.Minute).Unix()
 	hashedPassword, err := repository.PasswordByUsername(db, username, password)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve users password: %w", err)
