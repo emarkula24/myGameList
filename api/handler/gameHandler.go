@@ -13,7 +13,8 @@ func Search(env *utils.Env) http.HandlerFunc {
 
 		apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 		query := req.URL.Query().Get("query")
-		resp, err := http.Get("https://www.giantbomb.com/api/search/?api_key=" + apiKey + "&format=json&query=" + query + "&resources=game")
+		query = utils.ParseSearchQuery(query)
+		resp, err := http.Get("https://www.giantbomb.com/api/search/?api_key=" + apiKey + "&format=json&query=" + query + "&resources=game&limit=50")
 		if err != nil {
 			http.Error(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 		}
