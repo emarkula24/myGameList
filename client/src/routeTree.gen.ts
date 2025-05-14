@@ -11,122 +11,173 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ResultsImport } from './routes/results'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as GameGameGuidImport } from './routes/game.$gameGuid'
 
 // Create/Update Routes
 
+const ResultsRoute = ResultsImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const RegisterRoute = RegisterImport.update({
-        id: '/register',
-        path: '/register',
-        getParentRoute: () => rootRoute,
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const LoginRoute = LoginImport.update({
-        id: '/login',
-        path: '/login',
-        getParentRoute: () => rootRoute,
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const AboutRoute = AboutImport.update({
-        id: '/about',
-        path: '/about',
-        getParentRoute: () => rootRoute,
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const IndexRoute = IndexImport.update({
-        id: '/',
-        path: '/',
-        getParentRoute: () => rootRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GameGameGuidRoute = GameGameGuidImport.update({
+  id: '/game/$gameGuid',
+  path: '/game/$gameGuid',
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
-        interface FileRoutesByPath {
-                '/': {
-                        id: '/'
-                        path: '/'
-                        fullPath: '/'
-                        preLoaderRoute: typeof IndexImport
-                        parentRoute: typeof rootRoute
-                }
-                '/about': {
-                        id: '/about'
-                        path: '/about'
-                        fullPath: '/about'
-                        preLoaderRoute: typeof AboutImport
-                        parentRoute: typeof rootRoute
-                }
-                '/login': {
-                        id: '/login'
-                        path: '/login'
-                        fullPath: '/login'
-                        preLoaderRoute: typeof LoginImport
-                        parentRoute: typeof rootRoute
-                }
-                '/register': {
-                        id: '/register'
-                        path: '/register'
-                        fullPath: '/register'
-                        preLoaderRoute: typeof RegisterImport
-                        parentRoute: typeof rootRoute
-                }
-        }
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterImport
+      parentRoute: typeof rootRoute
+    }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsImport
+      parentRoute: typeof rootRoute
+    }
+    '/game/$gameGuid': {
+      id: '/game/$gameGuid'
+      path: '/game/$gameGuid'
+      fullPath: '/game/$gameGuid'
+      preLoaderRoute: typeof GameGameGuidImport
+      parentRoute: typeof rootRoute
+    }
+  }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-        '/': typeof IndexRoute
-        '/about': typeof AboutRoute
-        '/login': typeof LoginRoute
-        '/register': typeof RegisterRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/results': typeof ResultsRoute
+  '/game/$gameGuid': typeof GameGameGuidRoute
 }
 
 export interface FileRoutesByTo {
-        '/': typeof IndexRoute
-        '/about': typeof AboutRoute
-        '/login': typeof LoginRoute
-        '/register': typeof RegisterRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/results': typeof ResultsRoute
+  '/game/$gameGuid': typeof GameGameGuidRoute
 }
 
 export interface FileRoutesById {
-        __root__: typeof rootRoute
-        '/': typeof IndexRoute
-        '/about': typeof AboutRoute
-        '/login': typeof LoginRoute
-        '/register': typeof RegisterRoute
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/results': typeof ResultsRoute
+  '/game/$gameGuid': typeof GameGameGuidRoute
 }
 
 export interface FileRouteTypes {
-        fileRoutesByFullPath: FileRoutesByFullPath
-        fullPaths: '/' | '/about' | '/login' | '/register'
-        fileRoutesByTo: FileRoutesByTo
-        to: '/' | '/about' | '/login' | '/register'
-        id: '__root__' | '/' | '/about' | '/login' | '/register'
-        fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/register'
+    | '/results'
+    | '/game/$gameGuid'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/about' | '/login' | '/register' | '/results' | '/game/$gameGuid'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/login'
+    | '/register'
+    | '/results'
+    | '/game/$gameGuid'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-        IndexRoute: typeof IndexRoute
-        AboutRoute: typeof AboutRoute
-        LoginRoute: typeof LoginRoute
-        RegisterRoute: typeof RegisterRoute
+  IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  ResultsRoute: typeof ResultsRoute
+  GameGameGuidRoute: typeof GameGameGuidRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-        IndexRoute: IndexRoute,
-        AboutRoute: AboutRoute,
-        LoginRoute: LoginRoute,
-        RegisterRoute: RegisterRoute,
+  IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+  ResultsRoute: ResultsRoute,
+  GameGameGuidRoute: GameGameGuidRoute,
 }
 
 export const routeTree = rootRoute
-        ._addFileChildren(rootRouteChildren)
-        ._addFileTypes<FileRouteTypes>()
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -137,7 +188,9 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/login",
-        "/register"
+        "/register",
+        "/results",
+        "/game/$gameGuid"
       ]
     },
     "/": {
@@ -151,6 +204,12 @@ export const routeTree = rootRoute
     },
     "/register": {
       "filePath": "register.tsx"
+    },
+    "/results": {
+      "filePath": "results.tsx"
+    },
+    "/game/$gameGuid": {
+      "filePath": "game.$gameGuid.tsx"
     }
   }
 }

@@ -18,14 +18,19 @@ function Register() {
 
         });
 
-        function registerUser(event: React.FormEvent) {
+        async function registerUser(event: React.FormEvent) {
                 event.preventDefault()
-                return axios
-                        .post(`${url}/user/register`, {
-                                email: registerFormData.email,
-                                password: registerFormData.password,
-                                username: registerFormData.username,
-                        })
+                try {
+                        const response = await axios
+                                .post(`${url}/register`, {
+                                        email: registerFormData.email,
+                                        password: registerFormData.password,
+                                        username: registerFormData.username,
+                                });
+                        console.log(response);
+                } catch (error) {
+                        console.log(error);
+                }
         }
 
         function handleChange(event: React.ChangeEvent<HTMLInputElement>) {

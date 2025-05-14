@@ -1,26 +1,25 @@
 import axios from "axios"
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-const url = import.meta.env.VITE_BACKEND_URL
-import React, { useState } from "react"
+
+import React, { useEffect, useState } from "react"
 import useDebounce from "../../hooks/useDebounce"
 import styles from "./SearchBar.module.css"
+import { Game } from "../- types/types"
+import { useNavigate } from "@tanstack/react-router"
+import SearchResult from "./SearchResult"
 
-// Component for gamesearch function
-export default function SearchBar() {
+const url = import.meta.env.VITE_BACKEND_URL
+
+interface SearchBarProps {
+        setSearchResults: React.Dispatch<React.SetStateAction<Game[]>>
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
         const [searchQuery, setSearchQuery] = useState("")
+        const navigate = useNavigate({})
         const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-        interface Game {
-                id: number;
-                name: string;
-                image?: {
-                        medium_url: string;
-                };
-                original_release_date?: string;
-                platforms?: { abbreviation: string }[];
-                deck?: string;
-                site_detail_url: string;
-        }
+
 
         const fetchGames = async (searchQuery: string) => {
 
@@ -37,17 +36,29 @@ export default function SearchBar() {
 
         }
 
-        const { isFetched, isPending, isError, data, error } = useQuery({
+        const { isFetched, isPending, isError, isSuccess, data, error } = useQuery({
                 queryKey: ['games', debouncedSearchQuery],
-                queryFn: async () => fetchGames(debouncedSearchQuery),
-                enabled: !!searchQuery,
+                queryFn: () => fetchGames(debouncedSearchQuery),
+                enabled: !!debouncedSearchQuery,
                 placeholderData: keepPreviousData,
         });
+
+        useEffect(() => {
+                if (isSuccess) {
+                        setSearchResults(data)
+                }
+        }, [data])
 
         const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
                 setSearchQuery(event.currentTarget.value)
         }
 
+        const handleEnterPress = (event: React.KeyboardEvent) => {
+                if (event.key === "Enter") {
+                        navigate({ to: "/results" })
+                }
+                
+        }
 
         return (
                 <div className={styles.searchResults}>
@@ -59,21 +70,37 @@ export default function SearchBar() {
                                         placeholder="Search for games"
                                         value={searchQuery}
                                         onChange={handleInputChange}
+                                        onKeyDown={handleEnterPress}
                                 />
                         </label>
-                        {isPending ? (
+                        { data?.length === 0 && isFetched? (
+                                <div>No results. </div>
+                        ) : isPending ? (
                                 <div>Loading..</div>
                         ) : isError ? (
                                 <div>Error: {error.message}</div>
-                        ) : isFetched && data &&
+                        ) : isFetched && data && data.length > 0 &&
                         (
-
-                                <ul>
-                                        {data.map((game) => (
-                                                <li key={game.id}>{game.name}</li>
+                                <ul
+                                        style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                height: "600px",
+                                                overflowY: "scroll",
+                                                listStyleType: 'none',
+                                                padding: 0,
+                                                margin: 0,
+                                        }}
+                                >
+                                        {
+                                        data.map((game) => (
+                                                <SearchResult game={game} />
                                         ))}
                                 </ul>
-                        )}
+                        ) 
+                        }
                 </div>
-        );
+        )
 }
+
+export default SearchBar
