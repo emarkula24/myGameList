@@ -58,7 +58,11 @@ func main() {
 
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
-	router.HandleFunc("/search", handler.Search(env)).Methods("GET")
+
+	searchSubRoute := router.PathPrefix("/games").Subrouter()
+	searchSubRoute.HandleFunc("", handler.Search(env)).Methods("GET")
+	searchSubRoute.HandleFunc("/game", handler.SearchGame(env)).Methods("GET")
+
 	router.HandleFunc("/register", handler.Register(env)).Methods("POST")
 	router.HandleFunc("/login", handler.Login(env)).Methods("POST")
 	router.HandleFunc("/refresh", handler.Refresh(env)).Methods("POST")

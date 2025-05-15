@@ -1,7 +1,7 @@
-import { Game } from "../- types/types";
+import { Games } from "../- types/types";
 import { useNavigate } from "@tanstack/react-router";
 interface SearchResultProps {
-    game: Game;
+    game: Games;
 }
 
 const SearchResult: React.FC<SearchResultProps> = ({ game }) => {

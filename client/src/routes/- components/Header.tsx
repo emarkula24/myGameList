@@ -1,5 +1,5 @@
 import HeaderElement from "./HeaderElement"
-import { Location, Game } from "../- types/types"
+import { Location, Games } from "../- types/types"
 import styles from "./Header.module.css"
 import SearchBar from "./SearchBar"
 import { useState } from "react"
@@ -8,7 +8,7 @@ import { useState } from "react"
 
 // Header component, consists of HeaderElements and searchbar
 export default function Header() {
-        const [searchResults, setSearchResults] = useState<Game[]>([])
+        const [searchResults, setSearchResults] = useState<Games[]>([])
         const locations: Location[] = [
                 { address: "/", addressName: "Home" },
                 { address: "/about", addressName: "About" },

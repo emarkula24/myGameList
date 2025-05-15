@@ -16,7 +16,7 @@ import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
-import { Route as GameGameGuidImport } from './routes/game.$gameGuid'
+import { Route as GameGuidImport } from './routes/game.$guid'
 
 // Create/Update Routes
 
@@ -50,9 +50,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const GameGameGuidRoute = GameGameGuidImport.update({
-  id: '/game/$gameGuid',
-  path: '/game/$gameGuid',
+const GameGuidRoute = GameGuidImport.update({
+  id: '/game/$guid',
+  path: '/game/$guid',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -95,11 +95,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultsImport
       parentRoute: typeof rootRoute
     }
-    '/game/$gameGuid': {
-      id: '/game/$gameGuid'
-      path: '/game/$gameGuid'
-      fullPath: '/game/$gameGuid'
-      preLoaderRoute: typeof GameGameGuidImport
+    '/game/$guid': {
+      id: '/game/$guid'
+      path: '/game/$guid'
+      fullPath: '/game/$guid'
+      preLoaderRoute: typeof GameGuidImport
       parentRoute: typeof rootRoute
     }
   }
@@ -113,7 +113,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
-  '/game/$gameGuid': typeof GameGameGuidRoute
+  '/game/$guid': typeof GameGuidRoute
 }
 
 export interface FileRoutesByTo {
@@ -122,7 +122,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
-  '/game/$gameGuid': typeof GameGameGuidRoute
+  '/game/$guid': typeof GameGuidRoute
 }
 
 export interface FileRoutesById {
@@ -132,7 +132,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
-  '/game/$gameGuid': typeof GameGameGuidRoute
+  '/game/$guid': typeof GameGuidRoute
 }
 
 export interface FileRouteTypes {
@@ -143,9 +143,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/results'
-    | '/game/$gameGuid'
+    | '/game/$guid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/login' | '/register' | '/results' | '/game/$gameGuid'
+  to: '/' | '/about' | '/login' | '/register' | '/results' | '/game/$guid'
   id:
     | '__root__'
     | '/'
@@ -153,7 +153,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/results'
-    | '/game/$gameGuid'
+    | '/game/$guid'
   fileRoutesById: FileRoutesById
 }
 
@@ -163,7 +163,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ResultsRoute: typeof ResultsRoute
-  GameGameGuidRoute: typeof GameGameGuidRoute
+  GameGuidRoute: typeof GameGuidRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -172,7 +172,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ResultsRoute: ResultsRoute,
-  GameGameGuidRoute: GameGameGuidRoute,
+  GameGuidRoute: GameGuidRoute,
 }
 
 export const routeTree = rootRoute
@@ -190,7 +190,7 @@ export const routeTree = rootRoute
         "/login",
         "/register",
         "/results",
-        "/game/$gameGuid"
+        "/game/$guid"
       ]
     },
     "/": {
@@ -208,8 +208,8 @@ export const routeTree = rootRoute
     "/results": {
       "filePath": "results.tsx"
     },
-    "/game/$gameGuid": {
-      "filePath": "game.$gameGuid.tsx"
+    "/game/$guid": {
+      "filePath": "game.$guid.tsx"
     }
   }
 }

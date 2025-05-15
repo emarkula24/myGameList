@@ -1,18 +1,17 @@
 import axios from "axios"
 import { Game } from "./routes/- types/types"
-
 const url = import.meta.env.VITE_BACKEND_URL
 
 export class GameNotFoundError extends Error {}
 
-export const fetchGame = async (gameGuid: string) => {
+export const fetchGame = async (guid: string) => {
     await new Promise((r) => setTimeout(r, 500))
     const game = await axios
-    .get<Game>(`${url}/game/${gameGuid}`)
-    .then((r) => r.data)
+    .get<{ results: Game }>(`${url}/games/game?guid=${guid}`)
+    .then((r) => r.data.results)
     .catch((err) => {
         if (err.status === 404) {
-            throw new GameNotFoundError(`Game with id ${gameGuid} not found!`)
+            throw new GameNotFoundError(`Game with id ${guid} not found!`)
         }
         throw err
     })

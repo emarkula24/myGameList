@@ -4,14 +4,14 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import React, { useEffect, useState } from "react"
 import useDebounce from "../../hooks/useDebounce"
 import styles from "./SearchBar.module.css"
-import { Game } from "../- types/types"
+import { Games } from "../- types/types"
 import { useNavigate } from "@tanstack/react-router"
 import SearchResult from "./SearchResult"
 
 const url = import.meta.env.VITE_BACKEND_URL
 
 interface SearchBarProps {
-        setSearchResults: React.Dispatch<React.SetStateAction<Game[]>>
+        setSearchResults: React.Dispatch<React.SetStateAction<Games[]>>
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
@@ -27,7 +27,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
                 console.info(`${url}/search?query=${encodedSearchQuery}`)
                 await new Promise((r) => setTimeout(r, 500))
                 return axios
-                        .get<{ results: Game[] }>(`${url}/search?query=${searchQuery}`)
+                        .get<{ results: Games[] }>(`${url}/games?query=${searchQuery}`)
                         .then((response) => response.data.results)
                         .catch((err) => {
                                 console.error('Error fetching games:', err);
@@ -94,7 +94,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
                                 >
                                         {
                                         data.map((game) => (
-                                                <SearchResult game={game} />
+                                                <SearchResult key={game.id}game={game} />
                                         ))}
                                 </ul>
                         ) 

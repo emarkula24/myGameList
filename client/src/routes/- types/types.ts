@@ -7,7 +7,7 @@ export interface HeaderElementProps {
         location: Location;
 }
 
-export interface Game {
+export interface Games {
         id: number;
         guid: number;
         name: string;
@@ -23,4 +23,17 @@ export interface Game {
         platforms?: { abbreviation: string }[];
         deck?: string;
         site_detail_url: string;
+}
+
+export interface Game {
+        name: string;
+        deck: string;
+        description: string;
+        image: {
+                medium_url: string;
+        }
+        original_release_data: string;
+        platforms: Array<object>;
+        publishers: Array<object>;
+        
 }
