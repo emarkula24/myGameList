@@ -9,6 +9,8 @@ import (
 	"database/sql"
 
 	"example.com/mygamelist/handler"
+	"example.com/mygamelist/repository"
+	"example.com/mygamelist/service"
 	"example.com/mygamelist/utils"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -51,19 +53,25 @@ func main() {
 		log.Fatal(err)
 	}
 
+	client := &service.GiantBombClient{}
+
 	env := &utils.Env{
 		DB:       db,
 		FrontUrl: frontUrl,
+		API:      client,
 	}
+	repo := repository.NewRepository(db)
 
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 
-	searchSubRoute := router.PathPrefix("/games").Subrouter()
-	searchSubRoute.HandleFunc("", handler.Search(env)).Methods("GET")
-	searchSubRoute.HandleFunc("/game", handler.SearchGame(env)).Methods("GET")
+	h := handler.NewHandler(env, repo)
 
-	router.HandleFunc("/register", handler.Register(env)).Methods("POST")
+	searchSubRoute := router.PathPrefix("/games").Subrouter()
+	searchSubRoute.HandleFunc("/", h.Search).Methods("GET")
+	searchSubRoute.HandleFunc("/game", h.SearchGame).Methods("GET")
+
+	router.HandleFunc("/register", h.Register).Methods("POST")
 	router.HandleFunc("/login", handler.Login(env)).Methods("POST")
 	router.HandleFunc("/refresh", handler.Refresh(env)).Methods("POST")
 

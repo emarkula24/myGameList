@@ -6,14 +6,15 @@ import (
 	"time"
 )
 
-func SelectUserByUsername(db *sql.DB, username string) (bool, error) {
+func (r *Repository) SelectUserByUsername(username string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS ( SELECT 1 FROM users WHERE username=?)`
-	if err := db.QueryRow(query, username).Scan(&exists); err != nil {
+	if err := r.db.QueryRow(query, username).Scan(&exists); err != nil {
 		return false, fmt.Errorf("failed to retrieve user %s: %w", username, err)
 	}
 	return exists, nil
 }
+
 func SelectUserIdByUsername(db *sql.DB, username string) (int, error) {
 	var userId int
 	query := `SELECT user_id FROM users where username=?`
@@ -22,10 +23,11 @@ func SelectUserIdByUsername(db *sql.DB, username string) (int, error) {
 	}
 	return userId, nil
 }
-func InsertUser(db *sql.DB, username, email, hashedPassword string) (int64, error) {
+
+func (r *Repository) InsertUser(username, email, hashedPassword string) (int64, error) {
 
 	createdAt := time.Now()
-	result, err := db.Exec(`INSERT INTO users (username, email, password, created_at) VALUES (?,?,?,?)`, username, email, hashedPassword, createdAt)
+	result, err := r.db.Exec(`INSERT INTO users (username, email, password, created_at) VALUES (?,?,?,?)`, username, email, hashedPassword, createdAt)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert user into database: %w", err)
 	}

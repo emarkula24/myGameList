@@ -6,14 +6,15 @@ import (
 	"time"
 
 	"example.com/mygamelist/errorutils"
+	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/repository"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func RegisterUser(db *sql.DB, username, email, password string) (int64, error) {
+func RegisterUser(repo interfaces.Repository, username, email, password string) (int64, error) {
 
-	isUser, err := repository.SelectUserByUsername(db, username)
+	isUser, err := repo.SelectUserByUsername(username)
 	if err != nil {
 		return 0, fmt.Errorf("failed to select user: %w", err)
 	}
@@ -27,7 +28,7 @@ func RegisterUser(db *sql.DB, username, email, password string) (int64, error) {
 		return 0, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	userId, err := repository.InsertUser(db, username, email, hashedPassword)
+	userId, err := repo.InsertUser(username, email, hashedPassword)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert user: %w", err)
 	}
