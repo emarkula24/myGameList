@@ -66,10 +66,10 @@ func main() {
 	router.Use(loggingMiddleware)
 
 	h := handler.NewHandler(env, repo)
-
+	gameHandler := handler.NewGameHandler(env)
 	searchSubRoute := router.PathPrefix("/games").Subrouter()
-	searchSubRoute.HandleFunc("/", h.Search).Methods("GET")
-	searchSubRoute.HandleFunc("/game", h.SearchGame).Methods("GET")
+	searchSubRoute.HandleFunc("/", gameHandler.Search).Methods("GET")
+	searchSubRoute.HandleFunc("/game", gameHandler.SearchGame).Methods("GET")
 
 	router.HandleFunc("/register", h.Register).Methods("POST")
 	router.HandleFunc("/login", handler.Login(env)).Methods("POST")

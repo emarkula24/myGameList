@@ -10,6 +10,13 @@ type Handler struct {
 	Repo interfaces.Repository
 }
 
+type GameHandler struct {
+	Env *utils.Env
+}
+
+func NewGameHandler(env *utils.Env) *GameHandler {
+	return &GameHandler{Env: env}
+}
 func NewHandler(env *utils.Env, repo interfaces.Repository) *Handler {
 	return &Handler{Env: env}
 }

@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"example.com/mygamelist/handler"
-	"example.com/mygamelist/repository"
 	"example.com/mygamelist/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -26,23 +25,22 @@ func (m *MockAPI) SearchGames(query string) (*http.Response, error) {
 
 func TestSearchHandler(t *testing.T) {
 	// Mock response body
-	mockBody := `{"games": ["Game1", "Game2"]}`
+	mockBody := `{"error": "ok","status_code": 1}`
 	response := &http.Response{
 		StatusCode: 200,
 		Body:       io.NopCloser(strings.NewReader(mockBody)),
 	}
 
 	mockAPI := new(MockAPI)
-	mockAPI.On("SearchGames", "zelda").Return(response, nil)
+	mockAPI.On("SearchGames", "metroid").Return(response, nil)
 
 	env := &utils.Env{
 		API: mockAPI,
 	}
 
-	repo := &repository.Repository{} // stub if needed
-	h := handler.NewHandler(env, repo)
+	h := handler.NewGameHandler(env)
 
-	req := httptest.NewRequest("GET", "/games/search?query=zelda", nil)
+	req := httptest.NewRequest("GET", "/games/search?query=metroid", nil)
 	w := httptest.NewRecorder()
 
 	h.Search(w, req)
