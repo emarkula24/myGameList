@@ -1,9 +1,11 @@
 package handler_test
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -13,45 +15,100 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// mock_api.go
+// MockAPI mocks the SearchGames method
 type MockAPI struct {
 	mock.Mock
 }
 
+type searchTestCase struct {
+	name           string
+	queryParam     string
+	mockResponse   *http.Response
+	mockError      error
+	expectStatus   int
+	expectContains string
+}
+
+var searchTestCases = []searchTestCase{
+	{
+		name:       "Valid query returns OK",
+		queryParam: "mario",
+		mockResponse: &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"status_code":1, "results": []}`)),
+		},
+		mockError:      nil,
+		expectStatus:   http.StatusOK,
+		expectContains: `"status_code":1`,
+	},
+	{
+		name:       "Empty query returns OK",
+		queryParam: "",
+		mockResponse: &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"status_code":1, "results": []}`)),
+		},
+		mockError:      nil,
+		expectStatus:   http.StatusOK,
+		expectContains: `"status_code":1`,
+	},
+	{
+		name:           "API returns error",
+		queryParam:     "errorcase",
+		mockResponse:   nil,
+		mockError:      errors.New("API failure"),
+		expectStatus:   http.StatusInternalServerError,
+		expectContains: "Failed to fetch gamedata",
+	},
+	{
+		name:       "API returns wrong api key error code",
+		queryParam: "badstatus",
+		mockResponse: &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"status_code":100}`)),
+		},
+		mockError:      nil,
+		expectStatus:   http.StatusInternalServerError,
+		expectContains: "Failed to fetch gamedata",
+	},
+}
+
 func (m *MockAPI) SearchGames(query string) (*http.Response, error) {
 	args := m.Called(query)
-	return args.Get(0).(*http.Response), args.Error(1)
+	resp, _ := args.Get(0).(*http.Response) // safe type assertion, resp may be nil
+	return resp, args.Error(1)              // get error once
 }
 
 func TestSearchHandler(t *testing.T) {
-	// Mock response body
-	mockBody := `{"error": "ok","status_code": 1}`
-	response := &http.Response{
-		StatusCode: 200,
-		Body:       io.NopCloser(strings.NewReader(mockBody)),
+	for _, tt := range searchTestCases {
+		t.Run(tt.name, func(t *testing.T) {
+			mockAPI := new(MockAPI)
+			mockAPI.On("SearchGames", tt.queryParam).Return(tt.mockResponse, tt.mockError)
+
+			env := &utils.Env{
+				API: mockAPI,
+			}
+			h := handler.NewGameHandler(env)
+
+			req := httptest.NewRequest(http.MethodGet, "/search?query="+url.QueryEscape(tt.queryParam), nil)
+			w := httptest.NewRecorder()
+
+			h.Search(w, req)
+
+			res := w.Result()
+			defer res.Body.Close()
+
+			assert.Equal(t, tt.expectStatus, res.StatusCode, "Test %q: status code mismatch:", tt.name)
+
+			bodyBytes, err := io.ReadAll(res.Body)
+			if err != nil {
+				t.Fatalf("failed to read response body: %v", err)
+			}
+
+			bodyStr := string(bodyBytes)
+			assert.Contains(t, bodyStr, tt.expectContains, "Test %q: response body missing expected substring:", tt.name)
+
+			mockAPI.AssertExpectations(t)
+		})
 	}
-
-	mockAPI := new(MockAPI)
-	mockAPI.On("SearchGames", "metroid").Return(response, nil)
-
-	env := &utils.Env{
-		API: mockAPI,
-	}
-
-	h := handler.NewGameHandler(env)
-
-	req := httptest.NewRequest("GET", "/games/search?query=metroid", nil)
-	w := httptest.NewRecorder()
-
-	h.Search(w, req)
-
-	res := w.Result()
-	defer res.Body.Close()
-
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-
-	body, _ := io.ReadAll(res.Body)
-	assert.JSONEq(t, mockBody, string(body))
-
-	mockAPI.AssertExpectations(t)
 }

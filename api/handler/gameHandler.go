@@ -18,13 +18,21 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	query = utils.ParseSearchQuery(query)
 	resp, err := h.Env.API.SearchGames(query)
 	if err != nil {
-		http.Error(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		log.Printf("Failed to fetch gamedata: %s", err)
+		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Failed to fetch gamedata: %s", err)
+		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+		log.Printf("Failed to fetch gamedata: %s", err)
+		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
@@ -38,18 +46,25 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
 		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		return
 	}
 
 	if gameJSON.StatusCode != 1 {
-		log.Printf("data fetching from gamebomb failed")
-		http.Error(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		log.Printf("data fetching from gamebomb failed: %s", err)
+		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		return
+	}
+	if gameJSON.StatusCode == 100 {
+		log.Printf("invalid API key %s", err)
+		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	if _, err := w.Write(bodyBytes); err != nil {
-		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		log.Printf("failed to write response: %s", err)
+		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 }
