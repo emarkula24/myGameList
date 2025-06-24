@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+type Repository struct {
+	db *sql.DB
+}
+
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{db: db}
+}
+
 func (r *Repository) SelectUserByUsername(username string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS ( SELECT 1 FROM users WHERE username=?)`

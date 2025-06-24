@@ -12,6 +12,17 @@ import (
 	"example.com/mygamelist/utils"
 )
 
+// Defines dependencies for GameHandler struct
+type GameHandler struct {
+	Env *utils.Env
+}
+
+// Creates a new instance of GameHandler
+func NewGameHandler(env *utils.Env) *GameHandler {
+	return &GameHandler{Env: env}
+}
+
+// Requests GameBomb API for a list of game entries based on a query string and relays the received json to the client.
 func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
 	query := req.URL.Query().Get("query")
@@ -49,15 +60,20 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if gameJSON.StatusCode != 1 {
-		log.Printf("data fetching from gamebomb failed: %s", err)
+	// status_code received is not the HTTP status code, it is a code that the API sends with the JSON.
+	// It is safe to assume HTTP code 404 is not a likely scenario but countermeasures are taken.
+	// status_code 1 = success
+	// status_code 100 = wrong api key
+
+	switch gameJSON.StatusCode {
+	case 1:
+	case 100:
+		log.Printf("Invalid API key %s", err)
 		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
 		return
-	}
-	if gameJSON.StatusCode == 100 {
-		log.Printf("invalid API key %s", err)
+	default:
+		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
 		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
-		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -69,6 +85,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Requests GameBomb API for the information of a game-entry based on GUID, and relays it to the client.
 func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 	guid := req.URL.Query().Get("guid")

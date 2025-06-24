@@ -9,16 +9,25 @@ import (
 	"time"
 
 	"example.com/mygamelist/errorutils"
+	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/repository"
 	"example.com/mygamelist/service"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type RegisterRequest struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+// Defines dependencies for Handler struct
+type Handler struct {
+	Env         *utils.Env
+	UserService interfaces.UserService
+}
+
+// Creates a new instance of Handler
+func NewHandler(env *utils.Env, ur interfaces.UserService) *Handler {
+	return &Handler{
+		Env:         env,
+		UserService: ur,
+	}
 }
 
 func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
@@ -26,6 +35,12 @@ func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
 	if req.Header.Get("Content-Type") != "application/json" {
 		http.Error(w, "Unsupported Media Type", http.StatusUnsupportedMediaType)
 		return
+	}
+
+	type RegisterRequest struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	var regReq RegisterRequest
@@ -36,7 +51,7 @@ func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	userId, err := service.RegisterUser(h.Repo, regReq.Username, regReq.Email, regReq.Password)
+	userId, err := h.UserService.RegisterUser(regReq.Username, regReq.Email, regReq.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, errorutils.ErrUserExists):
@@ -56,14 +71,13 @@ func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(RegisterResponse{UserID: userId})
 }
 
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func Login(env *utils.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
+		type LoginRequest struct {
+			Username string `json:"username"`
+			Password string `json:"password"`
+		}
 		var loginReq LoginRequest
 		decoder := json.NewDecoder(req.Body)
 		decoder.DisallowUnknownFields()
@@ -88,6 +102,7 @@ func Login(env *utils.Env) http.HandlerFunc {
 		type LoginResponse struct {
 			AccessToken string `json:"accessToken"`
 		}
+
 		refreshToken, jti, err := utils.GenerateRefreshToken(loginReq.Username)
 		if err != nil {
 			log.Printf("Failed to login user: %s", err)
@@ -107,13 +122,12 @@ func Login(env *utils.Env) http.HandlerFunc {
 	}
 }
 
-type RefreshRequest struct {
-	Username string `json:"username"`
-}
-
 func Refresh(env *utils.Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
+		type RefreshRequest struct {
+			Username string `json:"username"`
+		}
 		var refreshReq RefreshRequest
 		decoder := json.NewDecoder(req.Body)
 		decoder.DisallowUnknownFields()

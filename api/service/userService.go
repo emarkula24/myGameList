@@ -12,9 +12,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func RegisterUser(repo interfaces.Repository, username, email, password string) (int64, error) {
+type Service struct {
+	interfaces.UserRepository
+}
 
-	isUser, err := repo.SelectUserByUsername(username)
+func NewService(repo interfaces.UserRepository) *Service {
+	return &Service{UserRepository: repo}
+}
+func (s *Service) RegisterUser(username, email, password string) (int64, error) {
+
+	isUser, err := s.SelectUserByUsername(username)
 	if err != nil {
 		return 0, fmt.Errorf("failed to select user: %w", err)
 	}
@@ -28,7 +35,7 @@ func RegisterUser(repo interfaces.Repository, username, email, password string) 
 		return 0, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	userId, err := repo.InsertUser(username, email, hashedPassword)
+	userId, err := s.InsertUser(username, email, hashedPassword)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert user: %w", err)
 	}

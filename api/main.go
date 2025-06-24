@@ -61,11 +61,11 @@ func main() {
 		API:      client,
 	}
 	repo := repository.NewRepository(db)
-
+	service := service.NewService(repo)
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 
-	h := handler.NewHandler(env, repo)
+	h := handler.NewHandler(env, service)
 	gameHandler := handler.NewGameHandler(env)
 	searchSubRoute := router.PathPrefix("/games").Subrouter()
 	searchSubRoute.HandleFunc("/", gameHandler.Search).Methods("GET")
