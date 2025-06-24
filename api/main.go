@@ -11,7 +11,6 @@ import (
 	"example.com/mygamelist/handler"
 	"example.com/mygamelist/repository"
 	"example.com/mygamelist/service"
-	"example.com/mygamelist/utils"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -55,18 +54,13 @@ func main() {
 
 	client := &service.GiantBombClient{}
 
-	env := &utils.Env{
-		DB:       db,
-		FrontUrl: frontUrl,
-		API:      client,
-	}
 	repo := repository.NewRepository(db)
 	service := service.NewService(repo)
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 
-	h := handler.NewHandler(env, service)
-	gameHandler := handler.NewGameHandler(env)
+	h := handler.NewHandler(service)
+	gameHandler := handler.NewGameHandler(client)
 	searchSubRoute := router.PathPrefix("/games").Subrouter()
 	searchSubRoute.HandleFunc("/", gameHandler.Search).Methods("GET")
 	searchSubRoute.HandleFunc("/game", gameHandler.SearchGame).Methods("GET")

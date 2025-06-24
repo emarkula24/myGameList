@@ -3,7 +3,6 @@ package handler_test
 import (
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -11,7 +10,6 @@ import (
 	"testing"
 
 	"example.com/mygamelist/handler"
-	"example.com/mygamelist/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -81,21 +79,16 @@ func (m *MockAPI) SearchGames(query string) (*http.Response, error) {
 	return resp, args.Error(1)
 }
 
-// Unit tests for Gamebomb functionalities, logs provided but the log package are disables for the duration of test.
+// Unit tests for Gamebomb functionalities
 func TestSearchHandler(t *testing.T) {
 	// External GameBomb API is mocked because without mocking it's not possible to produce a failure scenario.
 	for _, tt := range searchTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 
-			log.SetOutput(io.Discard)
-
 			mockAPI := new(MockAPI)
 			mockAPI.On("SearchGames", tt.queryParam).Return(tt.mockResponse, tt.mockError)
 
-			env := &utils.Env{
-				API: mockAPI,
-			}
-			h := handler.NewGameHandler(env)
+			h := handler.NewGameHandler(mockAPI)
 
 			req, err := http.NewRequest(http.MethodGet, "/search?query="+url.QueryEscape(tt.queryParam), nil)
 			assert.NoError(t, err, "creating request should not fail")

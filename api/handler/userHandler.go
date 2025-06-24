@@ -16,15 +16,13 @@ import (
 
 // Defines dependencies for Handler struct
 type Handler struct {
-	Env         *utils.Env
 	UserService interfaces.UserService
 }
 
 // Creates a new instance of Handler
-func NewHandler(env *utils.Env, ur interfaces.UserService) *Handler {
+func NewHandler(us interfaces.UserService) *Handler {
 	return &Handler{
-		Env:         env,
-		UserService: ur,
+		UserService: us,
 	}
 }
 

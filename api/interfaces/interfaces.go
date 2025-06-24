@@ -2,7 +2,7 @@ package interfaces
 
 import "net/http"
 
-type Client interface {
+type GiantBombClient interface {
 	SearchGames(query string) (*http.Response, error)
 }
 

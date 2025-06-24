@@ -9,17 +9,18 @@ import (
 	"os"
 
 	"example.com/mygamelist/errorutils"
+	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/utils"
 )
 
 // Defines dependencies for GameHandler struct
 type GameHandler struct {
-	Env *utils.Env
+	Gbc interfaces.GiantBombClient
 }
 
 // Creates a new instance of GameHandler
-func NewGameHandler(env *utils.Env) *GameHandler {
-	return &GameHandler{Env: env}
+func NewGameHandler(gbc interfaces.GiantBombClient) *GameHandler {
+	return &GameHandler{Gbc: gbc}
 }
 
 // Requests GameBomb API for a list of game entries based on a query string and relays the received json to the client.
@@ -27,7 +28,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
 	query := req.URL.Query().Get("query")
 	query = utils.ParseSearchQuery(query)
-	resp, err := h.Env.API.SearchGames(query)
+	resp, err := h.Gbc.SearchGames(query)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
 		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
