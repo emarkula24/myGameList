@@ -55,7 +55,7 @@ func main() {
 	client := &service.GiantBombClient{}
 
 	repo := repository.NewRepository(db)
-	service := service.NewService(repo)
+	service := service.NewUserService(repo)
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 

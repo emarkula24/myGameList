@@ -9,21 +9,19 @@ import (
 	"time"
 
 	"example.com/mygamelist/errorutils"
-	"example.com/mygamelist/interfaces"
+	"example.com/mygamelist/service"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 // Defines dependencies for Handler struct
 type Handler struct {
-	UserService interfaces.UserService
+	UserService *service.UserService
 }
 
 // Creates a new instance of Handler
-func NewHandler(us interfaces.UserService) *Handler {
-	return &Handler{
-		UserService: us,
-	}
+func NewHandler(us *service.UserService) *Handler {
+	return &Handler{UserService: us}
 }
 
 func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
