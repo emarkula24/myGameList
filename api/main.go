@@ -72,8 +72,8 @@ func main() {
 	searchSubRoute.HandleFunc("/game", gameHandler.SearchGame).Methods("GET")
 
 	router.HandleFunc("/register", h.Register).Methods("POST")
-	router.HandleFunc("/login", handler.Login(env)).Methods("POST")
-	router.HandleFunc("/refresh", handler.Refresh(env)).Methods("POST")
+	router.HandleFunc("/login", h.Login).Methods("POST")
+	router.HandleFunc("/refresh", h.Refresh).Methods("POST")
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{frontUrl},

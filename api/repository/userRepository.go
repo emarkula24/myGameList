@@ -23,10 +23,10 @@ func (r *Repository) SelectUserByUsername(username string) (bool, error) {
 	return exists, nil
 }
 
-func SelectUserIdByUsername(db *sql.DB, username string) (int, error) {
+func (r *Repository) SelectUserIdByUsername(username string) (int, error) {
 	var userId int
 	query := `SELECT user_id FROM users where username=?`
-	if err := db.QueryRow(query, username).Scan(&userId); err != nil {
+	if err := r.db.QueryRow(query, username).Scan(&userId); err != nil {
 		return 0, fmt.Errorf("failed to retrieve userID from user %s: %w", username, err)
 	}
 	return userId, nil
@@ -46,18 +46,18 @@ func (r *Repository) InsertUser(username, email, hashedPassword string) (int64, 
 	return userId, nil
 }
 
-func PasswordByUsername(db *sql.DB, username, password string) (string, error) {
+func (r *Repository) PasswordByUsername(username, password string) (string, error) {
 
 	var userPassword string
 	query := `SELECT password FROM users WHERE username = ?`
-	err := db.QueryRow(query, username).Scan(&userPassword)
+	err := r.db.QueryRow(query, username).Scan(&userPassword)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve password: %w", err)
 	}
 	return userPassword, nil
 }
 
-func InsertRefreshToken(db *sql.DB, userId int, refreshToken string, jti string) error {
+func (r *Repository) InsertRefreshToken(userId int, refreshToken string, jti string) error {
 	query := `
 		INSERT INTO refreshtokens (user_id, refresh_token, jti)
 		VALUES (?, ?, ?)
@@ -65,14 +65,14 @@ func InsertRefreshToken(db *sql.DB, userId int, refreshToken string, jti string)
 			refresh_token = VALUES(refresh_token),
 			jti = VALUES(jti)
 	`
-	_, err := db.Exec(query, userId, refreshToken, jti)
+	_, err := r.db.Exec(query, userId, refreshToken, jti)
 	return err
 }
 
-func RefreshTokenById(db *sql.DB, userId int) (string, string, error) {
+func (r *Repository) RefreshTokenById(userId int) (string, string, error) {
 	var token, jti string
 	query := `SELECT refresh_token, jti from refreshtokens WHERE user_id = ?`
-	err := db.QueryRow(query, userId).Scan(&token, &jti)
+	err := r.db.QueryRow(query, userId).Scan(&token, &jti)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to retrieve refresh token: %w", err)
 	}

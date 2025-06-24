@@ -1,13 +1,11 @@
 package service
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
 	"example.com/mygamelist/errorutils"
 	"example.com/mygamelist/interfaces"
-	"example.com/mygamelist/repository"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -43,10 +41,10 @@ func (s *Service) RegisterUser(username, email, password string) (int64, error) 
 	return userId, nil
 }
 
-func LoginUser(db *sql.DB, username, password string) (string, error) {
+func (s *Service) LoginUser(username, password string) (string, error) {
 	var secretKey = []byte("secret-key")
 	expirationTime := time.Now().Add(5 * time.Minute).Unix()
-	hashedPassword, err := repository.PasswordByUsername(db, username, password)
+	hashedPassword, err := s.PasswordByUsername(username, password)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve users password: %w", err)
 	}
@@ -64,15 +62,27 @@ func LoginUser(db *sql.DB, username, password string) (string, error) {
 
 }
 
-func StoreRefreshToken(db *sql.DB, username, refreshToken, jti string) error {
-	userId, err := repository.SelectUserIdByUsername(db, username)
+func (s *Service) StoreRefreshToken(username, refreshToken, jti string) error {
+	userId, err := s.SelectUserIdByUsername(username)
 	if err != nil {
 		return err
 	}
-	err = repository.InsertRefreshToken(db, userId, refreshToken, jti)
+	err = s.InsertRefreshToken(userId, refreshToken, jti)
 	if err != nil {
 		return fmt.Errorf("failed to insert refreshtoken: %w", err)
 	}
 
 	return nil
+}
+func (s *Service) FetchRefreshToken(username string) (string, error) {
+	userId, err := s.SelectUserIdByUsername(username)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch username: %w", err)
+		// http.Error(w, "failed to retrieve userId", http.StatusUnauthorized)
+	}
+	_, jtiFromDb, err := s.RefreshTokenById(userId)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch refreshtoken: %w", err)
+	}
+	return jtiFromDb, nil
 }
