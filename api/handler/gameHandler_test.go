@@ -12,6 +12,7 @@ import (
 	"example.com/mygamelist/handler"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 // MockAPI mocks the SearchGames method
@@ -55,7 +56,7 @@ var searchTestCases = []searchTestCase{
 		name:           "API returns 500 on error",
 		queryParam:     "errorcase",
 		mockResponse:   nil,
-		mockError:      errors.New("API failure"),
+		mockError:      errors.New("giantbomb return != 200"),
 		expectStatus:   http.StatusInternalServerError,
 		expectContains: "Failed to fetch gamedata",
 	},
@@ -91,21 +92,19 @@ func TestSearchHandler(t *testing.T) {
 			h := handler.NewGameHandler(mockAPI)
 
 			req, err := http.NewRequest(http.MethodGet, "/search?query="+url.QueryEscape(tt.queryParam), nil)
-			assert.NoError(t, err, "creating request should not fail")
+			require.Nil(t, err)
 			w := httptest.NewRecorder()
 
 			h.Search(w, req)
 
 			res := w.Result()
+			assert.NotNil(t, res)
 			defer res.Body.Close()
 
 			assert.Equal(t, tt.expectStatus, res.StatusCode, "Test %q: status code mismatch:", tt.name)
-			assert.Equal(t, "application/json", w.Header().Get("Content-Type"),
-				"Content type should be application json")
+			assert.Equal(t, "application/json", w.Header().Get("Content-Type"), "Content type should be application json")
 			bodyBytes, err := io.ReadAll(res.Body)
-			if err != nil {
-				t.Fatalf("failed to read response body: %v", err)
-			}
+			assert.Nil(t, err)
 
 			bodyStr := string(bodyBytes)
 			assert.Contains(t, bodyStr, tt.expectContains, "Test %q: response body missing expected substring:", tt.name)

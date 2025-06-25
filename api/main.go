@@ -28,6 +28,17 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// type AppHandler func(http.ResponseWriter, *http.Request) error
+
+// func WithErrorHandler(h AppHandler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		if err := h(w, r); err != nil {
+// 			log.Printf("handling %q: %v", r.RequestURI, err)
+// 			errorutils.WriteJSONError(w, "something went wrong", http.StatusInternalServerError)
+// 		}
+// 	})
+// }
+
 func main() {
 
 	err := godotenv.Load()
