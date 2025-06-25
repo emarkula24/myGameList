@@ -1,7 +1,16 @@
-CREATE TABLE IF NOT EXISTS profile (
-    id MEDIUMINT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(30) NOT NULL,
-    PRIMARY KEY (id)
+CREATE TABLE IF NOT EXISTS users (
+    user_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password CHAR(60) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id)
 );
 
-INSERT INTO profile (name) values ('profile 1');
+CREATE TABLE IF NOT EXISTS refreshtokens (
+    user_id INT UNSIGNED NOT NULL,
+    jti CHAR(36) NOT NULL UNIQUE,
+    refresh_token VARCHAR(512) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+)

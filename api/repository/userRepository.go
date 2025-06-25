@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"time"
 )
 
 type Repository struct {
@@ -34,8 +33,7 @@ func (r *Repository) SelectUserIdByUsername(username string) (int, error) {
 
 func (r *Repository) InsertUser(username, email, hashedPassword string) (int64, error) {
 
-	createdAt := time.Now()
-	result, err := r.db.Exec(`INSERT INTO users (username, email, password, created_at) VALUES (?,?,?,?)`, username, email, hashedPassword, createdAt)
+	result, err := r.db.Exec(`INSERT INTO users (username, email, password) VALUES (?,?,?)`, username, email, hashedPassword)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert user into database: %w", err)
 	}
