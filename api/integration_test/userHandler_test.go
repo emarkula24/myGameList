@@ -3,6 +3,7 @@ package integration_test
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -73,26 +74,39 @@ func TestMain(m *testing.M) {
 	testDB := SetupTestDatabase()
 	testDbInstance = testDB.DbInstance
 	defer testDB.TearDown()
+
 	os.Exit(m.Run())
 }
 
 func TestUserRegister(t *testing.T) {
+
 	repo := repository.NewRepository(testDbInstance)
 	service := service.NewUserService(repo)
 	h := handler.NewHandler(service)
 
+	mux := http.NewServeMux()
+	mux.HandleFunc("/register", h.Register)
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
 	body := `{
-		"username": "testuser",
-		"email": "testuser@example.com",
-		"password": "securepassword"
-	}`
-	rr := httptest.NewRecorder()
+			"username": "testuser",
+			"email": "testuser@example.com",
+			"password": "securepassword"
+		}`
 
-	req := httptest.NewRequest("POST", "/register", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	assert.Equal(t, rr.Code, http.StatusOK)
+	// Send HTTP POST to /register
+	resp, err := http.Post(server.URL+"/register", "application/json", strings.NewReader(body))
+	if err != nil {
+		t.Fatalf("failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
 
-	testHandler := http.HandlerFunc(h.Register)
-	testHandler.ServeHTTP(rr, req)
-
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+	var response struct {
+		UserID int64 `json:"user_id"`
+	}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	assert.NoError(t, err)
+	assert.Greater(t, response.UserID, int64(0))
 }
