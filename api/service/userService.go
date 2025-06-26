@@ -5,17 +5,21 @@ import (
 	"time"
 
 	"example.com/mygamelist/errorutils"
-	"example.com/mygamelist/repository"
+	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type UserService struct {
-	UserRepository *repository.Repository
+	UserRepository interfaces.UserRepository
+	AuthService    interfaces.AuthService
 }
 
-func NewUserService(repo *repository.Repository) *UserService {
-	return &UserService{UserRepository: repo}
+func NewUserService(repo interfaces.UserRepository, auth interfaces.AuthService) *UserService {
+	return &UserService{
+		UserRepository: repo,
+		AuthService:    auth,
+	}
 }
 func (s *UserService) RegisterUser(username, email, password string) (int64, error) {
 
@@ -28,7 +32,7 @@ func (s *UserService) RegisterUser(username, email, password string) (int64, err
 		return 0, errorutils.ErrUserExists
 	}
 
-	hashedPassword, err := utils.HashPassword(password)
+	hashedPassword, err := s.AuthService.HashPassword(password)
 	if err != nil {
 		return 0, fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -44,7 +48,7 @@ func (s *UserService) RegisterUser(username, email, password string) (int64, err
 func (s *UserService) LoginUser(username, password string) (string, error) {
 	var secretKey = []byte("secret-key")
 	expirationTime := time.Now().Add(5 * time.Minute).Unix()
-	hashedPassword, err := s.UserRepository.PasswordByUsername(username, password)
+	hashedPassword, err := s.UserRepository.PasswordByUsername(username)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve users password: %w", err)
 	}
