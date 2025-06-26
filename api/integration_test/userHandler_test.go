@@ -1,112 +1,118 @@
-package integration_test
+package integration
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"example.com/mygamelist/handler"
 	"example.com/mygamelist/repository"
+	"example.com/mygamelist/route"
 	"example.com/mygamelist/service"
+	"example.com/mygamelist/utils"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/mysql"
-	"github.com/testcontainers/testcontainers-go/wait"
+	"github.com/stretchr/testify/require"
 )
 
-var dbDSN string
-
-type TestDatabase struct {
-	DbInstance *sql.DB
-	container  testcontainers.Container
+type UserTestSuite struct {
+	DB      *sql.DB
+	Server  *httptest.Server
+	Router  *mux.Router
+	Handler *handler.UserHandler
 }
 
-func SetupTestDatabase() *TestDatabase {
+func NewUserTestSuite(db *sql.DB) *UserTestSuite {
+	repo := repository.NewRepository(db)
+	auth := utils.AuthService{}
+	svc := service.NewUserService(repo, auth)
+	h := handler.NewUserHandler(svc)
 
-	// setup db container
+	router := mux.NewRouter()
+	router = route.CreateUserSubrouter(router, h)
+	server := httptest.NewServer(router)
 
-	ctx := context.Background()
-
-	mysqlContainer, err := mysql.Run(ctx,
-		"mysql:8.0",
-		mysql.WithScripts(filepath.Join("../", "schema.sql")),
-		testcontainers.WithExposedPorts("3306/tcp"),
-		testcontainers.WithWaitStrategy(wait.ForExposedPort().WithStartupTimeout(300*time.Second)),
-	)
-	if err != nil {
-		log.Fatalf("failed to create container %s", err)
-	}
-	// Get DSN for sql.Open
-	dbDSN, err = mysqlContainer.ConnectionString(ctx)
-	if err != nil {
-		log.Fatalf("failed to get DSN: %s", err)
-	}
-	db, err := sql.Open("mysql", dbDSN)
-	if err != nil {
-		log.Fatal("failed to setup test", err)
-	}
-
-	return &TestDatabase{
-		container:  mysqlContainer,
-		DbInstance: db,
-	}
-}
-func (tdb *TestDatabase) TearDown() {
-	tdb.DbInstance.Close()
-	// remove test container
-	if err := testcontainers.TerminateContainer(tdb.container); err != nil {
-		log.Printf("failed to terminate container: %s", err)
+	return &UserTestSuite{
+		DB:      db,
+		Server:  server,
+		Handler: h,
 	}
 }
 
-var testDbInstance *sql.DB
+func (ts *UserTestSuite) Close() {
+	ts.Server.Close()
+}
+
+var (
+	testDbInstance *sql.DB
+	userTestSuite  *UserTestSuite
+)
 
 func TestMain(m *testing.M) {
 	testDB := SetupTestDatabase()
 	testDbInstance = testDB.DbInstance
+	userTestSuite = NewUserTestSuite(testDbInstance)
+
+	defer userTestSuite.Close()
 	defer testDB.TearDown()
 
 	os.Exit(m.Run())
 }
 
-func TestUserRegister(t *testing.T) {
-
-	repo := repository.NewRepository(testDbInstance)
-	service := service.NewUserService(repo)
-	h := handler.NewHandler(service)
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/register", h.Register)
-	server := httptest.NewServer(mux)
-	defer server.Close()
+func TestRegister(t *testing.T) {
 
 	body := `{
-			"username": "testuser",
-			"email": "testuser@example.com",
-			"password": "securepassword"
-		}`
+		"username": "testuser",
+		"email":    "testuser@example.com",
+		"password": "securepassword"
+	}`
 
 	// Send HTTP POST to /register
-	resp, err := http.Post(server.URL+"/register", "application/json", strings.NewReader(body))
-	if err != nil {
-		t.Fatalf("failed to send request: %v", err)
-	}
-	defer resp.Body.Close()
+	r, err := http.Post(userTestSuite.Server.URL+"/register", "application/json", strings.NewReader(body))
+	require.Nil(t, err)
+	assert.NotNil(t, r)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	assert.Equal(t, resp.StatusCode, http.StatusOK)
+	defer r.Body.Close()
 	var response struct {
 		UserID int64 `json:"user_id"`
 	}
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	assert.NoError(t, err)
+	err = json.NewDecoder(r.Body).Decode(&response)
+	require.Nil(t, err)
 	assert.Greater(t, response.UserID, int64(0))
+}
+
+// Tests Login endpoint, depends on Register test run finishing first.
+func TestLogin(t *testing.T) {
+	// Same body as the register test because there is no seeded data
+	body := `{
+ 		"username": "testuser",
+    	"password": "securepassword"
+	}`
+
+	r, err := http.Post(userTestSuite.Server.URL+"/login", "application/json", strings.NewReader(body))
+	require.Nil(t, err)
+	assert.NotNil(t, r)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+
+	defer r.Body.Close()
+
+	var response struct {
+		AccessToken string `json:"accessToken"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&response)
+	require.Nil(t, err)
+	assert.NotEmpty(t, response.AccessToken)
+}
+
+func TestRefresh(t *testing.T) {
+	body := `{
+ 		"username": "testuser"
+	}`
+
 }

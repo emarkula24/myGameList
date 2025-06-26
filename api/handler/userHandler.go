@@ -14,17 +14,17 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Defines dependencies for Handler struct
-type Handler struct {
+// Defines dependencies for UserHandler struct
+type UserHandler struct {
 	UserService *service.UserService
 }
 
-// Creates a new instance of Handler
-func NewHandler(us *service.UserService) *Handler {
-	return &Handler{UserService: us}
+// Creates a new instance of UserHandler
+func NewUserHandler(us *service.UserService) *UserHandler {
+	return &UserHandler{UserService: us}
 }
 
-func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
+func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 
 	if req.Header.Get("Content-Type") != "application/json" {
 		http.Error(w, "Unsupported Media Type", http.StatusUnsupportedMediaType)
@@ -65,7 +65,7 @@ func (h *Handler) Register(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(RegisterResponse{UserID: userId})
 }
 
-func (h *Handler) Login(w http.ResponseWriter, req *http.Request) {
+func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	type LoginRequest struct {
 		Username string `json:"username"`
@@ -114,7 +114,7 @@ func (h *Handler) Login(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken})
 }
 
-func (h *Handler) Refresh(w http.ResponseWriter, req *http.Request) {
+func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	type RefreshRequest struct {
 		Username string `json:"username"`
