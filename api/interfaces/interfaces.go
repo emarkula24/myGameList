@@ -9,6 +9,7 @@ type GiantBombClient interface {
 type AuthService interface {
 	HashPassword(password string) (string, error)
 }
+
 type UserRepository interface {
 	SelectUserByUsername(username string) (bool, error)
 	InsertUser(username, email, hashedPassword string) (int64, error)

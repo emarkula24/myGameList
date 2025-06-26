@@ -3,6 +3,7 @@ package integration
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -41,6 +42,7 @@ func NewUserTestSuite(db *sql.DB) *UserTestSuite {
 		DB:      db,
 		Server:  server,
 		Handler: h,
+		Router:  router,
 	}
 }
 
@@ -67,13 +69,13 @@ func TestMain(m *testing.M) {
 func TestRegister(t *testing.T) {
 
 	body := `{
-		"username": "testuser",
-		"email":    "testuser@example.com",
+		"username": "test",
+		"email":    "testregister@example.com",
 		"password": "securepassword"
 	}`
 
 	// Send HTTP POST to /register
-	r, err := http.Post(userTestSuite.Server.URL+"/register", "application/json", strings.NewReader(body))
+	r, err := http.Post(userTestSuite.Server.URL+"/user/register", "application/json", strings.NewReader(body))
 	require.Nil(t, err)
 	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
@@ -91,11 +93,11 @@ func TestRegister(t *testing.T) {
 func TestLogin(t *testing.T) {
 	// Same body as the register test because there is no seeded data
 	body := `{
- 		"username": "testuser",
+ 		"username": "test",
     	"password": "securepassword"
 	}`
 
-	r, err := http.Post(userTestSuite.Server.URL+"/login", "application/json", strings.NewReader(body))
+	r, err := http.Post(userTestSuite.Server.URL+"/user/login", "application/json", strings.NewReader(body))
 	require.Nil(t, err)
 	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
@@ -108,11 +110,62 @@ func TestLogin(t *testing.T) {
 	err = json.NewDecoder(r.Body).Decode(&response)
 	require.Nil(t, err)
 	assert.NotEmpty(t, response.AccessToken)
+
 }
 
 func TestRefresh(t *testing.T) {
-	body := `{
- 		"username": "testuser"
+	registerBody := `{
+		"username": "testrefresh",
+		"email":    "testrefresh@example.com",
+		"password": "123456778@M"
 	}`
+
+	loginBody := `{
+ 		"username": "testrefresh",
+		"password": "123456778@M"
+	}`
+
+	refreshBody := `{
+		"username": "testrefresh"
+	}`
+
+	r, err := http.Post(userTestSuite.Server.URL+"/user/register", "application/json", strings.NewReader(registerBody))
+	require.Nil(t, err)
+	require.NotNil(t, r)
+	r.Body.Close()
+	r, err = http.Post(userTestSuite.Server.URL+"/user/login", "application/json", strings.NewReader(loginBody))
+	require.Nil(t, err)
+	require.NotNil(t, r)
+
+	var response struct {
+		AccessToken string `json:"accessToken"`
+	}
+
+	cookies := r.Cookies()
+	err = json.NewDecoder(r.Body).Decode(&response)
+	require.Nil(t, err)
+	r.Body.Close()
+
+	client := userTestSuite.Server.Client()
+	refreshReq, err := http.NewRequest("POST", userTestSuite.Server.URL+"/user/refresh", strings.NewReader(refreshBody))
+	require.Nil(t, err)
+	refreshReq.Header.Set("Content-Type", "application/json")
+
+	for _, cookie := range cookies {
+		refreshReq.AddCookie(cookie)
+	}
+
+	r, err = client.Do(refreshReq)
+	require.Nil(t, err)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+	log.Println(r.Header)
+	defer r.Body.Close()
+
+	var refreshResponse struct {
+		AccessTokenFromRefresh string `json:"accessToken"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&refreshResponse)
+	require.Nil(t, err)
+	assert.NotEmpty(t, refreshResponse.AccessTokenFromRefresh)
 
 }

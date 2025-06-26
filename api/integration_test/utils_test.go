@@ -29,7 +29,7 @@ func SetupTestDatabase() *TestDatabase {
 		"mysql:8.0",
 		mysql.WithScripts(filepath.Join("../", "schema.sql")),
 		testcontainers.WithExposedPorts("3306/tcp"),
-		testcontainers.WithWaitStrategy(wait.ForExposedPort().WithStartupTimeout(500*time.Second)),
+		testcontainers.WithWaitStrategy(wait.ForExposedPort().WithStartupTimeout(120*time.Second)),
 	)
 	if err != nil {
 		log.Fatalf("failed to create container %s", err)
