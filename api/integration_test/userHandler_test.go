@@ -12,7 +12,7 @@ import (
 
 	"example.com/mygamelist/handler"
 	"example.com/mygamelist/repository"
-	"example.com/mygamelist/route"
+	"example.com/mygamelist/routes"
 	"example.com/mygamelist/service"
 	"example.com/mygamelist/utils"
 	_ "github.com/go-sql-driver/mysql"
@@ -35,7 +35,7 @@ func NewUserTestSuite(db *sql.DB) *UserTestSuite {
 	h := handler.NewUserHandler(svc)
 
 	router := mux.NewRouter()
-	router = route.CreateUserSubrouter(router, h)
+	router = routes.CreateUserSubrouter(router, h)
 	server := httptest.NewServer(router)
 
 	return &UserTestSuite{
@@ -56,6 +56,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+
 	testDB := SetupTestDatabase()
 	testDbInstance = testDB.DbInstance
 	userTestSuite = NewUserTestSuite(testDbInstance)

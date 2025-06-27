@@ -4,6 +4,7 @@ import "net/http"
 
 type GiantBombClient interface {
 	SearchGames(query string) (*http.Response, error)
+	SearchGame(guid string) (*http.Response, error)
 }
 
 type AuthService interface {

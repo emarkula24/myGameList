@@ -6,7 +6,7 @@ import (
 
 	"example.com/mygamelist/handler"
 	"example.com/mygamelist/repository"
-	"example.com/mygamelist/route"
+	"example.com/mygamelist/routes"
 	"example.com/mygamelist/service"
 	"example.com/mygamelist/utils"
 	"github.com/go-sql-driver/mysql"
@@ -70,8 +70,8 @@ func initializeServer() *mux.Router {
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 
-	route.CreateGameSubrouter(router, handlers.game)
-	route.CreateUserSubrouter(router, handlers.user)
+	routes.CreateGameSubrouter(router, handlers.game)
+	routes.CreateUserSubrouter(router, handlers.user)
 
 	return router
 }
