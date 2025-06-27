@@ -1,0 +1,39 @@
+.spinner {
+  display: inline-block;
+  padding-left: 12px;
+  padding-right: 12px;
+  animation: spin 1s linear infinite;
+  transition: opacity 0.5s ease;
+}
+
+.spinner.visible {
+  opacity: 1;
+}
+
+.spinner.hidden {
+  opacity: 0;
+  transition-delay: 0s !important;
+}
+
+/* Delay classes (extend as needed) */
+.delay-100 {
+  transition-delay: 100ms;
+}
+.delay-200 {
+  transition-delay: 200ms;
+}
+.delay-300 {
+  transition-delay: 300ms;
+}
+.delay-400 {
+  transition-delay: 400ms;
+}
+.delay-500 {
+  transition-delay: 500ms;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

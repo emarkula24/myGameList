@@ -37,3 +37,6 @@ export interface Game {
         publishers: Array<object>;
         
 }
+export interface LoginResponse {
+        accessToken: string;
+}

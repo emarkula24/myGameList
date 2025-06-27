@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import axios from 'axios'
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { LoginResponse } from './- types/types'
 
 export const Route = createFileRoute('/login')({
         component: Login,
@@ -16,7 +17,7 @@ function Login() {
         })
         const loginMutation = useMutation({
                 mutationFn: async (loginData: { username: string; password: string }) => {
-                        const response = await axios.post(`${url}/login`, loginData);
+                        const response = await axios.post<LoginResponse>(`${url}/login`, loginData);
                         return response.data;
                 },
                 onSuccess: (data) => {
