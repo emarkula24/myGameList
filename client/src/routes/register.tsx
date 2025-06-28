@@ -22,7 +22,7 @@ function Register() {
                 event.preventDefault()
                 try {
                         const response = await axios
-                                .post(`${url}/register`, {
+                                .post(`${url}/user/register`, {
                                         email: registerFormData.email,
                                         password: registerFormData.password,
                                         username: registerFormData.username,

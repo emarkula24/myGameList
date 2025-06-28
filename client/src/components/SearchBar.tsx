@@ -17,9 +17,9 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
         const [searchQuery, setSearchQuery] = useState("")
         const navigate = useNavigate({})
-        const debouncedSearchQuery = useDebounce(searchQuery, 500);
+        const debouncedSearchQuery = useDebounce(searchQuery, 150);
 
-        const { isFetched, isPending, isError, isSuccess, data, error } = useQuery({
+        const gameQuery = useQuery({
                 queryKey: ['games', debouncedSearchQuery],
                 queryFn: () => fetchGames(debouncedSearchQuery),
                 enabled: !!debouncedSearchQuery,
@@ -27,10 +27,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
         });
 
         useEffect(() => {
-                if (isSuccess) {
-                        setSearchResults(data)
+                if (gameQuery.isSuccess) {
+                        setSearchResults(gameQuery.data)
                 }
-        }, [data])
+                console.log("new content loaded")
+        }, [gameQuery.data])
 
         const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
                 setSearchQuery(event.currentTarget.value)
@@ -38,9 +39,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
 
         const handleEnterPress = (event: React.KeyboardEvent) => {
                 if (event.key === "Enter") {
-                        navigate({ to: "/games" })
+                        navigate({ to: "/results" })
                 }
-                
+
         }
 
         return (
@@ -54,34 +55,32 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
                                         value={searchQuery}
                                         onChange={handleInputChange}
                                         onKeyDown={handleEnterPress}
+                                        
                                 />
                         </label>
-                        { data?.length === 0 && isFetched? (
-                                <div>No results. </div>
-                        ) : isPending ? (
-                                <div>Loading..</div>
-                        ) : isError ? (
-                                <div>Error: {error.message}</div>
-                        ) : isFetched && data && data.length > 0 &&
-                        (
-                                <ul
-                                        style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                height: "600px",
-                                                overflowY: "scroll",
-                                                listStyleType: 'none',
-                                                padding: 0,
-                                                margin: 0,
-                                        }}
-                                >
-                                        {
-                                        data.map((game) => (
-                                                <SearchResult key={game.id}game={game} />
-                                        ))}
-                                </ul>
-                        ) 
-                        }
+                        <div>
+                                {gameQuery.isLoading ? (
+                                        "Loading..."
+                                ) : gameQuery.isFetched && gameQuery.data ?  (
+                                        <>
+                                                <ul
+                                                        style={{
+                                                                display: "flex",
+                                                                flexDirection: "column",
+                                                                height: "600px",
+                                                                overflowY: "scroll",
+                                                                listStyleType: 'none',
+                                                                padding: 0,
+                                                                margin: 0,
+                                                        }}
+                                                >
+                                                        {gameQuery.data?.map((game) => (
+                                                                <SearchResult key={game.id} game={game} />
+                                                        ))}
+                                                </ul>
+                                        </>
+                                ) : !gameQuery.isFetching && (<></>)}
+                        </div>
                 </div>
         )
 }

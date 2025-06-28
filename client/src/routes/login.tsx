@@ -1,44 +1,39 @@
-import { createFileRoute } from '@tanstack/react-router'
-import axios from 'axios'
-import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import type { LoginResponse } from '../types/types'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import React, { useState } from 'react'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/login')({
-        component: Login,
+        validateSearch: z.object({
+                redirect: z.string().optional(),
+        }),
+        component: LoginComponent,
 })
 
-const url = import.meta.env.VITE_BACKEND_URL
 
-function Login() {
+function LoginComponent() {
+        const router = useRouter()
+        const { auth, status } = Route.useRouteContext({
+                select: ({ auth }) => ({ auth, status: auth.status })
+        })
+        const search = Route.useSearch()
         const [loginFormData, setLoginFormData] = useState({
                 username: "",
                 password: "",
         })
-        const loginMutation = useMutation({
-                mutationFn: async (loginData: { username: string; password: string }) => {
-                        const response = await axios.post<LoginResponse>(`${url}/login`, loginData);
-                        return response.data;
-                },
-                onSuccess: (data) => {
-                        console.log(data)
-                        localStorage.setItem("token", data.accessToken)
-                        // AXIOS INTERCEPTOR FOR 401 CAN BE USED TO REFRESH
-                },
-                onError: (error) => {
 
-                        console.log(error)
-                },
-        });
-
-        const handleSubmit = (event: React.FormEvent) => {
+        const onSubmit = (event: React.FormEvent) => {
                 event.preventDefault();
-                loginMutation.mutate({
-                        username: loginFormData.username,
-                        password: loginFormData.password,
-                });
+                auth.login(loginFormData.username, loginFormData.password)
+                router.invalidate()
         };
-        function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+
+        React.useLayoutEffect(() => {
+                if (status === "loggedIn" && search.redirect) {
+                        router.history.push(search.redirect)
+                }
+        }, [status, search.redirect])
+
+        function onChange(event: React.ChangeEvent<HTMLInputElement>) {
                 setLoginFormData({
                         ...loginFormData,
                         [event.target.name]: event.target.value
@@ -49,22 +44,13 @@ function Login() {
                 <div>
                         <form className="formContainer">
                                 <label className="Label">Username:</label>
-                                <input name="username" value={loginFormData.username} onChange={handleChange} type="username" placeholder="Enter username" />
+                                <input name="username" value={loginFormData.username} onChange={onChange} type="text" placeholder="Enter username" />
                                 <label className="Label">Password:</label>
-                                <input name="password" value={loginFormData.password} onChange={handleChange} type="password" placeholder="Enter password" />
-                                <button onClick={handleSubmit} type="submit">Login</button>
+                                <input name="password" value={loginFormData.password} onChange={onChange} type="password" placeholder="Enter password" />
+                                <button onClick={onSubmit} type="submit">Login</button>
                         </form>
-                        {loginMutation.isPending ? (
-                                "logging in..."
-                        ) : (
-                                <>
-                                        {loginMutation.isError ? (
-                                                <div>failed to log in: {loginMutation.error.message}</div>
-                                        ) : null}
-
-                                        {loginMutation.isSuccess ? <div>login succeeded</div> : null}
-                                        </>
-                                        )}
-                                </div>
-                        )
+                        {auth.status === "loggedIn" && <p>logged in!</p>}
+                </div>
+                
+        )
 }

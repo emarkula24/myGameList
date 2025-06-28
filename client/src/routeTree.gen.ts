@@ -11,14 +11,22 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ResultsImport } from './routes/results'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
-import { Route as GamesImport } from './routes/games'
 import { Route as AboutImport } from './routes/about'
+import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
 import { Route as GamesGuidImport } from './routes/games.$guid'
+import { Route as AuthProfileImport } from './routes/_auth.profile'
 
 // Create/Update Routes
+
+const ResultsRoute = ResultsImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const RegisterRoute = RegisterImport.update({
   id: '/register',
@@ -32,15 +40,14 @@ const LoginRoute = LoginImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const GamesRoute = GamesImport.update({
-  id: '/games',
-  path: '/games',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -51,9 +58,15 @@ const IndexRoute = IndexImport.update({
 } as any)
 
 const GamesGuidRoute = GamesGuidImport.update({
-  id: '/$guid',
-  path: '/$guid',
-  getParentRoute: () => GamesRoute,
+  id: '/games/$guid',
+  path: '/games/$guid',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthProfileRoute = AuthProfileImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -67,18 +80,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/games': {
-      id: '/games'
-      path: '/games'
-      fullPath: '/games'
-      preLoaderRoute: typeof GamesImport
       parentRoute: typeof rootRoute
     }
     '/login': {
@@ -95,86 +108,128 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileImport
+      parentRoute: typeof AuthImport
+    }
     '/games/$guid': {
       id: '/games/$guid'
-      path: '/$guid'
+      path: '/games/$guid'
       fullPath: '/games/$guid'
       preLoaderRoute: typeof GamesGuidImport
-      parentRoute: typeof GamesImport
+      parentRoute: typeof rootRoute
     }
   }
 }
 
 // Create and export the route tree
 
-interface GamesRouteChildren {
-  GamesGuidRoute: typeof GamesGuidRoute
+interface AuthRouteChildren {
+  AuthProfileRoute: typeof AuthProfileRoute
 }
 
-const GamesRouteChildren: GamesRouteChildren = {
-  GamesGuidRoute: GamesGuidRoute,
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthProfileRoute: AuthProfileRoute,
 }
 
-const GamesRouteWithChildren = GamesRoute._addFileChildren(GamesRouteChildren)
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
-  '/games': typeof GamesRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/results': typeof ResultsRoute
+  '/profile': typeof AuthProfileRoute
   '/games/$guid': typeof GamesGuidRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
-  '/games': typeof GamesRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/results': typeof ResultsRoute
+  '/profile': typeof AuthProfileRoute
   '/games/$guid': typeof GamesGuidRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
-  '/games': typeof GamesRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/results': typeof ResultsRoute
+  '/_auth/profile': typeof AuthProfileRoute
   '/games/$guid': typeof GamesGuidRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/games' | '/login' | '/register' | '/games/$guid'
+  fullPaths:
+    | '/'
+    | ''
+    | '/about'
+    | '/login'
+    | '/register'
+    | '/results'
+    | '/profile'
+    | '/games/$guid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/games' | '/login' | '/register' | '/games/$guid'
+  to:
+    | '/'
+    | ''
+    | '/about'
+    | '/login'
+    | '/register'
+    | '/results'
+    | '/profile'
+    | '/games/$guid'
   id:
     | '__root__'
     | '/'
+    | '/_auth'
     | '/about'
-    | '/games'
     | '/login'
     | '/register'
+    | '/results'
+    | '/_auth/profile'
     | '/games/$guid'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRouteWithChildren
   AboutRoute: typeof AboutRoute
-  GamesRoute: typeof GamesRouteWithChildren
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  ResultsRoute: typeof ResultsRoute
+  GamesGuidRoute: typeof GamesGuidRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRouteWithChildren,
   AboutRoute: AboutRoute,
-  GamesRoute: GamesRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  ResultsRoute: ResultsRoute,
+  GamesGuidRoute: GamesGuidRoute,
 }
 
 export const routeTree = rootRoute
@@ -188,23 +243,25 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_auth",
         "/about",
-        "/games",
         "/login",
-        "/register"
+        "/register",
+        "/results",
+        "/games/$guid"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/_auth": {
+      "filePath": "_auth.tsx",
+      "children": [
+        "/_auth/profile"
+      ]
+    },
     "/about": {
       "filePath": "about.tsx"
-    },
-    "/games": {
-      "filePath": "games.tsx",
-      "children": [
-        "/games/$guid"
-      ]
     },
     "/login": {
       "filePath": "login.tsx"
@@ -212,9 +269,15 @@ export const routeTree = rootRoute
     "/register": {
       "filePath": "register.tsx"
     },
+    "/results": {
+      "filePath": "results.tsx"
+    },
+    "/_auth/profile": {
+      "filePath": "_auth.profile.tsx",
+      "parent": "/_auth"
+    },
     "/games/$guid": {
-      "filePath": "games.$guid.tsx",
-      "parent": "/games"
+      "filePath": "games.$guid.tsx"
     }
   }
 }

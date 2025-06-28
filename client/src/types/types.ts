@@ -39,4 +39,5 @@ export interface Game {
 }
 export interface LoginResponse {
         accessToken: string;
+        userId: number;
 }

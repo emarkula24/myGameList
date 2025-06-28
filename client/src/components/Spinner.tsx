@@ -1,4 +1,4 @@
-
+import "./Spinner.css"
 export function Spinner({
   show,
   wait,

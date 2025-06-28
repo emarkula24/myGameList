@@ -8,7 +8,7 @@ export class GamesNotFoundError extends Error { }
 // Fetches info on a game based on a guid
 export const fetchGame = async (guid: string) => {
     await new Promise((r) => setTimeout(r, 500))
-    const game = await axios
+    const game =  axios
         .get<{ results: Game }>(`${url}/games/game?guid=${guid}`)
         .then((r) => r.data.results)
         .catch((err) => {
@@ -24,10 +24,10 @@ export const fetchGames = async (searchQuery: string) => {
     const encodedSearchQuery = encodeURIComponent(searchQuery)
     await new Promise((r) => setTimeout(r, 500))
     return axios
-        .get<{ results: Games[] }>(`${url}/games?query=${searchQuery}`)
+        .get<{ results: Games[] }>(`${url}/games/search?query=${encodedSearchQuery}`)
         .then((response) => response.data.results)
         .catch((err) => {
-                        if (err.status === 500) {
+            if (err.status === 500) {
                 throw new GamesNotFoundError(`Games with query ${encodedSearchQuery} not found`)
             }
             throw err

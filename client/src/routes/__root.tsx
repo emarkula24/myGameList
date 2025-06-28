@@ -1,10 +1,19 @@
-import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Header from '../components/Header'
 import { QueryClient } from '@tanstack/react-query'
+import type { Auth } from '../utils/auth'
+import { Spinner } from '../components/Spinner'
+
+
+function RouterSpinner() {
+  const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
+  return <Spinner show={isLoading} />
+}
 
 export const Route = createRootRouteWithContext<{
+  auth: Auth
   queryClient: QueryClient
 }>()({
   component: RootComponent,
@@ -19,14 +28,15 @@ export const Route = createRootRouteWithContext<{
 })
 function RootComponent() {
   return (
-                        <>
-                        <div>
-                                < Header />
-                        </div>
-                        <hr />
-                        <Outlet />
-                        <TanStackRouterDevtools position="bottom-left" />
-                        <ReactQueryDevtools position="right" />
-                </>
+    <>
+      <div>
+        < Header />
+      </div>
+      < RouterSpinner />
+      <hr />
+      <Outlet />
+      <TanStackRouterDevtools position="bottom-left" />
+      <ReactQueryDevtools position="right" />
+    </>
   )
 }
