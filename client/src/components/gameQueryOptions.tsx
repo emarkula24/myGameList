@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { fetchGame } from "../../games";
+import { fetchGame } from "../games";
 
 export const gameQueryOptions = (guid: string)  => 
     queryOptions({

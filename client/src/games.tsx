@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Game } from "./routes/- types/types"
+import type { Game } from "./types/types"
 const url = import.meta.env.VITE_BACKEND_URL
 
 export class GameNotFoundError extends Error {}

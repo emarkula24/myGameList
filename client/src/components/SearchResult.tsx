@@ -1,4 +1,4 @@
-import { Games } from "../- types/types";
+import type { Games } from "../types/types";
 import { useNavigate } from "@tanstack/react-router";
 interface SearchResultProps {
     game: Games;

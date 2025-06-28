@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { gameQueryOptions } from './- components/gameQueryOptions'
+import { gameQueryOptions } from '../components/gameQueryOptions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 export const Route = createFileRoute('/game/$guid')({
   loader: ({ context: { queryClient }, params: { guid } }) => {

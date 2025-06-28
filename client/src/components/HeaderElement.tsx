@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { HeaderElementProps } from "../- types/types"
+import type { HeaderElementProps } from "../types/types";
 import styles from "./HeaderElement.module.css";
 
 // Component for elements inside the header

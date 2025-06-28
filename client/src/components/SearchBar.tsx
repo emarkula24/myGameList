@@ -2,9 +2,9 @@ import axios from "axios"
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import React, { useEffect, useState } from "react"
-import useDebounce from "../../hooks/useDebounce"
+import useDebounce from "../hooks/useDebounce"
 import styles from "./SearchBar.module.css"
-import { Games } from "../- types/types"
+import type { Games } from "../types/types"
 import { useNavigate } from "@tanstack/react-router"
 import SearchResult from "./SearchResult"
 

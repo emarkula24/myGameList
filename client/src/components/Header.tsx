@@ -1,5 +1,5 @@
 import HeaderElement from "./HeaderElement"
-import { Location, Games } from "../- types/types"
+import type { Location, Games } from "../types/types.ts"
 import styles from "./Header.module.css"
 import SearchBar from "./SearchBar"
 import { useState } from "react"
