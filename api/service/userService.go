@@ -45,15 +45,15 @@ func (s *UserService) RegisterUser(username, email, password string) (int64, err
 	return userId, nil
 }
 
-func (s *UserService) LoginUser(username, password string) (string, error) {
+func (s *UserService) LoginUser(username, password string) (string, int, error) {
 	var secretKey = []byte("secret-key")
 	expirationTime := time.Now().Add(5 * time.Minute).Unix()
 	hashedPassword, err := s.UserRepository.PasswordByUsername(username)
 	if err != nil {
-		return "", fmt.Errorf("failed to retrieve users password: %w", err)
+		return "", 0, fmt.Errorf("failed to retrieve password: %w", err)
 	}
 	if !utils.CheckPasswordHash(hashedPassword, password) {
-		return "", errorutils.ErrPasswordMatch
+		return "", 0, errorutils.ErrPasswordMatch
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
@@ -62,7 +62,12 @@ func (s *UserService) LoginUser(username, password string) (string, error) {
 
 	tokenString, err := token.SignedString(secretKey)
 
-	return tokenString, err
+	userId, err := s.UserRepository.SelectUserIdByUsername(username)
+	if err != nil {
+		return "", 0, fmt.Errorf("failed to retrieve user ID: %w", err)
+	}
+
+	return tokenString, userId, err
 
 }
 

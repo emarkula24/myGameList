@@ -79,7 +79,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		errorutils.WriteJSONError(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
-	jwtToken, err := h.UserService.LoginUser(loginReq.Username, loginReq.Password)
+	jwtToken, userId, err := h.UserService.LoginUser(loginReq.Username, loginReq.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, errorutils.ErrPasswordMatch):
@@ -94,6 +94,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	type LoginResponse struct {
 		AccessToken string `json:"accessToken"`
+		UserId      int    `json:"userId"`
 	}
 
 	refreshToken, jti, err := utils.GenerateRefreshToken(loginReq.Username)
@@ -111,7 +112,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, refreshTokenCookie)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken})
+	json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId})
 }
 
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {

@@ -107,6 +107,7 @@ func TestLogin(t *testing.T) {
 
 	var response struct {
 		AccessToken string `json:"accessToken"`
+		UserID      int    `json:"userId"`
 	}
 	err = json.NewDecoder(r.Body).Decode(&response)
 	require.Nil(t, err)

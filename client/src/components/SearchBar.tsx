@@ -1,4 +1,4 @@
-import axios from "axios"
+
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import React, { useEffect, useState } from "react"
@@ -7,8 +7,8 @@ import styles from "./SearchBar.module.css"
 import type { Games } from "../types/types"
 import { useNavigate } from "@tanstack/react-router"
 import SearchResult from "./SearchResult"
+import { fetchGames } from "../game"
 
-const url = import.meta.env.VITE_BACKEND_URL
 
 interface SearchBarProps {
         setSearchResults: React.Dispatch<React.SetStateAction<Games[]>>
@@ -18,23 +18,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
         const [searchQuery, setSearchQuery] = useState("")
         const navigate = useNavigate({})
         const debouncedSearchQuery = useDebounce(searchQuery, 500);
-
-
-
-        const fetchGames = async (searchQuery: string) => {
-
-                const encodedSearchQuery = encodeURIComponent(searchQuery)
-                console.info(`${url}/search?query=${encodedSearchQuery}`)
-                await new Promise((r) => setTimeout(r, 500))
-                return axios
-                        .get<{ results: Games[] }>(`${url}/games?query=${searchQuery}`)
-                        .then((response) => response.data.results)
-                        .catch((err) => {
-                                console.error('Error fetching games:', err);
-                                throw err
-                        })
-
-        }
 
         const { isFetched, isPending, isError, isSuccess, data, error } = useQuery({
                 queryKey: ['games', debouncedSearchQuery],
@@ -55,7 +38,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
 
         const handleEnterPress = (event: React.KeyboardEvent) => {
                 if (event.key === "Enter") {
-                        navigate({ to: "/results" })
+                        navigate({ to: "/games" })
                 }
                 
         }

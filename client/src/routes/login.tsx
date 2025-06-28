@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import axios from 'axios'
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { LoginResponse } from '../types/types'
+import type { LoginResponse } from '../types/types'
 
 export const Route = createFileRoute('/login')({
         component: Login,
