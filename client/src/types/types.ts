@@ -41,3 +41,7 @@ export interface LoginResponse {
         accessToken: string;
         userId: number;
 }
+
+export interface RegisterResponse {
+        user_id: number;
+}

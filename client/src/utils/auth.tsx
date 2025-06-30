@@ -1,13 +1,14 @@
 
 import axios from "axios"
-import type { LoginResponse } from "../types/types"
+import type { LoginResponse, RegisterResponse } from "../types/types"
 
 const url = import.meta.env.VITE_BACKEND_URL
 
 export class LoginFailedError extends Error { }
+export class RegisterFailedError extends Error { }
 
 export type Auth = {
-  login: (username: string, password: string) =>void
+  login: (username: string, password: string) => Promise<void>
   logout: () => void
   status: 'loggedOut' | 'loggedIn'
   username?: string
@@ -32,7 +33,7 @@ export const auth: Auth = {
 
 
 
-const postLogin = async (username: string, password: string ): Promise<LoginResponse> =>  {
+const postLogin = async (username: string, password: string): Promise<LoginResponse> => {
   const loginData = {
     "username": username,
     "password": password,
@@ -42,12 +43,34 @@ const postLogin = async (username: string, password: string ): Promise<LoginResp
     .post<LoginResponse>(`${url}/user/login`, loginData)
     .then((r) => r.data)
     .catch((err) => {
-      if (err.status === 401 || err.status === 404 || err.status === 500) {
+      const errStatus = err.response?.status
+      if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
         throw new LoginFailedError(`login failed for user ${username}`)
       }
       throw err
     })
-    
+
+  return response
+
+}
+
+export const postRegister = async (email: string, password: string, username: string): Promise<RegisterResponse> => {
+  const registerData = {
+    "email": email,
+    "password": password,
+    "username": username,
+  }
+  await new Promise((r) => setTimeout(r, 500))
+  const response = await axios
+    .post<RegisterResponse>(`${url}/user/register`, registerData)
+    .then((r) => r.data)
+    .catch((err) => {
+      const errStatus = err.response?.status
+      if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
+        throw new RegisterFailedError(`login failed for user ${username}`)
+      }
+      throw err
+    })
   return response
 
 }

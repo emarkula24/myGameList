@@ -6,7 +6,6 @@ export const Route = createFileRoute('/_auth/profile')({
 
 function ProfileComponent() {
   const { username } = Route.useRouteContext()
-
   return (
     <div className="p-2 space-y-2">
       <div>

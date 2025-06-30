@@ -1,17 +1,20 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import { z } from 'zod'
+import SubmitError from '../components/SubmitError'
 
 export const Route = createFileRoute('/login')({
         validateSearch: z.object({
                 redirect: z.string().optional(),
         }),
         component: LoginComponent,
+
 })
 
 
 function LoginComponent() {
         const router = useRouter()
+        const [error, setError] = React.useState<string | null>(null);
         const { auth, status } = Route.useRouteContext({
                 select: ({ auth }) => ({ auth, status: auth.status })
         })
@@ -21,10 +24,14 @@ function LoginComponent() {
                 password: "",
         })
 
-        const onSubmit = (event: React.FormEvent) => {
+        const onSubmit = async (event: React.FormEvent) => {
                 event.preventDefault();
-                auth.login(loginFormData.username, loginFormData.password)
-                router.invalidate()
+                try {
+                        await auth.login(loginFormData.username, loginFormData.password)
+                        router.invalidate()
+                } catch (err: any) {
+                        setError(err.message || 'Login failed');
+                }
         };
 
         React.useLayoutEffect(() => {
@@ -49,8 +56,9 @@ function LoginComponent() {
                                 <input name="password" value={loginFormData.password} onChange={onChange} type="password" placeholder="Enter password" />
                                 <button onClick={onSubmit} type="submit">Login</button>
                         </form>
+                        {error && <SubmitError err={error}/>}
                         {auth.status === "loggedIn" && <p>logged in!</p>}
                 </div>
-                
+
         )
 }

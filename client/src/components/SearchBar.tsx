@@ -4,19 +4,18 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import React, { useEffect, useState } from "react"
 import useDebounce from "../hooks/useDebounce"
 import styles from "./SearchBar.module.css"
-import type { Games } from "../types/types"
 import { useNavigate } from "@tanstack/react-router"
 import SearchResult from "./SearchResult"
 import { fetchGames } from "../game"
+import { useSearch } from '../hooks/useSearchContext'
 
 
-interface SearchBarProps {
-        setSearchResults: React.Dispatch<React.SetStateAction<Games[]>>
-}
 
-const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
+
+export default function SearchBar() {
         const [searchQuery, setSearchQuery] = useState("")
         const navigate = useNavigate({})
+        const { setSearchResults } = useSearch()
         const debouncedSearchQuery = useDebounce(searchQuery, 150);
 
         const gameQuery = useQuery({
@@ -84,5 +83,3 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchResults }) => {
                 </div>
         )
 }
-
-export default SearchBar

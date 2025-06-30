@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as ResultsImport } from './routes/results'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
+import { Route as CommunityImport } from './routes/community'
 import { Route as AboutImport } from './routes/about'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
@@ -37,6 +38,12 @@ const RegisterRoute = RegisterImport.update({
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CommunityRoute = CommunityImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -94,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -148,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
+  '/community': typeof CommunityRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
@@ -159,6 +174,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
+  '/community': typeof CommunityRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
@@ -171,6 +187,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
+  '/community': typeof CommunityRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
@@ -184,6 +201,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/about'
+    | '/community'
     | '/login'
     | '/register'
     | '/results'
@@ -194,6 +212,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/about'
+    | '/community'
     | '/login'
     | '/register'
     | '/results'
@@ -204,6 +223,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/about'
+    | '/community'
     | '/login'
     | '/register'
     | '/results'
@@ -216,6 +236,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
   AboutRoute: typeof AboutRoute
+  CommunityRoute: typeof CommunityRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ResultsRoute: typeof ResultsRoute
@@ -226,6 +247,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   AboutRoute: AboutRoute,
+  CommunityRoute: CommunityRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ResultsRoute: ResultsRoute,
@@ -245,6 +267,7 @@ export const routeTree = rootRoute
         "/",
         "/_auth",
         "/about",
+        "/community",
         "/login",
         "/register",
         "/results",
@@ -262,6 +285,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/community": {
+      "filePath": "community.tsx"
     },
     "/login": {
       "filePath": "login.tsx"

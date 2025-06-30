@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import axios from 'axios';
 import React, { useState } from 'react'
 import "../css/userForms.css"
-const url = import.meta.env.VITE_BACKEND_URL
+import { postRegister } from '../utils/auth';
+import SubmitError from '../components/SubmitError';
 
 
 export const Route = createFileRoute('/register')({
@@ -10,6 +10,7 @@ export const Route = createFileRoute('/register')({
 })
 
 function Register() {
+        const [error, setError] = React.useState<string | null>(null);
         const [registerFormData, setRegisterFormData] = useState({
                 username: "",
                 email: "",
@@ -18,19 +19,14 @@ function Register() {
 
         });
 
-        async function registerUser(event: React.FormEvent) {
+        async function handleSubmit(event: React.FormEvent) {
                 event.preventDefault()
                 try {
-                        const response = await axios
-                                .post(`${url}/user/register`, {
-                                        email: registerFormData.email,
-                                        password: registerFormData.password,
-                                        username: registerFormData.username,
-                                });
-                        console.log(response);
-                } catch (error) {
-                        console.log(error);
+                        await postRegister(registerFormData.email, registerFormData.password, registerFormData.username)
+                } catch (err: any) {
+                        setError(err.message || "Register failed.")
                 }
+
         }
 
         function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -51,8 +47,9 @@ function Register() {
                                 <input name="password" value={registerFormData.password} onChange={handleChange} type='password' placeholder='Enter Password' />
                                 <label className='Label'>Confirm Password:</label>
                                 <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm Password' />
-                                <button onClick={registerUser} type="submit" >Register</button>
+                                <button onClick={handleSubmit} type="submit" >Register</button>
                         </form>
+                        {error && <SubmitError err={error}/>}
                 </>
         )
 }

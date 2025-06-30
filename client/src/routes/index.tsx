@@ -7,7 +7,7 @@ function Index() {
         return (
                 <div style={{ padding: "2px" }}>
                         <h3>Welcome to myGameList!</h3>
-
+                        <p></p>
                 </div>
         )
 }

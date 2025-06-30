@@ -12,3 +12,5 @@ export const gamesQueryOptions = (query: string) =>
         queryKey: ["games", { query }],
         queryFn: () => fetchGames(query),
     })
+
+
