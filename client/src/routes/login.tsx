@@ -29,6 +29,7 @@ function LoginComponent() {
                 try {
                         await auth.login(loginFormData.username, loginFormData.password)
                         router.invalidate()
+                        router.navigate({to: "/"})
                 } catch (err: any) {
                         setError(err.message || 'Login failed');
                 }

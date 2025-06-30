@@ -32,15 +32,17 @@ function RootComponent() {
   const [searchResults, setSearchResults] = useState<Games[]>([])
   return (
     <>
+    <SearchContext.Provider value={{ searchResults, setSearchResults }}>
       <div>
-        <SearchContext.Provider value={{ searchResults, setSearchResults }}>
+        
           < Header />
-        </SearchContext.Provider>
+        
       </div>
       <hr />
       <Outlet />
       <TanStackRouterDevtools position="bottom-left" />
       <ReactQueryDevtools position="right" />
+      </SearchContext.Provider>
     </>
   )
 }

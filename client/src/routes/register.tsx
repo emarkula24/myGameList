@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import "../css/userForms.css"
 import { postRegister } from '../utils/auth';
@@ -10,6 +10,7 @@ export const Route = createFileRoute('/register')({
 })
 
 function Register() {
+        const router = useRouter()
         const [error, setError] = React.useState<string | null>(null);
         const [registerFormData, setRegisterFormData] = useState({
                 username: "",
@@ -23,6 +24,7 @@ function Register() {
                 event.preventDefault()
                 try {
                         await postRegister(registerFormData.email, registerFormData.password, registerFormData.username)
+                        router.navigate({to: "/login"})
                 } catch (err: any) {
                         setError(err.message || "Register failed.")
                 }
@@ -49,7 +51,7 @@ function Register() {
                                 <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm Password' />
                                 <button onClick={handleSubmit} type="submit" >Register</button>
                         </form>
-                        {error && <SubmitError err={error}/>}
+                        {error && <SubmitError err={error} />}
                 </>
         )
 }

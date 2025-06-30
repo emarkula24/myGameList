@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Games } from "../types/types";
 import { useNavigate } from "@tanstack/react-router";
 interface SearchResultProps {
@@ -6,7 +7,6 @@ interface SearchResultProps {
 
 const SearchResult: React.FC<SearchResultProps> = ({ game }) => {
     const navigate = useNavigate({})
-
     const guid = game.guid.toString()
     const onMouseClick = () => {
         navigate({
@@ -20,7 +20,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ game }) => {
         })
     }
     return (
-        <>
+        <> 
             <li
                 key={game.id}
                 onClick={onMouseClick}
@@ -28,6 +28,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ game }) => {
                     flex: '0 0 auto',
                     marginRight: '16px',
                 }}><img src={game.image?.icon_url} />{game.name}</li>
+        
         </>
     );
 };
