@@ -1,17 +1,6 @@
 import "./Spinner.css"
-export function Spinner({
-  show,
-  wait,
-}: {
-  show?: boolean
-  wait?: `delay-${number}`
-}) {
-    const isVisible = show ?? true
+export function Spinner() {
   return (
-    <div 
-    className={`spinner ${isVisible ? 'visible' : 'hidden'} ${wait ?? 'delay-300'}`}
-    >
-      ⍥
-    </div>
+    <div className="loader"></div>
   )
 }

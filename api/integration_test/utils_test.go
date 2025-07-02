@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -24,11 +25,11 @@ func SetupTestDatabase() *TestDatabase {
 	// setup db container
 
 	ctx := context.Background()
-
+	a := os.Getenv("TESTCONTAINER_ADDRESS")
 	mysqlContainer, err := mysql.Run(ctx,
 		"mysql:8.0",
 		mysql.WithScripts(filepath.Join("../", "schema.sql")),
-		testcontainers.WithExposedPorts("3306/tcp"),
+		testcontainers.WithExposedPorts(a),
 		testcontainers.WithWaitStrategy(wait.ForExposedPort().WithStartupTimeout(120*time.Second)),
 	)
 	if err != nil {

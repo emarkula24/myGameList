@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Games } from "../types/types";
 import { useNavigate } from "@tanstack/react-router";
 interface SearchResultProps {

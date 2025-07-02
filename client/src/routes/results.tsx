@@ -10,8 +10,8 @@ function RouteComponent() {
   return (
     <div>
       {searchResults.length > 0 ? (
-        searchResults.map((game, index) => (
-          <div key={index}>
+        searchResults.map((game) => (
+          <div key={game.id}>
             <h3>{game.name}</h3>
             <img src={game.image?.thumb_url} />
           </div>

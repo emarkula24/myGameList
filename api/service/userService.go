@@ -61,6 +61,9 @@ func (s *UserService) LoginUser(username, password string) (string, int, error) 
 	})
 
 	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return "", 0, fmt.Errorf("failed to sign token: %w", err)
+	}
 
 	userId, err := s.UserRepository.SelectUserIdByUsername(username)
 	if err != nil {

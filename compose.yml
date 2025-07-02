@@ -1,0 +1,49 @@
+services:
+  frontend:
+    container_name: mgl-frontend
+    build:
+      context: client/
+      dockerfile: frontend.Dockerfile
+    image: mgl-front
+    ports:
+      - ${CONTAINER_PORT_OUTER_FRONT}:${CONTAINER_PORT_INNER_FRONT}
+    env_file:
+      - ./client/.env.production
+    depends_on:
+      - backend
+    networks:
+      - mgl-net
+  backend:
+    container_name: mgl-backend
+    build:
+      context: api/
+      dockerfile: backend.Dockerfile
+    image: mgl-back
+    ports: 
+      - ${CONTAINER_PORT_OUTER_BACK}:${CONTAINER_PORT_INNER_BACK}
+    env_file:
+      - ./api/.env.production
+    depends_on:
+      - db
+    networks:
+      - mgl-net
+  db:
+    image: mysql:8.0
+    container_name: mgl-DB
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_TCP_PORT: ${MYSQL_TCP_PORT}
+    volumes:
+      - mgl-data:/var/lib/mysql
+    networks:
+      - mgl-net
+
+volumes:
+  mgl-data:
+networks:
+  mgl-net:
+    name: mgl-net
+    driver: bridge

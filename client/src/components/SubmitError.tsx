@@ -1,7 +1,10 @@
 
+type SubmitErrorProps = {
+  err: string | null;
+};
 
 
-export default function SubmitError({err}: any) {
+export default function SubmitError({err}:  SubmitErrorProps) {
     
 
 

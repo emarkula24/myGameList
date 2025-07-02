@@ -31,6 +31,7 @@ function gameErrorComponent({ error }: ErrorComponentProps) {
         onClick={() => {
           router.invalidate()
         }}
+        type="button"
       >
         retry
       </button>

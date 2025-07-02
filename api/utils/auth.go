@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"example.com/mygamelist/errorutils"
@@ -24,8 +25,9 @@ func CheckPasswordHash(hashed, password string) bool {
 }
 
 func VerifyToken(tokenString string) error {
-	var secretKey = []byte("secret-key")
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	k := os.Getenv("JWT_SECRET_KEY")
+	var secretKey = []byte(k)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return secretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
@@ -41,7 +43,8 @@ func VerifyToken(tokenString string) error {
 }
 
 func GenerateRefreshToken(username string) (string, string, error) {
-	var secretKey = []byte("secret-key")
+	k := os.Getenv("REFRESH_SECRET_KEY")
+	var secretKey = []byte(k)
 	expirationTime := time.Now().Add(7 * 24 * time.Hour).Unix()
 	jti := fmt.Sprintf("%s-%d", username, time.Now().UnixNano())
 

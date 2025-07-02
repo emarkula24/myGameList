@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, use } from 'react'
 import type { Games } from '../types/types'
 
 type SearchContextType = {
@@ -9,7 +9,7 @@ type SearchContextType = {
 export const SearchContext = createContext<SearchContextType | undefined>(undefined)
 
 export const useSearch = () => {
-  const ctx = useContext(SearchContext)
+  const ctx = use(SearchContext)
   if (!ctx) throw new Error('useSearch must be used within SearchProvider')
   return ctx
 }

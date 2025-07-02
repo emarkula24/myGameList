@@ -1,7 +1,8 @@
+# Database container for local development
 services:
   test:
     image: mysql:8.0
-    container_name: myGameList
+    container_name: myGameList_dev
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: test

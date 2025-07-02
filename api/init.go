@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	"example.com/mygamelist/handler"
 	"example.com/mygamelist/repository"
@@ -39,12 +40,16 @@ func setUpDependencies(db *sql.DB) *Handlers {
 
 func setUpDatabase() *sql.DB {
 
+	u := os.Getenv("MYSQL_USER")
+	p := os.Getenv("MYSQL_PASSWORD")
+	a := os.Getenv("MYSQL_ADDRESS")
+	n := os.Getenv("MYSQL_DATABASE")
 	cfg := mysql.NewConfig()
-	cfg.User = "mies"
-	cfg.Passwd = "mies"
+	cfg.User = u
+	cfg.Passwd = p
 	cfg.Net = "tcp"
-	cfg.Addr = "127.0.0.1:3308"
-	cfg.DBName = "test"
+	cfg.Addr = a
+	cfg.DBName = n
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
@@ -58,10 +63,16 @@ func setUpDatabase() *sql.DB {
 }
 
 func initializeServer() *mux.Router {
+	mode := os.Getenv("MODE")
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env variables")
+	// Development: load from file
+	if mode != "production" {
+		if err := godotenv.Load(".env"); err != nil {
+			log.Println("Warning: No .env file found, relying on external environment.")
+		}
+	} else {
+		// Optional: print loaded mode
+		log.Println("Running in production mode.")
 	}
 
 	db := setUpDatabase()

@@ -25,7 +25,7 @@ export default function SearchBar() {
     useEffect(() => {
         if (gameQuery.isSuccess) {
             setSearchResults(gameQuery.data);
-            setShowResults(true);
+            
         }
     }, [gameQuery.data]);
 
@@ -52,7 +52,11 @@ export default function SearchBar() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
+    useEffect(() => {
+        if (debouncedSearchQuery) {
+            setShowResults(true);
+        }
+    }, [debouncedSearchQuery])
     return (
         <div ref={containerRef} className={styles.searchResults}>
             <label>

@@ -45,3 +45,7 @@ export interface LoginResponse {
 export interface RegisterResponse {
         user_id: number;
 }
+
+export type SubmitErrorProps = {
+  err: string | null;
+};

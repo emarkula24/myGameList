@@ -14,7 +14,7 @@ const queryClient = new QueryClient()
 const router = createRouter({
         routeTree,
         defaultPendingComponent: () => (
-                <div className={`p-2 text-2xl`}>
+                <div>
                         <Spinner />
                 </div>
         ),

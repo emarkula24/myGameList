@@ -10,10 +10,9 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/rs/cors"
 )
-
-const port string = ":8080"
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +42,10 @@ func main() {
 	router := initializeServer()
 
 	frontUrl := os.Getenv("VITE_FRONTEND_URL")
+	if frontUrl == "" {
+		log.Fatal("VITE_FRONTEND_URL is not set")
+	}
+	port := os.Getenv("BACKEND_PORT")
 
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{frontUrl},
@@ -51,6 +54,7 @@ func main() {
 		AllowCredentials: true,
 	})
 	corsHandler := cors.Handler(router)
+	compressedHandler := handlers.CompressHandler(corsHandler)
 
 	srv := &http.Server{
 		Addr: port,
@@ -58,10 +62,14 @@ func main() {
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      corsHandler, // Pass our instance of gorilla/mux in.
+		Handler:      compressedHandler, // Pass our instance of gorilla/mux in.
 
 	}
-	fmt.Printf("running server on port %s \n", port)
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello from root"))
+	}).Methods("GET")
+
+	fmt.Printf("running server on port %s, address \n", port)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)

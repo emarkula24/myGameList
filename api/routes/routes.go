@@ -7,7 +7,7 @@ import (
 
 func CreateGameSubrouter(router *mux.Router, game *handler.GameHandler) *mux.Router {
 	s := router.PathPrefix("/games").Subrouter()
-	s.HandleFunc("/", game.Search).Methods("GET")
+	s.HandleFunc("/search", game.Search).Methods("GET")
 	s.HandleFunc("/game", game.SearchGame).Methods("GET")
 	return s
 }
