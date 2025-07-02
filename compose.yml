@@ -9,6 +9,7 @@ services:
       - ${CONTAINER_PORT_OUTER_FRONT}:${CONTAINER_PORT_INNER_FRONT}
     env_file:
       - ./client/.env.production
+    restart: always
     depends_on:
       - backend
     networks:
@@ -23,6 +24,7 @@ services:
       - ${CONTAINER_PORT_OUTER_BACK}:${CONTAINER_PORT_INNER_BACK}
     env_file:
       - ./api/.env.production
+    restart: always
     depends_on:
       - db
     networks:
@@ -30,6 +32,7 @@ services:
   db:
     image: mysql:8.0
     container_name: mgl-DB
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -38,6 +41,7 @@ services:
       MYSQL_TCP_PORT: ${MYSQL_TCP_PORT}
     volumes:
       - mgl-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - mgl-net
 
