@@ -68,7 +68,7 @@ func initializeServer() *mux.Router {
 	// Development: load from file
 	if mode != "production" {
 		if err := godotenv.Load(".env"); err != nil {
-			log.Println("Warning: No .env file found, relying on external environment.")
+			log.Println("Running in development mode, local .env file needed")
 		}
 	} else {
 		// Optional: print loaded mode

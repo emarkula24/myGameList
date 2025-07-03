@@ -69,7 +69,7 @@ func main() {
 		w.Write([]byte("Hello from root"))
 	}).Methods("GET")
 
-	fmt.Printf("running server on port %s, address \n", port)
+	fmt.Printf("running server on port %s \n", port)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
