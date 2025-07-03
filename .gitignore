@@ -28,3 +28,5 @@ client/env
 myGameList\client\.env
 go-database-test/
 .vscode
+
+cloudflare.ini

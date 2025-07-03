@@ -5,11 +5,9 @@ services:
       context: client/
       dockerfile: frontend.Dockerfile
     image: mgl-front
-    ports:
-      - ${CONTAINER_PORT_OUTER_FRONT}:${CONTAINER_PORT_INNER_FRONT}
     env_file:
       - ./client/.env.production
-    restart: always
+    restart: unless-stopped
     depends_on:
       - backend
     networks:
@@ -20,11 +18,9 @@ services:
       context: api/
       dockerfile: backend.Dockerfile
     image: mgl-back
-    ports: 
-      - ${CONTAINER_PORT_OUTER_BACK}:${CONTAINER_PORT_INNER_BACK}
     env_file:
       - ./api/.env.production
-    restart: always
+    restart: unless-stopped
     depends_on:
       - db
     networks:
@@ -32,7 +28,7 @@ services:
   db:
     image: mysql:8.0
     container_name: mgl-DB
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -44,9 +40,51 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - mgl-net
+  nginx:
+    image: "nginx:stable-alpine-slim"
+    container_name: "nginx"
+    hostname: "nginx"
+    restart: "unless-stopped"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot_etc:/etc/letsencrypt:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./.conf.d:/etc/nginx/conf.d
+      - ./ssl-dhparams.pem:/ssl-dhparams.pem
+      - ./log:/var/log/nginx
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - mgl-net
 
+  certbot:
+    image: certbot/dns-cloudflare
+    container_name: "nginx-certbot"
+    restart: "unless-stopped"
+    environment:
+    
+    env_file:
+      .env
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_lib:/var/lib/letsencrypt
+      - ./cloudflare.ini:/cloudflare.ini
+      - ./certbot-manager.sh:/certbot-manager.sh:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - mgl-net
+    entrypoint: ["/bin/sh", "/certbot-manager.sh"]
 volumes:
   mgl-data:
+  certbot_etc:
+    name: certbot_etc
+  certbot_lib:
+    name: certbot_lib
 networks:
   mgl-net:
     name: mgl-net
