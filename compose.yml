@@ -53,7 +53,7 @@ services:
       - certbot_etc:/etc/letsencrypt
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./.conf.d:/etc/nginx/conf.d
-      - ./ssl-dhparams.pem:/etc/letsencrypt/ssl-dhparams.pem
+      - ./ssl-dhparams.pem:/ssl-dhparams.pem
       - ./log:/var/log/nginx
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
