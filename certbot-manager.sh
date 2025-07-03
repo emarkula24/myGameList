@@ -28,8 +28,8 @@ if [ ! -f /etc/letsencrypt/live/tecronin.uk/fullchain.pem ]; then
         --agree-tos \
         --no-eff-email \
         --keep-until-expiring \
-        -d XXXXX.com \
-        -d *.XXXXX.com
+        -d mygamelist.xyz \
+        -d *.mygamelist.xyz
     
     if [ $? -eq 0 ]; then
         echo "Initial certificate obtained successfully!"

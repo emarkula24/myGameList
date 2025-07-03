@@ -65,8 +65,6 @@ services:
     image: certbot/dns-cloudflare
     container_name: "nginx-certbot"
     restart: "unless-stopped"
-    environment:
-    
     env_file:
       .env
     volumes:
