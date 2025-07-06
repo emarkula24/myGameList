@@ -42,7 +42,7 @@ services:
       - mgl-net
     ## need to create the params first by using openssl  dhparam  -out  ssl-dhparams.pem  2048
   nginx:
-    image: "nginx:stable-alpine-slim"
+    image: "nginx:stable"
     container_name: "mgl-nginx"
     hostname: "nginx"
     restart: "unless-stopped"
