@@ -1,4 +1,4 @@
--- Init file for production
+-- Init file for localhosting
 CREATE TABLE IF NOT EXISTS users (
     user_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     username VARCHAR(80) NOT NULL UNIQUE,
