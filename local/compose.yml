@@ -1,0 +1,57 @@
+# Application containers for localhost
+services:
+  frontend:
+    container_name: mgl-frontend
+    build:
+      context: ../client/
+      dockerfile: frontend.Dockerfile
+    image: mgl-front
+    env_file:
+      - ../client/.env
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - 3004:3004
+    networks:
+      - mgl-net
+  backend:
+    container_name: mgl-backend
+    build:
+      context: ../api/
+      dockerfile: backend.Dockerfile
+    image: mgl-back
+    env_file:
+      - ../api/.env
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+    networks:
+      - mgl-net
+  db:
+    image: mysql:8.0
+    container_name: mgl-DB
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_TCP_PORT: ${MYSQL_TCP_PORT}
+    volumes:
+      - mgl-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - mgl-net
+    ports:
+      - 3306:3306
+
+volumes:
+  mgl-data:
+
+networks:
+  mgl-net:
+    name: mgl-net
+    driver: bridge

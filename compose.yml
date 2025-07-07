@@ -1,3 +1,4 @@
+# Application containers for production
 services:
   frontend:
     container_name: mgl-frontend

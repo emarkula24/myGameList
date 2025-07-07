@@ -12,7 +12,7 @@ export default function SearchBar() {
     const [showResults, setShowResults] = useState(false);
     const navigate = useNavigate({});
     const { setSearchResults } = useSearch();
-    const debouncedSearchQuery = useDebounce(searchQuery, 150);
+    const debouncedSearchQuery = useDebounce(searchQuery, 1000);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     const gameQuery = useQuery({
