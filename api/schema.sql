@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     password CHAR(60) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     PRIMARY KEY (user_id)
-);
+)
 
 CREATE TABLE IF NOT EXISTS refreshtokens (
     user_id INT UNSIGNED NOT NULL,

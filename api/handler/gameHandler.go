@@ -98,11 +98,7 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		if cerr := response.Body.Close(); cerr != nil {
-			log.Printf("Failed to close response body: %v", cerr)
-		}
-	}()
+
 	if response.StatusCode != http.StatusOK {
 		log.Printf("Failed to fetch gamedata: %s", err)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
@@ -114,7 +110,12 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
-
+	err = response.Body.Close()
+	if err != nil {
+		log.Printf("Failed to fetch gamedata: %s", err)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		return
+	}
 	type GameJSON struct {
 		StatusCode int `json:"status_code"`
 	}

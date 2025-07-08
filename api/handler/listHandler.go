@@ -30,11 +30,13 @@ func (h *ListHandler) AddToList(w http.ResponseWriter, r *http.Request) {
 	if err := decoder.Decode(&listReq); err != nil {
 		log.Printf("Failed to insert game: %s", err)
 		errorutils.WriteJSONError(w, "Invalid JSON", http.StatusBadRequest)
+		return
 	}
 	err := h.ListService.AddGame(listReq.GameId, listReq.UserId, listReq.Status)
 	if err != nil {
 		log.Printf("Failed to insert game: %s", err)
 		errorutils.WriteJSONError(w, "Failed to add game to list", http.StatusInternalServerError)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

@@ -51,11 +51,13 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 		switch {
 		case errors.Is(err, errorutils.ErrUserExists):
 			errorutils.WriteJSONError(w, "User already exists", http.StatusBadRequest)
+			return
 		default:
 			log.Printf("Failed to register user: %s", err)
 			errorutils.WriteJSONError(w, "Error adding user: "+err.Error(), http.StatusInternalServerError)
+			return
 		}
-		return
+
 	}
 	type RegisterResponse struct {
 		UserID int64 `json:"user_id"`
@@ -67,6 +69,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Failed to register user: %s", err)
 		errorutils.WriteJSONError(w, "Error adding user: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -90,11 +93,12 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		case errors.Is(err, errorutils.ErrPasswordMatch):
 			log.Printf("Failed to login user: %s", err)
 			errorutils.WriteJSONError(w, "incorrect username or password", http.StatusUnauthorized)
+			return
 		default:
 			log.Printf("Failed to login user: %s", err)
 			errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+			return
 		}
-		return
 	}
 
 	type LoginResponse struct {
@@ -106,17 +110,20 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+		return
 	}
 	refreshTokenCookie, err := utils.CreateRefreshTokenCookie(refreshToken)
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+		return
 	}
 
 	err = h.UserService.StoreRefreshToken(loginReq.Username, refreshToken, jti)
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+		return
 	}
 	http.SetCookie(w, refreshTokenCookie)
 	w.Header().Set("Content-Type", "application/json")
@@ -125,6 +132,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+		return
 	}
 }
 
@@ -165,6 +173,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Failed to refresh, invalid user: %s", err)
 		errorutils.WriteJSONError(w, "invalid user", http.StatusUnauthorized)
+		return
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
