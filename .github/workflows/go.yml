@@ -24,7 +24,7 @@ jobs:
       
     - name: Install dependencies
       working-directory: ./api
-      run: go install.
+      run: go install .
     - name: Test
       working-directory: ./api
       run: go test -v ./...
