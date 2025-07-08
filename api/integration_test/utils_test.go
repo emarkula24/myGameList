@@ -70,7 +70,10 @@ func GetTestDataBase() (*TestDatabase, error) {
 }
 
 func (tdb *TestDatabase) TearDown() {
-	tdb.DbInstance.Close()
+	err := tdb.DbInstance.Close()
+	if err != nil {
+		log.Printf("failed to close dbinrance: %s", err)
+	}
 	// remove test container
 	if err := testcontainers.TerminateContainer(tdb.container); err != nil {
 		log.Printf("failed to terminate container: %s", err)

@@ -1,6 +1,10 @@
 package service
 
-import "example.com/mygamelist/repository"
+import (
+	"log"
+
+	"example.com/mygamelist/repository"
+)
 
 type ListService struct {
 	ListRepository *repository.ListRepository
@@ -11,6 +15,10 @@ func NewListService(repo *repository.ListRepository) *ListService {
 }
 
 func (s *ListService) AddGame(gameId, userId, status string) error {
-	s.ListRepository.InsertGame(gameId, userId, status)
+	err := s.ListRepository.InsertGame(gameId, userId, status)
+	if err != nil {
+		log.Printf("failed to add game %s", err)
+		return err
+	}
 	return nil
 }

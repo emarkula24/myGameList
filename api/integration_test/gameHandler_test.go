@@ -53,7 +53,7 @@ var searchTestCases = []searchTestCase{
 		mockResponse:   nil,
 		mockError:      errors.New("giantbomb return != 200"),
 		expectStatus:   http.StatusInternalServerError,
-		expectContains: "Failed to fetch gamedata",
+		expectContains: "failed to fetch gamedata",
 	},
 	{
 		name:       "API returns 500 on wrong-api-key error code",
@@ -64,7 +64,7 @@ var searchTestCases = []searchTestCase{
 		},
 		mockError:      nil,
 		expectStatus:   http.StatusInternalServerError,
-		expectContains: "Failed to fetch gamedata",
+		expectContains: "failed to fetch gamedata",
 	},
 	{
 		name:       "API return 404",
@@ -75,7 +75,7 @@ var searchTestCases = []searchTestCase{
 		},
 		mockError:      nil,
 		expectStatus:   http.StatusInternalServerError,
-		expectContains: "Failed to fetch gamedata",
+		expectContains: "failed to fetch gamedata",
 	},
 }
 
@@ -98,7 +98,8 @@ func TestSearch(t *testing.T) {
 
 			res := w.Result()
 			assert.NotNil(t, res)
-			defer res.Body.Close()
+			err = res.Body.Close()
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.expectStatus, res.StatusCode)
 			assert.Equal(t, "application/json", w.Header().Get("Content-Type"), "Content type should be application json")
@@ -193,11 +194,13 @@ func TestSearchGame(t *testing.T) {
 
 			res := w.Result()
 			assert.NotNil(t, res)
-			defer res.Body.Close()
 
+			require.NoError(t, err)
 			assert.Equal(t, tt.expectStatus, res.StatusCode)
 			assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
 			bodyBytes, err := io.ReadAll(res.Body)
+			require.NoError(t, err)
+			err = res.Body.Close()
 			require.NoError(t, err)
 
 			bodyStr := string(bodyBytes)

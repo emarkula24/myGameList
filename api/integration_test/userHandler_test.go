@@ -62,11 +62,12 @@ func TestRegister(t *testing.T) {
 	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	defer r.Body.Close()
 	var response struct {
 		UserID int64 `json:"user_id"`
 	}
 	err = json.NewDecoder(r.Body).Decode(&response)
+	require.NoError(t, err)
+	err = r.Body.Close()
 	require.NoError(t, err)
 	assert.Positive(t, response.UserID)
 }
@@ -84,13 +85,13 @@ func TestLogin(t *testing.T) {
 	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	defer r.Body.Close()
-
 	var response struct {
 		AccessToken string `json:"accessToken"`
 		UserID      int    `json:"userId"`
 	}
 	err = json.NewDecoder(r.Body).Decode(&response)
+	require.NoError(t, err)
+	err = r.Body.Close()
 	require.NoError(t, err)
 	assert.NotEmpty(t, response.AccessToken)
 
@@ -115,7 +116,8 @@ func TestRefresh(t *testing.T) {
 	r, err := http.Post(userTestSuite.Server.URL+"/user/register", "application/json", strings.NewReader(registerBody))
 	require.NoError(t, err)
 	require.NotNil(t, r)
-	r.Body.Close()
+	err = r.Body.Close()
+	require.NoError(t, err)
 	r, err = http.Post(userTestSuite.Server.URL+"/user/login", "application/json", strings.NewReader(loginBody))
 	require.NoError(t, err)
 	require.NotNil(t, r)
@@ -127,7 +129,8 @@ func TestRefresh(t *testing.T) {
 	cookies := r.Cookies()
 	err = json.NewDecoder(r.Body).Decode(&response)
 	require.NoError(t, err)
-	r.Body.Close()
+	err = r.Body.Close()
+	require.NoError(t, err)
 
 	client := userTestSuite.Server.Client()
 	refreshReq, err := http.NewRequest("POST", userTestSuite.Server.URL+"/user/refresh", strings.NewReader(refreshBody))
@@ -142,12 +145,13 @@ func TestRefresh(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 	log.Println(r.Header)
-	defer r.Body.Close()
 
 	var refreshResponse struct {
 		AccessTokenFromRefresh string `json:"accessToken"`
 	}
 	err = json.NewDecoder(r.Body).Decode(&refreshResponse)
+	require.NoError(t, err)
+	err = r.Body.Close()
 	require.NoError(t, err)
 	assert.NotEmpty(t, refreshResponse.AccessTokenFromRefresh)
 

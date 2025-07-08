@@ -3,6 +3,7 @@ package errorutils
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -17,8 +18,11 @@ func WriteJSONError(w http.ResponseWriter, message string, code int) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 
-	json.NewEncoder(w).Encode(map[string]any{
+	err := json.NewEncoder(w).Encode(map[string]any{
 		"error": message,
 		"code":  code,
 	})
+	if err != nil {
+		fmt.Printf("failed to encode error message %s", err)
+	}
 }

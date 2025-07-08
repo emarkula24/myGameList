@@ -31,23 +31,26 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	resp, err := h.Gbc.SearchGames(query)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
-	defer resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+	}
 
 	type GameJSON struct {
 		StatusCode int `json:"status_code"`
@@ -57,7 +60,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
@@ -72,16 +75,16 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {
 			log.Printf("failed to write response: %s", err)
-			errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+			errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 			return
 		}
 	case 100:
 		log.Printf("Invalid API key %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	default:
 		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 	}
 
 }
@@ -92,21 +95,25 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	response, err := h.Gbc.SearchGame(guid)
 	if err != nil {
 		log.Printf("failed to fetch game data %s:", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
+	defer func() {
+		if cerr := response.Body.Close(); cerr != nil {
+			log.Printf("Failed to close response body: %v", cerr)
+		}
+	}()
 	if response.StatusCode != http.StatusOK {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
-	defer response.Body.Close()
 
 	type GameJSON struct {
 		StatusCode int `json:"status_code"`
@@ -120,7 +127,7 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
@@ -130,15 +137,15 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {
 			log.Printf("failed to write response: %s", err)
-			errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+			errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 			return
 		}
 	case 100:
 		log.Printf("Invalid API key %s", err)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	default:
 		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
-		errorutils.WriteJSONError(w, "Failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 	}
 }

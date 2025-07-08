@@ -63,7 +63,11 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(RegisterResponse{UserID: userId})
+	err = json.NewEncoder(w).Encode(RegisterResponse{UserID: userId})
+	if err != nil {
+		log.Printf("Failed to register user: %s", err)
+		errorutils.WriteJSONError(w, "Error adding user: "+err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
@@ -109,11 +113,19 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
 	}
 
-	h.UserService.StoreRefreshToken(loginReq.Username, refreshToken, jti)
+	err = h.UserService.StoreRefreshToken(loginReq.Username, refreshToken, jti)
+	if err != nil {
+		log.Printf("Failed to login user: %s", err)
+		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+	}
 	http.SetCookie(w, refreshTokenCookie)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId})
+	err = json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId})
+	if err != nil {
+		log.Printf("Failed to login user: %s", err)
+		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
+	}
 }
 
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
@@ -184,11 +196,16 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 			})
 			tokenString, err := token.SignedString(secretKey)
 			if err != nil {
-				http.Error(w, "failed to sign key in refresh", http.StatusBadGateway)
+				log.Printf("Failed to sing refresh token: %s", err)
+				errorutils.WriteJSONError(w, "invalid refresh token", http.StatusUnauthorized)
 			}
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(RefreshResponse{AccessToken: tokenString})
+			err = json.NewEncoder(w).Encode(RefreshResponse{AccessToken: tokenString})
+			if err != nil {
+				log.Printf("Failed to sing refresh token: %s", err)
+				errorutils.WriteJSONError(w, "invalid refresh token", http.StatusUnauthorized)
+			}
 			fmt.Println("You look nice today")
 		case errors.Is(err, jwt.ErrTokenMalformed):
 			fmt.Println("That's not even a token")

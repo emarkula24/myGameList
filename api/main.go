@@ -65,9 +65,6 @@ func main() {
 		Handler:      compressedHandler, // Pass our instance of gorilla/mux in.
 
 	}
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello from root"))
-	}).Methods("GET")
 
 	fmt.Printf("running server on port %s \n", port)
 	go func() {
@@ -89,7 +86,10 @@ func main() {
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
-	srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		log.Fatal("failed to shutdown gracefully")
+	}
 	// Optionally, you could run srv.Shutdown in a goroutine and block on
 	// <-ctx.Done() if your application should wait for other services
 	// to finalize based on context cancellation.
