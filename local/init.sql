@@ -14,4 +14,4 @@ CREATE TABLE IF NOT EXISTS refreshtokens (
     refresh_token VARCHAR(512) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
-)
+);

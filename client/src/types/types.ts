@@ -26,6 +26,7 @@ export interface Games {
 }
 
 export interface Game {
+        id: number;
         name: string;
         deck: string;
         description: string;
@@ -35,6 +36,9 @@ export interface Game {
         original_release_data: string;
         platforms: Array<object>;
         publishers: Array<object>;
+        similar_games: Array<object>;
+        genres: Array<object>;
+
         
 }
 export interface LoginResponse {
