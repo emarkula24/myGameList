@@ -12,7 +12,7 @@ import (
 func TestMain(m *testing.M) {
 	err := godotenv.Load(filepath.Join("../", ".env"))
 	if err != nil {
-		log.Fatalf("No .env file found or failed to load: %v", err)
+		log.Println("No .env file found or failed to load:")
 	}
 
 	testDB, err := GetTestDataBase()
