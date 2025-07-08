@@ -152,7 +152,7 @@ var searchGameTestCases = []searchGameTestCase{
 		mockResponse:   nil,
 		mockError:      errors.New("giantbomb return != 200"),
 		expectStatus:   http.StatusInternalServerError,
-		expectContains: "Failed to fetch gamedata",
+		expectContains: "failed to fetch gamedata",
 	},
 	{
 		name: "API returns 500 on wrong-api-key error code",
@@ -163,7 +163,7 @@ var searchGameTestCases = []searchGameTestCase{
 		},
 		mockError:      nil,
 		expectStatus:   http.StatusInternalServerError,
-		expectContains: "Failed to fetch gamedata",
+		expectContains: "failed to fetch gamedata",
 	},
 	{
 		name: "API return 404",
@@ -174,7 +174,7 @@ var searchGameTestCases = []searchGameTestCase{
 		},
 		mockError:      nil,
 		expectStatus:   http.StatusInternalServerError,
-		expectContains: "Failed to fetch gamedata",
+		expectContains: "failed to fetch gamedata",
 	},
 }
 
