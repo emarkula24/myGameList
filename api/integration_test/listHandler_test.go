@@ -2,7 +2,9 @@ package integration_test
 
 import (
 	"database/sql"
+	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"example.com/mygamelist/handler"
@@ -10,6 +12,8 @@ import (
 	"example.com/mygamelist/routes"
 	"example.com/mygamelist/service"
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type ListTestSuite struct {
@@ -40,14 +44,14 @@ var listTestSuite *ListTestSuite
 
 func TestAddToList(t *testing.T) {
 
-	// body := `{
-	// 	"game_id":34126,
-	// 	"status":"playing",
-	// 	"user_id": "1"
-	// }`
+	body := `{
+		"game_id":34126,
+		"status":"playing",
+		"user_id": 1
+	}`
 
-	// r, err := http.Post(listTestSuite.Server.URL+"/list/add", "application/json", strings.NewReader(body))
-	// require.NoError(t, err)
-	// assert.NotNil(t, r)
-	// assert.Equal(t, http.StatusOK, r.StatusCode)
+	r, err := http.Post(listTestSuite.Server.URL+"/list/add", "application/json", strings.NewReader(body))
+	require.NoError(t, err)
+	assert.NotNil(t, r)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
 }

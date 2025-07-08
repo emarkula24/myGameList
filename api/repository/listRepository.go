@@ -13,7 +13,7 @@ func NewListRepository(Db *sql.DB) *ListRepository {
 	return &ListRepository{Db: Db}
 }
 
-func (r *ListRepository) InsertGame(gameId, userId, status string) error {
+func (r *ListRepository) InsertGame(gameId, userId int, status string) error {
 
 	query := `INSERT INTO games (game_id) VALUES (?) ON DUPLICATE KEY UPDATE game_id = game_id`
 	_, err := r.Db.Exec(query, gameId)

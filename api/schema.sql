@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     password CHAR(60) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     PRIMARY KEY (user_id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS refreshtokens (
     user_id INT UNSIGNED NOT NULL,
@@ -30,3 +30,5 @@ CREATE TABLE IF NOT EXISTS user_games (
     FOREIGN KEY (game_id) REFERENCES games(game_id)
 );
 
+INSERT INTO users (username, email, password, create_at)
+VALUES ('listaddtest', 'list@example.com', 'hashedpassword123', NOW());

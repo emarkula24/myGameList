@@ -20,9 +20,9 @@ func NewListHandler(ls *service.ListService) *ListHandler {
 func (h *ListHandler) AddToList(w http.ResponseWriter, r *http.Request) {
 
 	type ListRequest struct {
-		GameId string `json:"game_id"`
+		GameId int    `json:"game_id"`
 		Status string `json:"status"`
-		UserId string `json:"user_id"`
+		UserId int    `json:"user_id"`
 	}
 	var listReq ListRequest
 	decoder := json.NewDecoder(r.Body)
