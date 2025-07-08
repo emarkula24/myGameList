@@ -170,7 +170,7 @@ var searchGameTestCases = []searchGameTestCase{
 		guid: "404",
 		mockResponse: &http.Response{
 			StatusCode: http.StatusNotFound,
-			Body:       nil,
+			Body:       io.NopCloser(strings.NewReader("")),
 		},
 		mockError:      nil,
 		expectStatus:   http.StatusInternalServerError,
