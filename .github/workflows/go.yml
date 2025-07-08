@@ -23,7 +23,8 @@ jobs:
         cache-dependency-path: api/go.sum
       
     - name: Install dependencies
-      run: go get .
+      working-directory: ./api
+      run: go install.
     - name: Test
       working-directory: ./api
       run: go test -v ./...
