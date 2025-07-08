@@ -35,7 +35,7 @@ func SetupTestDatabase() {
 	mysqlContainer, err := mysql.Run(ctx,
 		"mysql:8.0",
 		mysql.WithScripts(filepath.Join("../", "schema.sql")),
-		testcontainers.WithExposedPorts("3306/tcp"),
+		testcontainers.WithExposedPorts("3360/tcp"),
 		testcontainers.WithWaitStrategy(wait.ForExposedPort().WithStartupTimeout(160*time.Second)),
 	)
 	if err != nil {
