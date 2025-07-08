@@ -1,4 +1,4 @@
-package integration
+package integration_test
 
 import (
 	"errors"
@@ -91,7 +91,7 @@ func TestSearch(t *testing.T) {
 			h := handler.NewGameHandler(mockAPI)
 
 			req, err := http.NewRequest(http.MethodGet, "/?query="+url.QueryEscape(tt.queryParam), nil)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			w := httptest.NewRecorder()
 
 			h.Search(w, req)
@@ -103,7 +103,7 @@ func TestSearch(t *testing.T) {
 			assert.Equal(t, tt.expectStatus, res.StatusCode)
 			assert.Equal(t, "application/json", w.Header().Get("Content-Type"), "Content type should be application json")
 			bodyBytes, err := io.ReadAll(res.Body)
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			bodyStr := string(bodyBytes)
 			assert.Contains(t, bodyStr, tt.expectContains)
@@ -186,7 +186,7 @@ func TestSearchGame(t *testing.T) {
 			h := handler.NewGameHandler(mockApi)
 
 			req, err := http.NewRequest(http.MethodGet, "/games/game?guid="+url.QueryEscape(tt.guid), nil)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			w := httptest.NewRecorder()
 
 			h.SearchGame(w, req)
@@ -198,7 +198,7 @@ func TestSearchGame(t *testing.T) {
 			assert.Equal(t, tt.expectStatus, res.StatusCode)
 			assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
 			bodyBytes, err := io.ReadAll(res.Body)
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			bodyStr := string(bodyBytes)
 			assert.Contains(t, bodyStr, tt.expectContains)

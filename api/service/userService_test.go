@@ -8,6 +8,7 @@ import (
 	"example.com/mygamelist/mocks"
 	"example.com/mygamelist/service"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MockHasher implements interfaces.PasswordHasher
@@ -97,11 +98,11 @@ func TestRegisterUser(t *testing.T) {
 			userID, err := svc.RegisterUser(tt.username, tt.email, tt.password)
 
 			if tt.expectedErrorStr != "" {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.expectedErrorStr)
 				assert.Equal(t, int64(0), userID)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.expectedUserID, userID)
 			}
 

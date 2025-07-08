@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"example.com/mygamelist/errorutils"
@@ -138,9 +139,9 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	}
 
 	tokenStr := cookie.Value
-
+	k := os.Getenv("REFRESH_SECRET_KEY")
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret-key"), nil
+		return []byte(k), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
 		log.Printf("Failed to refresh, invalid refresh token: %s", err)
@@ -174,7 +175,8 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	if jti == jtiFromDb {
 		switch {
 		case token.Valid:
-			var secretKey = []byte("secret-key")
+			k := os.Getenv("JWT_SECRET_KEY")
+			var secretKey = []byte(k)
 			expirationTime := time.Now().Add(5 * time.Minute).Unix()
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 				"username": refreshReq.Username,

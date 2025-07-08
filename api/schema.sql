@@ -14,4 +14,19 @@ CREATE TABLE IF NOT EXISTS refreshtokens (
     refresh_token VARCHAR(512) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
-)
+);
+
+CREATE TABLE IF NOT EXISTS games (
+    game_id INT UNSIGNED NOT NULL,
+    PRIMARY KEY (game_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_games (
+    user_id INT UNSIGNED NOT NULL,
+    game_id INT UNSIGNED NOT NULL,
+    status VARCHAR(120) NOT NULL,
+    PRIMARY KEY (user_id, game_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (game_id) REFERENCES games(game_id)
+);
+

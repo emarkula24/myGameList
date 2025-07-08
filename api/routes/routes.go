@@ -19,3 +19,8 @@ func CreateUserSubrouter(router *mux.Router, user *handler.UserHandler) *mux.Rou
 	return s
 
 }
+func CreateListSubRouter(router *mux.Router, list *handler.ListHandler) *mux.Router {
+	s := router.PathPrefix("/list").Subrouter()
+	s.HandleFunc("/add", list.AddToList).Methods("POST")
+	return s
+}
