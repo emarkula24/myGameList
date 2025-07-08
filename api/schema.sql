@@ -30,5 +30,5 @@ CREATE TABLE IF NOT EXISTS user_games (
     FOREIGN KEY (game_id) REFERENCES games(game_id)
 );
 
-INSERT INTO users (username, email, password, create_at)
+INSERT INTO users (username, email, password, created_at)
 VALUES ('listaddtest', 'list@example.com', 'hashedpassword123', NOW());
