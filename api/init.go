@@ -18,20 +18,25 @@ import (
 type Handlers struct {
 	user *handler.UserHandler
 	game *handler.GameHandler
+	list *handler.ListHandler
 }
 
 func setUpDependencies(db *sql.DB) *Handlers {
 	client := &service.GiantBombClient{}
 	auth := &utils.AuthService{}
-	repo2 := repository.NewRepository(db)
-	service := service.NewUserService(repo2, auth)
+	repo := repository.NewRepository(db)
+	listRepo := repository.NewListRepository(db)
+	userService := service.NewUserService(repo, auth)
+	listService := service.NewListService(listRepo)
 
-	userHandler := handler.NewUserHandler(service)
+	userHandler := handler.NewUserHandler(userService)
 	gameHandler := handler.NewGameHandler(client)
+	listHandler := handler.NewListHandler(listService)
 
 	handlers := &Handlers{
 		user: userHandler,
 		game: gameHandler,
+		list: listHandler,
 	}
 
 	return handlers
@@ -83,6 +88,7 @@ func initializeServer() *mux.Router {
 
 	routes.CreateGameSubrouter(router, handlers.game)
 	routes.CreateUserSubrouter(router, handlers.user)
+	routes.CreateListSubRouter(router, handlers.list)
 
 	return router
 }
