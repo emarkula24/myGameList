@@ -127,7 +127,6 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	}
 	http.SetCookie(w, refreshTokenCookie)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId})
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
@@ -209,7 +208,6 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 				errorutils.WriteJSONError(w, "invalid refresh token", http.StatusUnauthorized)
 			}
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
 			err = json.NewEncoder(w).Encode(RefreshResponse{AccessToken: tokenString})
 			if err != nil {
 				log.Printf("Failed to sing refresh token: %s", err)

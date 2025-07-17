@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS games (
 );
 
 CREATE TABLE IF NOT EXISTS user_games (
-    user_id INT UNSIGNED NOT NULL,
+    username VARCHAR(80) NOT NULL,
     game_id INT UNSIGNED NOT NULL,
     status VARCHAR(120) NOT NULL,
-    PRIMARY KEY (user_id, game_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    PRIMARY KEY (username, game_id),
+    FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (game_id) REFERENCES games(game_id)
 );
 

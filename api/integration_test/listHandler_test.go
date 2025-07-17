@@ -47,11 +47,29 @@ func TestAddToList(t *testing.T) {
 	body := `{
 		"game_id":34126,
 		"status":"playing",
-		"user_id": 1
+		"username": "mies"
 	}`
 
 	r, err := http.Post(listTestSuite.Server.URL+"/list/add", "application/json", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
+}
+
+func TestUpdateList(t *testing.T) {
+	body := `{
+		"game_id":34126,
+		"status":"completed",
+		"username":"mies"
+	}`
+	client := listTestSuite.Server.Client()
+	updateReq, err := http.NewRequest("PUT", listTestSuite.Server.URL+"list/update", strings.NewReader(body))
+	require.NoError(t, err)
+	assert.NotNil(t, updateReq)
+	updateReq.Header.Set("Content-Type", "application/json")
+
+	updateResp, err := client.Do(updateReq)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, updateResp.StatusCode)
+
 }
