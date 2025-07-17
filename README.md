@@ -54,9 +54,7 @@ Frontend testing will begin shortly, testing will be conducted using Vitest and 
 ## Design Philosophy
 The main goal of this project was to improve as a software developer.
 
-I wanted to create something useful and do deployment, pipelines, and architecture from scratch while properly testing all the application features. The main concern when designing the application
-was building it in scalable and testable way with little code repeated. 
+I wanted to create something useful and do deployment, pipelines, and architecture from scratch while properly testing all the application features. The main concern when designing the applicationwas building it in scalable and testable way with little code repeated. 
 
-On the backend, TDD development style was adopted after figuring out the architecture and Go way of coding. 
-For CI/CD pipelines, I decided to use GitLab because the workflow was compatible with my self hosted deployment solution.
+On the backend, TDD development style was adopted after figuring out the architecture and Go way of coding. I decided to not implement many unit tests because of the simplicity of the API endpoints. For CI/CD pipelines, I decided to use GitLab because the workflow was compatible with my self hosted deployment solution.
 
