@@ -41,6 +41,10 @@ export interface Game {
 
         
 }
+export interface GameListEntry {
+        id: number;
+        status: string;
+}
 export interface LoginResponse {
         accessToken: string;
         userId: number;

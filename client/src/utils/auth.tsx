@@ -12,6 +12,7 @@ export type Auth = {
   logout: () => void
   status: 'loggedOut' | 'loggedIn'
   username?: string
+  userId?: string 
 }
 export const auth: Auth = {
   status: 'loggedOut',
@@ -19,13 +20,13 @@ export const auth: Auth = {
   login: async (username: string, password: string) => {
     const user = await postLogin(username, password)
     localStorage.setItem('accessToken', user.accessToken)
-    localStorage.setItem('userId', user.userId.toString())
+    auth.userId = user.userId.toString()
     auth.status = 'loggedIn'
     auth.username = username
   },
   logout: () => {
     localStorage.removeItem('accessToken')
-    localStorage.removeItem('userId')
+    auth.userId = undefined
     auth.status = 'loggedOut'
     auth.username = undefined
   },

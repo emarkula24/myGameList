@@ -19,6 +19,7 @@ import { Route as AboutImport } from './routes/about'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
 import { Route as GamesGuidImport } from './routes/games.$guid'
+import { Route as GamelistUsernameImport } from './routes/gamelist.$username'
 import { Route as AuthProfileImport } from './routes/_auth.profile'
 
 // Create/Update Routes
@@ -67,6 +68,12 @@ const IndexRoute = IndexImport.update({
 const GamesGuidRoute = GamesGuidImport.update({
   id: '/games/$guid',
   path: '/games/$guid',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GamelistUsernameRoute = GamelistUsernameImport.update({
+  id: '/gamelist/$username',
+  path: '/gamelist/$username',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -136,6 +143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthProfileImport
       parentRoute: typeof AuthImport
     }
+    '/gamelist/$username': {
+      id: '/gamelist/$username'
+      path: '/gamelist/$username'
+      fullPath: '/gamelist/$username'
+      preLoaderRoute: typeof GamelistUsernameImport
+      parentRoute: typeof rootRoute
+    }
     '/games/$guid': {
       id: '/games/$guid'
       path: '/games/$guid'
@@ -167,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
   '/profile': typeof AuthProfileRoute
+  '/gamelist/$username': typeof GamelistUsernameRoute
   '/games/$guid': typeof GamesGuidRoute
 }
 
@@ -179,6 +194,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
   '/profile': typeof AuthProfileRoute
+  '/gamelist/$username': typeof GamelistUsernameRoute
   '/games/$guid': typeof GamesGuidRoute
 }
 
@@ -192,6 +208,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/results': typeof ResultsRoute
   '/_auth/profile': typeof AuthProfileRoute
+  '/gamelist/$username': typeof GamelistUsernameRoute
   '/games/$guid': typeof GamesGuidRoute
 }
 
@@ -206,6 +223,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/results'
     | '/profile'
+    | '/gamelist/$username'
     | '/games/$guid'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -217,6 +235,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/results'
     | '/profile'
+    | '/gamelist/$username'
     | '/games/$guid'
   id:
     | '__root__'
@@ -228,6 +247,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/results'
     | '/_auth/profile'
+    | '/gamelist/$username'
     | '/games/$guid'
   fileRoutesById: FileRoutesById
 }
@@ -240,6 +260,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ResultsRoute: typeof ResultsRoute
+  GamelistUsernameRoute: typeof GamelistUsernameRoute
   GamesGuidRoute: typeof GamesGuidRoute
 }
 
@@ -251,6 +272,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ResultsRoute: ResultsRoute,
+  GamelistUsernameRoute: GamelistUsernameRoute,
   GamesGuidRoute: GamesGuidRoute,
 }
 
@@ -271,6 +293,7 @@ export const routeTree = rootRoute
         "/login",
         "/register",
         "/results",
+        "/gamelist/$username",
         "/games/$guid"
       ]
     },
@@ -301,6 +324,9 @@ export const routeTree = rootRoute
     "/_auth/profile": {
       "filePath": "_auth.profile.tsx",
       "parent": "/_auth"
+    },
+    "/gamelist/$username": {
+      "filePath": "gamelist.$username.tsx"
     },
     "/games/$guid": {
       "filePath": "games.$guid.tsx"

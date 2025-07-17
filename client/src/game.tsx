@@ -1,9 +1,10 @@
 import axios from "axios"
-import type { Game, Games } from "./types/types"
+import { type GameListEntry, type Game, type Games } from "./types/types"
 const url = import.meta.env.VITE_BACKEND_URL
 
 export class GameNotFoundError extends Error { }
 export class GamesNotFoundError extends Error { }
+export class GameListNotFoundError extends Error { }
 
 // Fetches info on a game based on a guid
 export const fetchGame = async (guid: string) => {
@@ -33,4 +34,19 @@ export const fetchGames = async (searchQuery: string) => {
             throw err
         })
 
+}
+
+export const fetchGameList = async (username: string) => {
+    
+    await new Promise((r) => setTimeout(r, 500))
+    return axios
+        .get<GameListEntry[]>(`${url}/list?username=${username}`)
+        .then((response) => response.data)
+        .catch((err) => {
+            const errStatus = err.response?.status
+            if (errStatus === 500 || errStatus == 404) {
+                throw new GameListNotFoundError(`no gamelist found for user`)
+            }
+            throw err
+        })
 }
