@@ -6,20 +6,24 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"example.com/mygamelist/errorutils"
 	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/utils"
+	"github.com/patrickmn/go-cache"
 )
 
 // Defines dependencies for GameHandler struct
 type GameHandler struct {
-	Gbc interfaces.GiantBombClient
+	Gbc   interfaces.GiantBombClient
+	Cache *cache.Cache
 }
 
 // Creates a new instance of GameHandler
 func NewGameHandler(gbc interfaces.GiantBombClient) *GameHandler {
-	return &GameHandler{Gbc: gbc}
+	c := cache.New(10*time.Minute, 15*time.Minute)
+	return &GameHandler{Gbc: gbc, Cache: c}
 }
 
 // GET /games/?query=string
@@ -28,6 +32,16 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
 	query := req.URL.Query().Get("query")
 	query = utils.ParseSearchQuery(query)
+
+	if cachedResp, found := h.Cache.Get(query); found {
+		log.Print("used the cache")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write(cachedResp.([]byte)); err != nil {
+			log.Printf("failed to write cached response: %s", err)
+		}
+		return
+	}
 	resp, err := h.Gbc.SearchGames(query)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
@@ -71,6 +85,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
 	switch gameJSON.StatusCode {
 	case 1:
+		h.Cache.Set(query, bodyBytes, cache.DefaultExpiration)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {
@@ -92,6 +107,17 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 // Requests GameBomb API for the information of a game-entry based on GUID, and relays it to the client.
 func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	guid := req.URL.Query().Get("guid")
+
+	if cachedResp, found := h.Cache.Get(guid); found {
+		log.Print("used the cache")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write(cachedResp.([]byte)); err != nil {
+			log.Printf("failed to write cached response: %s", err)
+		}
+		return
+	}
+
 	response, err := h.Gbc.SearchGame(guid)
 	if err != nil {
 		log.Printf("failed to fetch game data %s:", err)
@@ -134,6 +160,7 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 
 	switch gameJSON.StatusCode {
 	case 1:
+		h.Cache.Set(guid, bodyBytes, cache.DefaultExpiration)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {

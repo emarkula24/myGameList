@@ -17,6 +17,8 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/mysql v0.37.0
 )
 
+require github.com/patrickmn/go-cache v2.1.0+incompatible
+
 require (
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
