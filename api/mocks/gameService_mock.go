@@ -3,6 +3,7 @@ package mocks
 import (
 	"net/http"
 
+	"example.com/mygamelist/repository"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -20,5 +21,9 @@ func (m *GameServiceMock) SearchGames(query string) (*http.Response, error) {
 
 func (m *GameServiceMock) SearchGame(guid string) (*http.Response, error) {
 	args := m.Called(guid)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
+func (m *GameServiceMock) SearchGameList(games []repository.Game, limit int) (*http.Response, error) {
+	args := m.Called(games, limit)
 	return args.Get(0).(*http.Response), args.Error(1)
 }

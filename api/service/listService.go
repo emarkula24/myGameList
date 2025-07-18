@@ -3,16 +3,19 @@ package service
 import (
 	"fmt"
 	"log"
+	"net/http"
 
+	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/repository"
 )
 
 type ListService struct {
 	ListRepository *repository.ListRepository
+	Cbc            interfaces.GiantBombClient
 }
 
-func NewListService(repo *repository.ListRepository) *ListService {
-	return &ListService{ListRepository: repo}
+func NewListService(repo *repository.ListRepository, client interfaces.GiantBombClient) *ListService {
+	return &ListService{ListRepository: repo, Cbc: client}
 }
 
 func (s *ListService) PostGame(gameId int, username, status string) error {
@@ -33,11 +36,17 @@ func (s *ListService) PutGame(gameId int, username, status string) error {
 	return nil
 }
 
-func (s *ListService) GetGameList(username string) ([]repository.Game, error) {
-	gamelist, err := s.ListRepository.FetchGames(username)
+func (s *ListService) GetGameList(username string, page, limit int) (*http.Response, []repository.Game, error) {
+	gamelist, err := s.ListRepository.FetchGames(username, page, limit)
 	if err != nil {
 		log.Printf("failed to fetch gamelist from database %s", err)
-		return nil, fmt.Errorf("%w", err)
+		return nil, nil, fmt.Errorf("%w", err)
 	}
-	return gamelist, nil
+	fullGameList, err := s.Cbc.SearchGameList(gamelist, limit)
+	if err != nil {
+		log.Printf("failed to fetch gamelistdata from gamebomb %s", err)
+		return nil, nil, fmt.Errorf("%w", err)
+	}
+	return fullGameList, gamelist, nil
+
 }

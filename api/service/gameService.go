@@ -3,7 +3,12 @@ package service
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
+	"strings"
+
+	"example.com/mygamelist/repository"
 )
 
 type GiantBombClient struct{}
@@ -21,4 +26,41 @@ func (c *GiantBombClient) SearchGame(guid string) (*http.Response, error) {
 	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 	url := "https://www.giantbomb.com/api/game/" + guid + "/?api_key=" + apiKey + "&format=json"
 	return http.Get(url)
+}
+
+func (c *GiantBombClient) SearchGameList(games []repository.Game, limit int) (*http.Response, error) {
+	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
+	baseURL := "https://www.giantbomb.com/api/games/"
+	fields := "id,name,original_release_date,image"
+	var ids []string
+	for _, game := range games {
+		idStr := strconv.Itoa(game.GameID)
+		ids = append(ids, idStr)
+	}
+
+	filter := BuildUrl(ids, limit)
+	params := url.Values{}
+	params.Set("api_key", apiKey)
+	params.Set("format", "json")
+	params.Set("field_list", fields)
+	params.Set("filter", filter)
+
+	url := baseURL + "?" + params.Encode()
+	return http.Get(url)
+}
+
+func BuildUrl(ids []string, limit int) string {
+	if len(ids) == 0 {
+		return ""
+	}
+	if limit <= 0 {
+		limit = len(ids)
+	}
+	// Return the first N IDs joined by pipe
+	chunk := ids
+	if len(ids) > limit {
+		chunk = ids[:limit]
+	}
+	filter := "id:" + strings.Join(chunk, "|")
+	return filter
 }

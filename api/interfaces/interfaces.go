@@ -1,10 +1,15 @@
 package interfaces
 
-import "net/http"
+import (
+	"net/http"
+
+	"example.com/mygamelist/repository"
+)
 
 type GiantBombClient interface {
 	SearchGames(query string) (*http.Response, error)
 	SearchGame(guid string) (*http.Response, error)
+	SearchGameList(games []repository.Game, limit int) (*http.Response, error)
 }
 
 type AuthService interface {

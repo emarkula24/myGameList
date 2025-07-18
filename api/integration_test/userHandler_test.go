@@ -60,7 +60,7 @@ func TestRegister(t *testing.T) {
 	r, err := http.Post(userTestSuite.Server.URL+"/user/register", "application/json", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, r)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.Equal(t, http.StatusCreated, r.StatusCode)
 
 	var response struct {
 		UserID int64 `json:"user_id"`

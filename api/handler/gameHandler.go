@@ -20,7 +20,8 @@ type GameHandler struct {
 	Cache *cache.Cache
 }
 
-// Creates a new instance of GameHandler
+// Creates a new instance of GameHandler.
+// The handler uses go-cache to store api responses because the amount of API requests per hour is limited.
 func NewGameHandler(gbc interfaces.GiantBombClient) *GameHandler {
 	c := cache.New(10*time.Minute, 15*time.Minute)
 	return &GameHandler{Gbc: gbc, Cache: c}
@@ -105,6 +106,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 }
 
 // Requests GameBomb API for the information of a game-entry based on GUID, and relays it to the client.
+// Uses go-cache to store response data due to the request amount to gamebomb API being limited
 func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	guid := req.URL.Query().Get("guid")
 
@@ -125,20 +127,15 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if response.StatusCode != http.StatusOK {
-		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
-		return
-	}
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Printf("Failed to fetch gamedata: %s", err)
+		log.Printf("failed to read response body: %s", err)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 	err = response.Body.Close()
 	if err != nil {
-		log.Printf("Failed to fetch gamedata: %s", err)
+		log.Printf("failed to close body: %s", err)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
@@ -153,7 +150,7 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	// status_code 100 = wrong api key
 	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
 	if err != nil {
-		log.Printf("Failed to fetch gamedata: %s", err)
+		log.Printf("failed to decode json body: %s", err)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}

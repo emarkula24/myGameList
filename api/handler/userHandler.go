@@ -64,7 +64,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(RegisterResponse{UserID: userId})
 	if err != nil {
 		log.Printf("Failed to register user: %s", err)

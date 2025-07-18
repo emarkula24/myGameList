@@ -24,8 +24,9 @@ type ListTestSuite struct {
 }
 
 func NewListTestSuite(db *sql.DB) *ListTestSuite {
+	client := &service.GiantBombClient{}
 	repo := repository.NewListRepository(db)
-	service := service.NewListService(repo)
+	service := service.NewListService(repo, client)
 	handler := handler.NewListHandler(service)
 
 	router := mux.NewRouter()
@@ -53,7 +54,7 @@ func TestAddToList(t *testing.T) {
 	r, err := http.Post(listTestSuite.Server.URL+"/list/add", "application/json", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, r)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.Equal(t, http.StatusCreated, r.StatusCode)
 }
 
 func TestUpdateList(t *testing.T) {

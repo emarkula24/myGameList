@@ -22,7 +22,7 @@ func CreateUserSubrouter(router *mux.Router, user *handler.UserHandler) *mux.Rou
 func CreateListSubRouter(router *mux.Router, list *handler.ListHandler) *mux.Router {
 	s := router.PathPrefix("/list").Subrouter()
 	s.HandleFunc("", list.GetList).Methods("GET")
-	s.HandleFunc("/add", list.AddToList).Methods("POST")
+	s.HandleFunc("/add", list.InsertToList).Methods("POST")
 	s.HandleFunc("/update", list.UpdateList).Methods("PUT")
 
 	return s

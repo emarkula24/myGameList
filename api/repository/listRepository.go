@@ -47,13 +47,18 @@ type Game struct {
 	Status string `json:"status"`
 }
 
-func (r *ListRepository) FetchGames(username string) ([]Game, error) {
+func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, error) {
+	// Calculate the OFFSET
+	offset := (page - 1) * limit
 	query := `
 			SELECT game_id, status
 			FROM user_games
 			WHERE username = ?
-	`
-	rows, err := r.Db.Query(query, username)
+			ORDER BY game_id DESC
+			LIMIT ?
+			OFFSET ?
+			`
+	rows, err := r.Db.Query(query, username, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch gamelist (username=%s): %w", username, err)
 	}

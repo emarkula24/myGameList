@@ -27,7 +27,7 @@ func setUpDependencies(db *sql.DB) *Handlers {
 	repo := repository.NewRepository(db)
 	listRepo := repository.NewListRepository(db)
 	userService := service.NewUserService(repo, auth)
-	listService := service.NewListService(listRepo)
+	listService := service.NewListService(listRepo, client)
 
 	userHandler := handler.NewUserHandler(userService)
 	gameHandler := handler.NewGameHandler(client)
