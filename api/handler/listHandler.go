@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -73,18 +74,7 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
-
 	username := r.URL.Query().Get("username")
-	// if cachedResp, found := h.Cache.Get(username); found {
-	// 	log.Print("used the cache")
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(http.StatusOK)
-	// 	if _, err := w.Write(cachedResp.([]byte)); err != nil {
-	// 		log.Printf("failed to write cached response: %s", err)
-	// 	}
-	// 	return
-	// }
-
 	// Extract 'page' and 'limit' query parameters
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil || page < 1 {
@@ -93,6 +83,18 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 	if err != nil || limit < 1 {
 		limit = 2 // Default to 10 items per page
+	}
+
+	cacheKey := fmt.Sprintf("%s,%d,%d", username, page, limit)
+
+	if cachedResp, found := h.Cache.Get(cacheKey); found {
+		log.Print("used the cache")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write(cachedResp.([]byte)); err != nil {
+			log.Printf("failed to write cached response: %s", err)
+		}
+		return
 	}
 
 	response, gameListDb, err := h.ListService.GetGameList(username, page, limit)
@@ -133,7 +135,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 
 	switch gameJSON.StatusCode {
 	case 1:
-		h.Cache.Set(username, bodyBytes, cache.DefaultExpiration)
+		h.Cache.Set(cacheKey, bodyBytes, cache.DefaultExpiration)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {
