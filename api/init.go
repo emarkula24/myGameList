@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"example.com/mygamelist/handler"
+	"example.com/mygamelist/middleware"
 	"example.com/mygamelist/repository"
 	"example.com/mygamelist/routes"
 	"example.com/mygamelist/service"
@@ -84,7 +85,7 @@ func initializeServer() *mux.Router {
 	handlers := setUpDependencies(db)
 
 	router := mux.NewRouter()
-	router.Use(loggingMiddleware)
+	router.Use(middleware.LoggingMiddleware)
 
 	routes.CreateGameSubrouter(router, handlers.game)
 	routes.CreateUserSubrouter(router, handlers.user)

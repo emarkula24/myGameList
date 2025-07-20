@@ -1,0 +1,54 @@
+package middleware
+
+import (
+	"log"
+	"net/http"
+	"strings"
+
+	"example.com/mygamelist/errorutils"
+	"example.com/mygamelist/utils"
+)
+
+func VerifyJWTMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			errorutils.WriteJSONError(w, "Authorization header missing or invalid access token", http.StatusUnauthorized)
+			return
+		}
+		// Expecting header format: "Bearer <token>"
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+			http.Error(w, "Authorization header format must be Bearer {token}", http.StatusUnauthorized)
+			return
+		}
+
+		token := parts[1]
+		if err := utils.VerifyToken(token); err != nil {
+			errorutils.WriteJSONError(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+		log.Println("checked jwt token")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Do stuff here
+		log.Println(r.RequestURI)
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
+}
+
+// type AppHandler func(http.ResponseWriter, *http.Request) error
+
+// func WithErrorHandler(h AppHandler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		if err := h(w, r); err != nil {
+// 			log.Printf("handling %q: %v", r.RequestURI, err)
+// 			errorutils.WriteJSONError(w, "something went wrong", http.StatusInternalServerError)
+// 		}
+// 	})
+// }
