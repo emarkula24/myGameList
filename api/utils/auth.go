@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -38,7 +39,12 @@ func VerifyToken(tokenString string) error {
 	if !token.Valid {
 		return errorutils.ErrInvalidToken
 	}
-
+	switch {
+	case token.Valid:
+		return nil
+	case errors.Is(err, jwt.ErrTokenExpired):
+		return jwt.ErrTokenExpired
+	}
 	return nil
 }
 

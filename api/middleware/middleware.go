@@ -1,12 +1,14 @@
 package middleware
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"strings"
 
 	"example.com/mygamelist/errorutils"
 	"example.com/mygamelist/utils"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func VerifyJWTMiddleware(next http.Handler) http.Handler {
@@ -24,9 +26,14 @@ func VerifyJWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		token := parts[1]
-		if err := utils.VerifyToken(token); err != nil {
-			errorutils.WriteJSONError(w, "Invalid or expired token", http.StatusUnauthorized)
-			return
+		err := utils.VerifyToken(token)
+		switch {
+		case errors.Is(err, jwt.ErrTokenExpired):
+			errorutils.WriteJSONError(w, "token expired", http.StatusForbidden)
+		case errors.Is(err, jwt.ErrTokenMalformed):
+			errorutils.WriteJSONError(w, "token malformed", http.StatusForbidden)
+		default:
+			errorutils.WriteJSONError(w, "failed to verify jwt", http.StatusInternalServerError)
 		}
 		log.Println("checked jwt token")
 		next.ServeHTTP(w, r)
