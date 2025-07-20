@@ -23,6 +23,7 @@ type UserRepository interface {
 	SelectUserIdByUsername(username string) (int, error)
 	InsertRefreshToken(userId int, refreshtoken, jti string) error
 	RefreshTokenById(userId int) (string, string, error)
+	DeleteRefreshToken(userId int, jti string) error
 }
 
 // type UserService interface {

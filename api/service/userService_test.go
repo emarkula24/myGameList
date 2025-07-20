@@ -13,12 +13,16 @@ import (
 
 // MockHasher implements interfaces.PasswordHasher
 type MockHasher struct {
-	HashResult string
-	HashError  error
+	HashResult  string
+	HashError   error
+	DeleteError error
 }
 
 func (m MockHasher) HashPassword(password string) (string, error) {
 	return m.HashResult, m.HashError
+}
+func (m MockHasher) DeleteRefreshToken(userId int, jti string) error {
+	return m.DeleteError
 }
 
 func TestRegisterUser(t *testing.T) {

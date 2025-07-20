@@ -139,6 +139,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	type RefreshRequest struct {
 		Username string `json:"username"`
+		UserId   int    `json:"userId"`
 	}
 	var refreshReq RefreshRequest
 	decoder := json.NewDecoder(req.Body)
@@ -159,7 +160,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	tokenStr := cookie.Value
 	k := os.Getenv("REFRESH_SECRET_KEY")
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		return []byte(k), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
@@ -220,6 +221,11 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 			// Invalid signature
 			fmt.Println("Invalid signature")
 		case errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet):
+			err := h.UserService.UserRepository.DeleteRefreshToken(refreshReq.UserId, jti)
+			if err != nil {
+				log.Printf("Token expired, deleted from database: %s", err)
+				errorutils.WriteJSONError(w, "invalid refresh token", http.StatusUnauthorized)
+			}
 			// Token is either expired or not active yet
 			fmt.Println("Timing is everything")
 		default:

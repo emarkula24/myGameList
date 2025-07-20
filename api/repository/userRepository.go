@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -77,4 +78,23 @@ func (r *Repository) RefreshTokenById(userId int) (string, string, error) {
 	}
 
 	return token, jti, nil
+}
+func (r *Repository) DeleteRefreshToken(userId int, jti string) error {
+	query := `
+			DELETE 
+			FROM refreshtokens
+			WHERE user_id = ? AND jti = ?
+	`
+	rows, err := r.Db.Exec(query, userId, jti)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		log.Printf("RowsAffected error: %v", err)
+		return err
+	}
+	log.Println(rowsAffected)
+	log.Println(rows)
+	return err
 }

@@ -37,3 +37,7 @@ func (m *UserRepositoryMock) RefreshTokenById(userId int) (string, string, error
 	args := m.Called(userId)
 	return args.String(0), args.String(1), args.Error(2)
 }
+func (m *UserRepositoryMock) DeleteRefreshToken(userId int, jti string) error {
+	args := m.Called(userId, jti)
+	return args.Error(0)
+}

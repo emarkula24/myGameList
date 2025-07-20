@@ -45,7 +45,7 @@ func VerifyToken(tokenString string) error {
 func GenerateRefreshToken(username string) (string, string, error) {
 	k := os.Getenv("REFRESH_SECRET_KEY")
 	var secretKey = []byte(k)
-	expirationTime := time.Now().Add(7 * 24 * time.Hour).Unix()
+	expirationTime := time.Now().Add(24 * time.Hour).Unix()
 	jti := fmt.Sprintf("%s-%d", username, time.Now().UnixNano())
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
