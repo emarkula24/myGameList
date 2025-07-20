@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS refreshtokens (
 
 CREATE TABLE IF NOT EXISTS games (
     game_id INT UNSIGNED NOT NULL,
+    gamename VARCHAR(255)
     PRIMARY KEY (game_id)
 );
 

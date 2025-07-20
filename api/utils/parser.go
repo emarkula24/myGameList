@@ -27,6 +27,7 @@ type ApiImage struct {
 
 type ApiResult struct {
 	ID                  int      `json:"id"`
+	Guid                string   `json:"guid"`
 	Image               ApiImage `json:"image"`
 	Name                string   `json:"name"`
 	OriginalReleaseDate string   `json:"original_release_date"`

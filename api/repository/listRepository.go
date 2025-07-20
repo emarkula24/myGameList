@@ -13,11 +13,11 @@ func NewListRepository(Db *sql.DB) *ListRepository {
 	return &ListRepository{Db: Db}
 }
 
-func (r *ListRepository) InsertGame(gameId int, username, status string) error {
+func (r *ListRepository) InsertGame(gameId int, username, gamename, status string) error {
 
 	// ON DUPLICATE KEY is used to keep from inserting duplicates
-	query := `INSERT INTO games (game_id) VALUES (?) ON DUPLICATE KEY UPDATE game_id = game_id`
-	_, err := r.Db.Exec(query, gameId)
+	query := `INSERT INTO games (game_id, gamename) VALUES (?,?) ON DUPLICATE KEY UPDATE game_id = game_id`
+	_, err := r.Db.Exec(query, gameId, gamename)
 	if err != nil {
 		return fmt.Errorf("failed to insert game into table games %w", err)
 	}
@@ -51,10 +51,11 @@ func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, e
 	// Calculate the OFFSET
 	offset := (page - 1) * limit
 	query := `
-			SELECT game_id, status
-			FROM user_games
-			WHERE username = ?
-			ORDER BY game_id DESC
+			SELECT gm.game_id, ug.status
+			FROM user_games ug
+			JOIN games gm ON ug.game_id = gm.game_id
+			WHERE ug.username = ?
+			ORDER BY gm.gamename ASC
 			LIMIT ?
 			OFFSET ?
 			`

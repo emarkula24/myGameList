@@ -36,12 +36,12 @@ export const fetchGames = async (searchQuery: string) => {
 
 }
 
-export const fetchGameList = async (username: string) => {
+export const fetchGameList = async (username: string, page: number = 1, limit: number = 20) => {
     
     await new Promise((r) => setTimeout(r, 500))
     return axios
-        .get<GameListEntry[]>(`${url}/list?username=${username}`)
-        .then((response) => response.data)
+        .get<{results: GameListEntry[]}>(`${url}/list?username=${username}&page=${page}&limit=${limit}`)
+        .then((response) => response.data.results)
         .catch((err) => {
             const errStatus = err.response?.status
             if (errStatus === 500 || errStatus == 404) {

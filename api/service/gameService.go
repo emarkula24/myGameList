@@ -31,7 +31,7 @@ func (c *GiantBombClient) SearchGame(guid string) (*http.Response, error) {
 func (c *GiantBombClient) SearchGameList(games []repository.Game, limit int) (*http.Response, error) {
 	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 	baseURL := "https://www.giantbomb.com/api/games/"
-	fields := "id,name,original_release_date,image"
+	fields := "id,guid,name,original_release_date,image"
 	var ids []string
 	for _, game := range games {
 		idStr := strconv.Itoa(game.GameID)

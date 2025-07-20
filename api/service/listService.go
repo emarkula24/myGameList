@@ -18,8 +18,8 @@ func NewListService(repo *repository.ListRepository, client interfaces.GiantBomb
 	return &ListService{ListRepository: repo, Cbc: client}
 }
 
-func (s *ListService) PostGame(gameId int, username, status string) error {
-	err := s.ListRepository.InsertGame(gameId, username, status)
+func (s *ListService) PostGame(gameId int, username, gamename, status string) error {
+	err := s.ListRepository.InsertGame(gameId, username, gamename, status)
 	if err != nil {
 		log.Printf("failed to add game %s", err)
 		return fmt.Errorf("%w", err)

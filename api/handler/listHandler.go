@@ -30,6 +30,7 @@ type ListRequest struct {
 	GameId   int    `json:"game_id"`
 	Status   string `json:"status"`
 	UserName string `json:"username"`
+	GameName string `json:"gamename"`
 }
 
 func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +43,7 @@ func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
 		errorutils.WriteJSONError(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	err := h.ListService.PostGame(listReq.GameId, listReq.UserName, listReq.Status)
+	err := h.ListService.PostGame(listReq.GameId, listReq.UserName, listReq.GameName, listReq.Status)
 	if err != nil {
 		log.Printf("failed to insert game: %s", err)
 		errorutils.WriteJSONError(w, "failed to add game to list", http.StatusInternalServerError)
@@ -93,7 +94,7 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	if username == "" {
-		log.Printf("query parameter for username is missing")
+		log.Printf("query parameter for username or gamename is missing")
 		errorutils.WriteJSONError(w, "no query parameter for username", http.StatusBadRequest)
 		return
 	}
