@@ -3,7 +3,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Header from '../components/Header'
 import { QueryClient } from '@tanstack/react-query'
-import type { Auth } from '../utils/auth'
+import type { AuthContext } from '../utils/auth'
 import { useMemo, useState } from 'react'
 import type { Games } from '../types/types'
 import { SearchContext } from '../hooks/useSearchContext'
@@ -13,11 +13,12 @@ import { SearchContext } from '../hooks/useSearchContext'
 //   const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
 //   return <Spinner show={isLoading} />
 // }
-
-export const Route = createRootRouteWithContext<{
-  auth: Auth
+interface MyRouterContext {
+  auth: AuthContext
   queryClient: QueryClient
-}>()({
+}
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+
   component: RootComponent,
   notFoundComponent: () => {
     return (

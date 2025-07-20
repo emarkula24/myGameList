@@ -104,9 +104,10 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	type LoginResponse struct {
 		AccessToken string `json:"accessToken"`
 		UserId      int    `json:"userId"`
+		Username    string `json:"username"`
 	}
-
-	refreshToken, jti, err := utils.GenerateRefreshToken(loginReq.Username)
+	username := loginReq.Username
+	refreshToken, jti, err := utils.GenerateRefreshToken(username)
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)
@@ -127,7 +128,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	}
 	http.SetCookie(w, refreshTokenCookie)
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId})
+	err = json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId, Username: username})
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)

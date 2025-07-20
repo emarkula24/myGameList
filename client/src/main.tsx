@@ -5,7 +5,8 @@ import { ErrorComponent, RouterProvider, createRouter } from '@tanstack/react-ro
 import { routeTree } from './routeTree.gen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Spinner } from './components/Spinner'
-import { auth } from './utils/auth'
+import axios from 'axios'
+import { useAuth, AuthProvider } from './utils/auth'
 
 
 
@@ -35,7 +36,21 @@ declare module '@tanstack/react-router' {
                 router: typeof router
         }
 }
+// Set default base url for axios
+const url = import.meta.env.VITE_BACKEND_URL
+axios.defaults.baseURL = url
 
+function InnerApp() {
+  const auth = useAuth()
+  return <RouterProvider router={router} context={{ auth }} />
+}
+function App() {
+  return (
+    <AuthProvider>
+      <InnerApp />
+    </AuthProvider>
+  )
+}
 // Render the app
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
@@ -43,10 +58,7 @@ if (!rootElement.innerHTML) {
         root.render(
                 <StrictMode>
                         <QueryClientProvider client={queryClient}>
-                                <RouterProvider router={router} context={{
-                                        auth, 
-                                }}
-                                />
+                                <App />
                         </QueryClientProvider>
                 </StrictMode>,
         )
