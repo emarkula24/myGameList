@@ -12,6 +12,7 @@ import (
 
 	"example.com/mygamelist/errorutils"
 	"example.com/mygamelist/service"
+	"example.com/mygamelist/utils"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -73,8 +74,29 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Handler for GET /list.
+//
+// URL Parameters:
+//   - username (string, required): The username whose game list is being requested.
+//   - page (int, optional): The page number for pagination. Defaults to 1 if not provided or invalid.
+//   - limit (int, optional): The number of items per page. Defaults to 20 if not provided or invalid.
+//
+// Description:
+// Retrieves a paginated list of game IDs and their play statuses from the database for the specified user.
+// Then fetches detailed game data from the GiantBomb API using those IDs, combines the play status into said API response
+// and returns the response.
+//
+// Responses:
+//   - 200 OK: Successfully fetched and merged data.
+//   - 400 Bad Request: Missing username or empty game list.
+//   - 500 Internal Server Error: API failure, data unmarshalling errors, or other unexpected issues.
 func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
+	if username == "" {
+		log.Printf("query parameter for username is missing")
+		errorutils.WriteJSONError(w, "no query parameter for username", http.StatusBadRequest)
+		return
+	}
 	// Extract 'page' and 'limit' query parameters
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil || page < 1 {
@@ -82,7 +104,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	}
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 	if err != nil || limit < 1 {
-		limit = 2 // Default to 10 items per page
+		limit = 20 // Default to 20 items per page
 	}
 
 	cacheKey := fmt.Sprintf("%s,%d,%d", username, page, limit)
@@ -113,8 +135,20 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
-
+	combinedApiResponse, err := utils.CombineGameListJSON(gameListDb, bodyBytes)
+	if err != nil {
+		log.Printf("failed to inject values in apiResp: %s", err)
+		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		return
+	}
+	finalResponse, err := json.Marshal(combinedApiResponse)
+	if err != nil {
+		log.Printf("failed to marshal combined response: %s", err)
+		errorutils.WriteJSONError(w, "failed to getch gamedata", http.StatusInternalServerError)
+		return
+	}
 	err = response.Body.Close()
+
 	if err != nil {
 		log.Printf("failed to close body: %s", err)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
@@ -126,7 +160,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	}
 	var gameJSON GameJSON
 
-	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
+	err = json.NewDecoder(bytes.NewReader(finalResponse)).Decode(&gameJSON)
 	if err != nil {
 		log.Printf("failed to decode json body: %s", err)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
@@ -135,10 +169,10 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 
 	switch gameJSON.StatusCode {
 	case 1:
-		h.Cache.Set(cacheKey, bodyBytes, cache.DefaultExpiration)
+		h.Cache.Set(cacheKey, finalResponse, cache.DefaultExpiration)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(bodyBytes); err != nil {
+		if _, err := w.Write(finalResponse); err != nil {
 			log.Printf("failed to write response: %s", err)
 			errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 			return
