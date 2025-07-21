@@ -153,6 +153,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	}
 
 	cookie, err := req.Cookie("refreshToken")
+	log.Printf("cookie: %s", cookie)
 	if err != nil {
 		log.Printf("Failed to refresh, missing refresh token: %s", err)
 		errorutils.WriteJSONError(w, "missing refresh token", http.StatusUnauthorized)
@@ -160,6 +161,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	}
 
 	tokenStr := cookie.Value
+	log.Println(tokenStr)
 	k := os.Getenv("REFRESH_SECRET_KEY")
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		return []byte(k), nil

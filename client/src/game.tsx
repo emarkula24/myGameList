@@ -1,10 +1,34 @@
 import axios from "axios"
 import { type GameListEntry, type Game, type Games } from "./types/types"
+import { UserNotLoggedInError } from "./utils/auth"
 
 export class GameNotFoundError extends Error { }
 export class GamesNotFoundError extends Error { }
 export class GameListNotFoundError extends Error { }
 
+export const addGame = async (gameId: number, status: string, username: string | undefined, gamename: string) => {
+    await new Promise((r) => setTimeout(r, 500))
+    const result = axios
+    .post(`list/add`, {
+        game_id: gameId,
+        status: status,
+        username: username,
+        gamename: gamename,
+
+    })
+    .then((r) => console.log(r))
+    .catch((err) => {
+        const errStatus = err.response?.status
+        if (errStatus === 403 ) {
+            console.log(err.response)
+            throw new UserNotLoggedInError(`user not logged in when trying to add game ${gamename}`)
+        } else {
+            console.log(err.response)
+            throw new Error
+        }
+    })
+    return result
+}
 // Fetches info on a game based on a guid
 export const fetchGame = async (guid: string) => {
     await new Promise((r) => setTimeout(r, 500))

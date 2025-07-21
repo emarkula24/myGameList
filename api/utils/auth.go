@@ -31,7 +31,6 @@ func VerifyToken(tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return secretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-
 	if err != nil {
 		return err
 	}
@@ -96,11 +95,11 @@ func CreateRefreshTokenCookie(refreshToken string) (*http.Cookie, error) {
 func IsRefreshTokenValid(db *sql.DB, userID int, token string) (bool, error) {
 	var exists bool
 	query := `
-		SELECT EXISTS (
-			SELECT 1 FROM refresh_tokens 
-			WHERE user_id = $1 AND token = $2 
-			AND revoked = FALSE AND expires_at > NOW()
-		)`
+			SELECT EXISTS (
+				SELECT 1 FROM refresh_tokens 
+				WHERE user_id = $1 AND token = $2 
+				AND revoked = FALSE AND expires_at > NOW()
+			)`
 	err := db.QueryRow(query, userID, token).Scan(&exists)
 	return exists, err
 }

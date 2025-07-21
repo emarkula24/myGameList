@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	ErrUserExists    = errors.New("user already exists")
-	ErrPasswordMatch = errors.New("incorrect password")
-	ErrInvalidToken  = errors.New("invalid token")
+	ErrUserExists         = errors.New("user already exists")
+	ErrPasswordMatch      = errors.New("incorrect password")
+	ErrInvalidToken       = errors.New("invalid token")
+	ErrRefreshTokenExists = errors.New("refreshtoken already in db")
 )
 
 func WriteJSONError(w http.ResponseWriter, message string, code int) {

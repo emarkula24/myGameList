@@ -14,6 +14,7 @@ import (
 func VerifyJWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
+
 		if authHeader == "" {
 			errorutils.WriteJSONError(w, "Authorization header missing or invalid access token", http.StatusUnauthorized)
 			return
@@ -21,21 +22,34 @@ func VerifyJWTMiddleware(next http.Handler) http.Handler {
 		// Expecting header format: "Bearer <token>"
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			http.Error(w, "Authorization header format must be Bearer {token}", http.StatusUnauthorized)
+			errorutils.WriteJSONError(w, "Authorization header format must be Bearer {token}", http.StatusUnauthorized)
 			return
 		}
 
 		token := parts[1]
 		err := utils.VerifyToken(token)
-		switch {
-		case errors.Is(err, jwt.ErrTokenExpired):
-			errorutils.WriteJSONError(w, "token expired", http.StatusForbidden)
-		case errors.Is(err, jwt.ErrTokenMalformed):
-			errorutils.WriteJSONError(w, "token malformed", http.StatusForbidden)
-		default:
-			errorutils.WriteJSONError(w, "failed to verify jwt", http.StatusInternalServerError)
+
+		if err != nil {
+			switch {
+			case errors.Is(err, jwt.ErrTokenExpired):
+				log.Printf("%s", err)
+				errorutils.WriteJSONError(w, "token expired", http.StatusForbidden)
+				return
+			case errors.Is(err, jwt.ErrTokenMalformed):
+				log.Printf("%s", err)
+				errorutils.WriteJSONError(w, "token malformed", http.StatusForbidden)
+				return
+			case errors.Is(err, jwt.ErrTokenSignatureInvalid):
+				log.Printf("%s", err)
+				errorutils.WriteJSONError(w, "token signature invalid", http.StatusForbidden)
+				return
+			default:
+				log.Printf("%s", err)
+				errorutils.WriteJSONError(w, "failed to verify token", http.StatusInternalServerError)
+				return
+			}
 		}
-		log.Println("checked jwt token")
+		log.Printf("checked jwt token %s", token)
 		next.ServeHTTP(w, r)
 	})
 }

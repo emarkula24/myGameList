@@ -4,6 +4,7 @@ import React from "react"
 import { sleep } from "./utils"
 export class LoginFailedError extends Error { }
 export class RegisterFailedError extends Error { }
+export class UserNotLoggedInError extends Error { }
 
 export type User = {
   username: string

@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS refreshtokens (
-    user_id INT UNSIGNED NOT NULL,
-    jti CHAR(36) NOT NULL UNIQUE,
+    user_id INT UNSIGNED NOT NULL UNIQUE,
+    jti CHAR(36) NOT NULL,
     refresh_token VARCHAR(512) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -33,3 +33,4 @@ CREATE TABLE IF NOT EXISTS user_games (
 
 INSERT INTO users (username, email, password, created_at)
 VALUES ('listaddtest', 'list@example.com', 'hashedpassword123', NOW());
+

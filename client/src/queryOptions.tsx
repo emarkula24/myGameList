@@ -12,9 +12,8 @@ export const gamesQueryOptions = (query: string) =>
         queryKey: ["games", { query }],
         queryFn: () => fetchGames(query),
     })
-export const gameListQueryOptions = (username: string) =>
+export const fetchGameListQueryOptions = (username: string) =>
     queryOptions({
         queryKey: ["gamelist", {username}],
         queryFn: () => fetchGameList(username)
     })
-

@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { gameListQueryOptions } from '../queryOptions'
+import { fetchGameListQueryOptions } from '../queryOptions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/gamelist/$username')({
     loader: ({ context: {queryClient}, params: {username} }) => {
-        return queryClient.ensureQueryData(gameListQueryOptions(username))
+        return queryClient.ensureQueryData(fetchGameListQueryOptions(username))
 },
   component: GameListComponent,
 })
-
 function GameListComponent() {
   const username = Route.useParams().username
-  const {data: gamelist} = useSuspenseQuery(gameListQueryOptions(username))
+  const {data: gamelist} = useSuspenseQuery(fetchGameListQueryOptions(username))
   console.log(gamelist)
   gamelist.sort((a, b) => a.name.localeCompare(b.name));
   return (

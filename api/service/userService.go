@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"example.com/mygamelist/errorutils"
@@ -46,8 +47,9 @@ func (s *UserService) RegisterUser(username, email, password string) (int64, err
 }
 
 func (s *UserService) LoginUser(username, password string) (string, int, error) {
-	var secretKey = []byte("secret-key")
-	expirationTime := time.Now().Add(5 * time.Minute).Unix()
+	k := os.Getenv("JWT_SECRET_KEY")
+	var secretKey = []byte(k)
+	expirationTime := time.Now().Add(1 * time.Minute).Unix()
 	hashedPassword, err := s.UserRepository.PasswordByUsername(username)
 	if err != nil {
 		return "", 0, fmt.Errorf("failed to retrieve password: %w", err)
@@ -79,6 +81,7 @@ func (s *UserService) StoreRefreshToken(username, refreshToken, jti string) erro
 	if err != nil {
 		return err
 	}
+
 	err = s.UserRepository.InsertRefreshToken(userId, refreshToken, jti)
 	if err != nil {
 		return fmt.Errorf("failed to insert refreshtoken: %w", err)
