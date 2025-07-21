@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"example.com/mygamelist/errorutils"
@@ -140,7 +141,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	type RefreshRequest struct {
 		Username string `json:"username"`
-		UserId   int    `json:"userId"`
+		UserId   string `json:"userId"`
 	}
 	var refreshReq RefreshRequest
 	decoder := json.NewDecoder(req.Body)
@@ -151,7 +152,16 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		errorutils.WriteJSONError(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
+	if refreshReq.UserId == "" || refreshReq.Username == "" {
+		errorutils.WriteJSONError(w, "missing values from body", http.StatusBadRequest)
+		return
+	}
+	userIdInt, err := strconv.Atoi(refreshReq.UserId)
+	if err != nil {
+		errorutils.WriteJSONError(w, "failed to convert userId", http.StatusBadRequest)
+		return
 
+	}
 	cookie, err := req.Cookie("refreshToken")
 	log.Printf("cookie: %s", cookie)
 	if err != nil {
@@ -172,7 +182,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	jtiFromDb, err := h.UserService.FetchRefreshToken(refreshReq.Username)
+	jtiFromDb, err := h.UserService.FetchRefreshToken(refreshReq.Username, userIdInt)
 	if err != nil {
 		log.Printf("Failed to refresh, invalid user: %s", err)
 		errorutils.WriteJSONError(w, "invalid user", http.StatusUnauthorized)
@@ -224,7 +234,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 			// Invalid signature
 			fmt.Println("Invalid signature")
 		case errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet):
-			err := h.UserService.UserRepository.DeleteRefreshToken(refreshReq.UserId, jti)
+			err := h.UserService.UserRepository.DeleteRefreshToken(userIdInt, jti)
 			if err != nil {
 				log.Printf("Token expired, deleted from database: %s", err)
 				errorutils.WriteJSONError(w, "invalid refresh token", http.StatusUnauthorized)

@@ -89,12 +89,7 @@ func (s *UserService) StoreRefreshToken(username, refreshToken, jti string) erro
 
 	return nil
 }
-func (s *UserService) FetchRefreshToken(username string) (string, error) {
-	userId, err := s.UserRepository.SelectUserIdByUsername(username)
-	if err != nil {
-		return "", fmt.Errorf("failed to fetch username: %w", err)
-		// http.Error(w, "failed to retrieve userId", http.StatusUnauthorized)
-	}
+func (s *UserService) FetchRefreshToken(username string, userId int) (string, error) {
 	_, jtiFromDb, err := s.UserRepository.RefreshTokenById(userId)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch refreshtoken: %w", err)

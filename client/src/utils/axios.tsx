@@ -6,9 +6,8 @@ const axiosAuthorizationInstance = axios.create({
 })
 
 
-const username = localStorage.getItem("username")
-const userId = localStorage.getItem("userId")
-
+const username = localStorage.getItem("tanstack.auth.username")
+const userId = localStorage.getItem("tanstack.auth.userId")
 axiosAuthorizationInstance.interceptors.request.use(request => {
     const accessToken = localStorage.getItem('tanstack.auth.accessToken');
     console.log(accessToken)

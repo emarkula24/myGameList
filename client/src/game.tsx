@@ -1,6 +1,7 @@
 import axios from "axios"
 import { type GameListEntry, type Game, type Games } from "./types/types"
 import { UserNotLoggedInError } from "./utils/auth"
+import axiosAuthorizationInstance from "./utils/axios"
 
 export class GameNotFoundError extends Error { }
 export class GamesNotFoundError extends Error { }
@@ -8,7 +9,7 @@ export class GameListNotFoundError extends Error { }
 
 export const addGame = async (gameId: number, status: string, username: string | undefined, gamename: string) => {
     await new Promise((r) => setTimeout(r, 500))
-    const result = axios
+    const result = axiosAuthorizationInstance
     .post(`list/add`, {
         game_id: gameId,
         status: status,

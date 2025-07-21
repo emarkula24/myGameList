@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -74,9 +75,11 @@ func (r *Repository) RefreshTokenById(userId int) (string, string, error) {
 	query := `SELECT refresh_token, jti from refreshtokens WHERE user_id = ?`
 	err := r.Db.QueryRow(query, userId).Scan(&token, &jti)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", "", fmt.Errorf("no refresh token found for user ID %d", userId)
+		}
 		return "", "", fmt.Errorf("failed to retrieve refresh token: %w", err)
 	}
-
 	return token, jti, nil
 }
 func (r *Repository) DeleteRefreshToken(userId int, jti string) error {

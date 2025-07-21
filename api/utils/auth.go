@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -81,11 +82,17 @@ func CreateFingerPrintCookie(jwtToken string) (*http.Cookie, error) {
 
 func CreateRefreshTokenCookie(refreshToken string) (*http.Cookie, error) {
 
+	secure := false
+	if os.Getenv("MODE") == "production" {
+		log.Println("using production")
+		secure = true
+	}
+
 	cookie := &http.Cookie{
 		Name:     "refreshToken",
 		Value:    refreshToken,
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   secure,
 		SameSite: http.SameSiteStrictMode,
 		MaxAge:   int(24 * time.Hour.Seconds()),
 	}
