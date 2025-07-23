@@ -63,7 +63,6 @@ func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch gamelist (username=%s): %w", username, err)
 	}
-	defer rows.Close()
 
 	var games []Game
 	for rows.Next() {
@@ -72,6 +71,10 @@ func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, e
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 		games = append(games, game)
+	}
+
+	if err := rows.Close(); err != nil {
+		return nil, err
 	}
 
 	return games, nil

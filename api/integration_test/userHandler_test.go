@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -42,6 +43,13 @@ func NewUserTestSuite(db *sql.DB) *UserTestSuite {
 		Handler: h,
 		Router:  router,
 	}
+}
+func (s *UserTestSuite) GetServerURL() string {
+	return s.Server.URL
+}
+
+func (s *UserTestSuite) GetClient() *http.Client {
+	return s.Server.Client()
 }
 
 var (
@@ -109,10 +117,6 @@ func TestRefresh(t *testing.T) {
 		"password": "123456778@M"
 	}`
 
-	refreshBody := `{
-		"username": "testrefresh"
-	}`
-
 	r, err := http.Post(userTestSuite.Server.URL+"/user/register", "application/json", strings.NewReader(registerBody))
 	require.NoError(t, err)
 	require.NotNil(t, r)
@@ -124,6 +128,7 @@ func TestRefresh(t *testing.T) {
 
 	var response struct {
 		AccessToken string `json:"accessToken"`
+		UserId      int    `json:"userId"`
 	}
 
 	cookies := r.Cookies()
@@ -132,8 +137,15 @@ func TestRefresh(t *testing.T) {
 	err = r.Body.Close()
 	require.NoError(t, err)
 
+	refreshData := map[string]any{
+		"username": "testrefresh",
+		"userId":   response.UserId,
+	}
+
+	refreshBodyBytes, err := json.Marshal(refreshData)
+	require.NoError(t, err)
 	client := userTestSuite.Server.Client()
-	refreshReq, err := http.NewRequest("POST", userTestSuite.Server.URL+"/user/refresh", strings.NewReader(refreshBody))
+	refreshReq, err := http.NewRequest("POST", userTestSuite.Server.URL+"/user/refresh", bytes.NewReader(refreshBodyBytes))
 	require.NoError(t, err)
 	refreshReq.Header.Set("Content-Type", "application/json")
 

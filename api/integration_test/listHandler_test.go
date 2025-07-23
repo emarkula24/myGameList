@@ -40,20 +40,33 @@ func NewListTestSuite(db *sql.DB) *ListTestSuite {
 		Router:  router,
 	}
 }
+func (s *ListTestSuite) GetServerURL() string {
+	return s.Server.URL
+}
+func (s *ListTestSuite) GetClient() *http.Client {
+	return s.Server.Client()
+}
 
 var listTestSuite *ListTestSuite
 
 func TestAddToList(t *testing.T) {
+	accessToken, _, _, err := RegisterAndLoginTestUser(userTestSuite, "listaddtest", "listadd@test.com", "1234567@M")
+	require.NoError(t, err)
 
 	body := `{
 		"game_id":34126,
 		"status":"playing",
-		"username": "mies"
+		"username":"mies",
+		"gamename":"metroid"
 	}`
-
-	r, err := http.Post(listTestSuite.Server.URL+"/list/add", "application/json", strings.NewReader(body))
+	client := listTestSuite.Server.Client()
+	listAddRequest, err := http.NewRequest("POST", listTestSuite.Server.URL+"list/add", strings.NewReader(body))
 	require.NoError(t, err)
-	assert.NotNil(t, r)
+	assert.NotNil(t, listAddRequest)
+	listAddRequest.Header.Set("Authorization", accessToken)
+	listAddRequest.Header.Set("Content-Type", "application/json")
+	r, err := client.Do(listAddRequest)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
 }
 

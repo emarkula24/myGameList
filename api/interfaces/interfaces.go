@@ -25,6 +25,10 @@ type UserRepository interface {
 	RefreshTokenById(userId int) (string, string, error)
 	DeleteRefreshToken(userId int, jti string) error
 }
+type TestSuiteWithServer interface {
+	GetServerURL() string
+	GetClient() *http.Client
+}
 
 // type UserService interface {
 // 	RegisterUser(username, email, password string) (int64, error)
