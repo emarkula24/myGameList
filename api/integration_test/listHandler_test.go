@@ -50,7 +50,7 @@ func (s *ListTestSuite) GetClient() *http.Client {
 var listTestSuite *ListTestSuite
 
 func TestAddToList(t *testing.T) {
-	accessToken, _, _, err := RegisterAndLoginTestUser(userTestSuite, "listaddtest", "listadd@test.com", "1234567@M")
+	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listaddtest", "listadd@test.com", "1234567@M")
 	require.NoError(t, err)
 
 	body := `{
@@ -71,6 +71,8 @@ func TestAddToList(t *testing.T) {
 }
 
 func TestUpdateList(t *testing.T) {
+	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listupdateest", "listupdate@test.com", "1234567@M")
+	require.NoError(t, err)
 	body := `{
 		"game_id":34126,
 		"status":"completed",
@@ -80,6 +82,7 @@ func TestUpdateList(t *testing.T) {
 	updateReq, err := http.NewRequest("PUT", listTestSuite.Server.URL+"list/update", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, updateReq)
+	updateReq.Header.Set("Authorization", accessToken)
 	updateReq.Header.Set("Content-Type", "application/json")
 
 	updateResp, err := client.Do(updateReq)
