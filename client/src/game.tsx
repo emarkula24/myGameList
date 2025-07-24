@@ -88,7 +88,7 @@ export const fetchGames = async (searchQuery: string) => {
 
 }
 
-export const fetchGameList = async (username: string, page: number = 1, limit: number = 20) => {
+export const fetchGameList = async (username: string | undefined, page: number = 1, limit: number = 20) => {
 
     await new Promise((r) => setTimeout(r, 500))
     return axios

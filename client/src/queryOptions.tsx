@@ -1,5 +1,6 @@
-import { queryOptions} from "@tanstack/react-query";
-import { fetchGame, fetchGameList, fetchGameListEntry, fetchGames } from "./game";
+import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
+import { addGame, fetchGame, fetchGameList, fetchGameListEntry, fetchGames, updateGame } from "./game";
+import { useAuth } from "./utils/auth";
 
 export const gameQueryOptions = (guid: string) =>
     queryOptions({
@@ -12,13 +13,52 @@ export const gamesQueryOptions = (query: string) =>
         queryKey: ["games", { query }],
         queryFn: () => fetchGames(query),
     })
-export const gameListQueryOptions = (username: string) =>
+export const gameListQueryOptions = (username: string | undefined) =>
     queryOptions({
-        queryKey: ["gamelist", {username}],
-        queryFn: () => fetchGameList(username)
+        queryKey: ["gamelist", { username }],
+        queryFn: () => fetchGameList(username),
+
     })
 export const gameListEntryQueryOptions = (username: string | undefined, gameId: number) =>
     queryOptions({
-        queryKey: ["gamelistsingle", { username, gameId}],
-        queryFn: () => fetchGameListEntry(username, gameId)
+        queryKey: ["gamelistentry", { username, gameId }],
+        queryFn: () => fetchGameListEntry(username, gameId),
+
+
     })
+
+export function useAddGameMutation(gameId: number, gameName: string) {
+    const queryClient = useQueryClient()
+    const auth = useAuth()
+    const username = auth.user?.username
+
+    return useMutation({
+        mutationFn: async (status: number) => {
+            return await addGame(gameId, status, username, gameName)
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["gamelistentry"] }),
+        onError: (error) => {
+            console.error('Add game error:', error)
+        }
+    })
+}
+export function createUpdateGameMutation(username: string | undefined) {
+    return (gameId: number, gameName: string) => {
+        const auth = useAuth()
+        const queryClient = useQueryClient()
+        return useMutation({
+
+            mutationFn: async (status: number) => {
+                if (auth.user?.username !== username) {
+                    return new Error("you are not this user")
+                }
+                return await updateGame(gameId, status, username, gameName)
+            },
+            onSettled: () => queryClient.invalidateQueries({ queryKey: ["gamelist"] }),
+            onError: (error) => {
+                console.error('Update game error:', error)
+            }
+
+        })
+    }
+}

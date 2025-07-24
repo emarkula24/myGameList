@@ -1,11 +1,11 @@
   import { createFileRoute, ErrorComponent, useRouter, type ErrorComponentProps } from '@tanstack/react-router'
-  import { gameListEntryQueryOptions, gameQueryOptions } from '../queryOptions'
-  import { useMutation, useQueryClient, useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query'
-  import { addGame, GameNotFoundError, updateGame } from '../game'
+  import { createUpdateGameMutation, gameListEntryQueryOptions, gameQueryOptions, useAddGameMutation } from '../queryOptions'
+  import { useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query'
+  import { GameNotFoundError } from '../game'
   import React from 'react'
   import { useAuth } from '../utils/auth'
-  import GameAddDropdown from '../components/GameAddDropdown'
 import GameAddButton from '../components/GameAddButton'
+import GameUpdateDropdown from '../components/GameUpdateDropdown'
 
 
   export const Route = createFileRoute('/games/$guid')({
@@ -44,7 +44,6 @@ import GameAddButton from '../components/GameAddButton'
   }
 
   function GameComponent() {
-    const queryClient = useQueryClient()
     const auth = useAuth()
     const guid = Route.useParams().guid
     const { data: game } = useSuspenseQuery(gameQueryOptions(guid))
@@ -52,23 +51,10 @@ import GameAddButton from '../components/GameAddButton'
     const gameListEntry = gameListEntryQuery.data
     const status = gameListEntry.gamedata?.status ?? false
 
-    const addMutation = useMutation({
-      mutationFn: async (status: number) => {
-        return await addGame(game.id, status, auth.user?.username, game.name)
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries(gameListEntryQueryOptions(auth.user?.username, game.id))
-      },
-      onError: (error) => {
-        console.error(error)
-      }
-    })
-
-    const updateMutation = useMutation({
-      mutationFn: async (status: number) => {
-        return await updateGame(game.id, status, auth.user?.username, game.name)
-      }
-    })
+    const addMutation = useAddGameMutation(game.id, game.name)
+    const getUpdateMutation = createUpdateGameMutation(auth.user?.username)
+    const updateMutation = getUpdateMutation(game.id, game.name)
+    
     return (
       <div>
         <h2>{game.name}</h2>
@@ -93,7 +79,7 @@ import GameAddButton from '../components/GameAddButton'
         )}
         
         {auth.isAuthenticated && status ? (
-          <GameAddDropdown
+          <GameUpdateDropdown
             onUpdateListEntry={(status) => updateMutation.mutate(status)}
             status={status}
           />

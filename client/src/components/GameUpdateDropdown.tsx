@@ -1,4 +1,4 @@
-import styles from './GameAddDropdown.module.css'
+import styles from './GameUpdateDropdown.module.css'
 import { useEffect, useState } from "react";
 
 type GameAddDropdownProps = {
@@ -14,7 +14,7 @@ const statusOptions: { [key: number]: string } = {
     5: "Plan to Play"
 }
 
-export default function GameAddDropdown({ onUpdateListEntry, status }: GameAddDropdownProps) {
+export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAddDropdownProps) {
     const [showDropdown, setShowDropdown] = useState(false);
     const [currentStatus, setCurrentStatus] = useState(status);
 
