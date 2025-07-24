@@ -29,7 +29,6 @@
   z-index: 1;
 }
 
-/* Links inside the dropdown */
 .dropdownContent p {
   color: black;
   padding: 12px 16px;
@@ -42,3 +41,9 @@
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;}
+
+.disabled {
+    opacity: 50;
+    pointer-events:stroke; 
+    cursor: default;
+}

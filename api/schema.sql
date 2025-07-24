@@ -25,12 +25,8 @@ CREATE TABLE IF NOT EXISTS games (
 CREATE TABLE IF NOT EXISTS user_games (
     username VARCHAR(80) NOT NULL,
     game_id INT UNSIGNED NOT NULL,
-    status VARCHAR(120) NOT NULL,
+    status INT NOT NULL,
     PRIMARY KEY (username, game_id),
     FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (game_id) REFERENCES games(game_id)
 );
-
-INSERT INTO users (username, email, password, created_at)
-VALUES ('listaddtest', 'list@example.com', 'hashedpassword123', NOW());
-

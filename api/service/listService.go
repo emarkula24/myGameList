@@ -18,8 +18,8 @@ func NewListService(repo *repository.ListRepository, client interfaces.GiantBomb
 	return &ListService{ListRepository: repo, Cbc: client}
 }
 
-func (s *ListService) PostGame(gameId int, username, gamename, status string) error {
-	err := s.ListRepository.InsertGame(gameId, username, gamename, status)
+func (s *ListService) PostGame(gameId, status int, username, gamename string) error {
+	err := s.ListRepository.InsertGame(gameId, status, username, gamename)
 	if err != nil {
 		log.Printf("failed to add game %s", err)
 		return fmt.Errorf("%w", err)
@@ -27,8 +27,8 @@ func (s *ListService) PostGame(gameId int, username, gamename, status string) er
 	return nil
 }
 
-func (s *ListService) PutGame(gameId int, username, status string) error {
-	err := s.ListRepository.UpdateGame(gameId, username, status)
+func (s *ListService) PutGame(gameId, status int, username string) error {
+	err := s.ListRepository.UpdateGame(gameId, status, username)
 	if err != nil {
 		log.Printf("failed to update game %s", err)
 		return fmt.Errorf("%w", err)
@@ -49,4 +49,8 @@ func (s *ListService) GetGameList(username string, page, limit int) (*http.Respo
 	}
 	return fullGameList, gamelist, nil
 
+}
+func (s *ListService) GetGameFromList(username string, gameId int) *repository.Game {
+	gameListItem := s.ListRepository.FetchGame(username, gameId)
+	return gameListItem
 }

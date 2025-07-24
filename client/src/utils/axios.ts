@@ -5,16 +5,14 @@ const axiosAuthorizationInstance = axios.create({
     withCredentials: true,
 })
 
-
 const username = localStorage.getItem("tanstack.auth.username")
 const userId = localStorage.getItem("tanstack.auth.userId")
 axiosAuthorizationInstance.interceptors.request.use(request => {
-    const accessToken = localStorage.getItem('tanstack.auth.accessToken');
-    console.log(accessToken)
+    const accessToken = localStorage.getItem('tanstack.auth.accessToken')
+
     if (accessToken) {
     request.headers['Authorization'] = `Bearer ${accessToken}`;
     }
-    console.log(request)
     return request
 }, error  => {  
     return Promise.reject(error)
@@ -28,22 +26,22 @@ axiosAuthorizationInstance.interceptors.response.use(
       originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
       try {
         console.log("trying to refresh accessToken...")
-        const response = await axios.post('/user/refresh', {username: username, userId: userId}, {withCredentials: true});
-        const { accessToken } = response.data;
+        const response = await axios.post('/user/refresh', {username: username, userId: userId}, {withCredentials: true})
+        const { accessToken } = response.data
         console.log(response)
         // Store the new access and refresh tokens.
-        localStorage.setItem('tanstack.auth.accessToken', accessToken);
+        localStorage.setItem('tanstack.auth.accessToken', accessToken)
         // Update the authorization header with the new access token.
-        axiosAuthorizationInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        axiosAuthorizationInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
         return axiosAuthorizationInstance(originalRequest); // Retry the original request with the new access token.
       } catch (refreshError) {
         // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
-        console.error('Token refresh failed:', refreshError);
+        console.error('Token refresh failed:', refreshError)
         console.log("logged out, no redirect")
-        return Promise.reject(refreshError);
+        return Promise.reject(refreshError)
       }
     }
-    return Promise.reject(error); // For all other errors, return the error as is.
+    return Promise.reject(error) // For all other errors, return the error as is.
   }
 );
 

@@ -71,7 +71,7 @@ func TestAddToList(t *testing.T) {
 }
 
 func TestUpdateList(t *testing.T) {
-	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listupdateest", "listupdate@test.com", "1234567@M")
+	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listupdatest", "listupdate@test.com", "1234567@M")
 	require.NoError(t, err)
 	body := `{
 		"game_id":34126,

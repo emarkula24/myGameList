@@ -41,8 +41,8 @@ export interface Game {
 
         
 }
-export interface GameListEntry {
-        status: string;
+export interface GameListEntries {
+        status: number;
         id: number;
         guid: string;
         name: string;
@@ -62,7 +62,13 @@ export interface GameListEntry {
         genres: Array<object>;
 
 }
-
+export interface GameData {
+        id?: number;
+        status?: number;
+}
+export interface GameListEntry {
+        gamedata: GameData | null
+}
 export interface RegisterResponse {
         user_id: number;
 }

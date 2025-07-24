@@ -21,7 +21,6 @@ func main() {
 	flag.Parse()
 
 	router := initializeServer()
-
 	frontUrl := os.Getenv("VITE_FRONTEND_URL")
 	if frontUrl == "" {
 		log.Fatal("VITE_FRONTEND_URL is not set")

@@ -13,7 +13,7 @@ func NewListRepository(Db *sql.DB) *ListRepository {
 	return &ListRepository{Db: Db}
 }
 
-func (r *ListRepository) InsertGame(gameId int, username, gamename, status string) error {
+func (r *ListRepository) InsertGame(gameId, status int, username, gamename string) error {
 
 	// ON DUPLICATE KEY is used to keep from inserting duplicates
 	query := `INSERT INTO games (game_id, gamename) VALUES (?,?) ON DUPLICATE KEY UPDATE game_id = game_id`
@@ -29,15 +29,23 @@ func (r *ListRepository) InsertGame(gameId int, username, gamename, status strin
 	return nil
 }
 
-func (r *ListRepository) UpdateGame(gameId int, username, status string) error {
+func (r *ListRepository) UpdateGame(gameId, status int, username string) error {
+
 	query := `
 			UPDATE user_games 
 			SET status = ? 
-			WHERE username = ? AND game_id = ?
+			WHERE username = ? AND game_id = ? AND status != ?
 			`
-	_, err := r.Db.Exec(query, status, username, gameId)
+	res, err := r.Db.Exec(query, status, username, gameId, status)
 	if err != nil {
 		return fmt.Errorf("failed to update game (game_id=%d, user_id=%s): %w", gameId, username, err)
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("no rows updated: likely no match for (username=%s, game_id=%d)", username, gameId)
 	}
 	return nil
 }
@@ -78,4 +86,20 @@ func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, e
 	}
 
 	return games, nil
+}
+func (r *ListRepository) FetchGame(username string, gameId int) *Game {
+	query := `
+			SELECT gm.game_id, ug.status
+			FROM user_games ug
+			JOIN games gm ON ug.game_id = gm.game_id
+			WHERE ug.username = ? AND ug.game_id = ?
+			ORDER BY gm.gamename ASC
+	`
+	var game Game
+	err := r.Db.QueryRow(query, username, gameId).Scan(&game.GameID, &game.Status)
+	if err != nil {
+		return nil
+	}
+	return &game
+
 }

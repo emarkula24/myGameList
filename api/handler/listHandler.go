@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"example.com/mygamelist/errorutils"
@@ -28,7 +29,7 @@ func NewListHandler(ls *service.ListService) *ListHandler {
 
 type ListRequest struct {
 	GameId   int    `json:"game_id"`
-	Status   string `json:"status"`
+	Status   int    `json:"status"`
 	UserName string `json:"username"`
 	GameName string `json:"gamename"`
 }
@@ -43,13 +44,17 @@ func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
 		errorutils.WriteJSONError(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	err := h.ListService.PostGame(listReq.GameId, listReq.UserName, listReq.GameName, listReq.Status)
+	err := h.ListService.PostGame(listReq.GameId, listReq.Status, listReq.UserName, listReq.GameName)
 	if err != nil {
 		log.Printf("failed to insert game: %s", err)
 		errorutils.WriteJSONError(w, "failed to add game to list", http.StatusInternalServerError)
 		return
 	}
-	h.Cache.Delete(listReq.UserName)
+	for k := range h.Cache.Items() {
+		if strings.HasPrefix(k, listReq.UserName+",") {
+			h.Cache.Delete(k)
+		}
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -64,11 +69,16 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 		errorutils.WriteJSONError(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	err := h.ListService.PutGame(updateReq.GameId, updateReq.UserName, updateReq.Status)
+	err := h.ListService.PutGame(updateReq.GameId, updateReq.Status, updateReq.UserName)
 	if err != nil {
 		log.Printf("failed to update game: %s", err)
 		errorutils.WriteJSONError(w, "failed to update list", http.StatusBadRequest)
 		return
+	}
+	for k := range h.Cache.Items() {
+		if strings.HasPrefix(k, updateReq.UserName+",") {
+			h.Cache.Delete(k)
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -95,7 +105,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	if username == "" {
 		log.Printf("query parameter for username or gamename is missing")
-		errorutils.WriteJSONError(w, "no query parameter for username", http.StatusBadRequest)
+		errorutils.WriteJSONError(w, "no query parameter for username or gamename", http.StatusBadRequest)
 		return
 	}
 	// Extract 'page' and 'limit' query parameters
@@ -172,7 +182,6 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	case 1:
 		h.Cache.Set(cacheKey, finalResponse, cache.DefaultExpiration)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(finalResponse); err != nil {
 			log.Printf("failed to write response: %s", err)
 			errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
@@ -186,5 +195,39 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Gamebomb API status != 200: %d", gameJSON.StatusCode)
 		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
 	}
+
+}
+
+func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
+	gameId := r.URL.Query().Get("gameId")
+	if username == "" || gameId == "" {
+		log.Printf("query parameter for username or gameId is missing")
+		errorutils.WriteJSONError(w, "no query parameter for username or gameId", http.StatusBadRequest)
+		return
+	}
+	gameIdInt, err := strconv.Atoi(gameId)
+	if err != nil {
+		log.Printf("failed to convert gameId to int")
+		errorutils.WriteJSONError(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
+		return
+	}
+	type GameResponse struct {
+		GameData any `json:"gamedata"`
+	}
+	game := h.ListService.GetGameFromList(username, gameIdInt)
+	var response GameResponse
+	if game == nil {
+		response = GameResponse{GameData: map[string]any{}}
+	} else {
+		response = GameResponse{GameData: game}
+	}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("failed to encode into json")
+		errorutils.WriteJSONError(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 
 }

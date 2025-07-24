@@ -1,53 +1,65 @@
 import styles from './GameAddDropdown.module.css'
-import { useState } from "react";
-export default function GameAddDropdown({ onSelect }: { onSelect: (status: string) => void }) {
+import { useEffect, useState } from "react";
+
+type GameAddDropdownProps = {
+    onUpdateListEntry: (status: number) => void
+    status: number
+}
+
+const statusOptions: { [key: number]: string } = {
+    1: "Playing",
+    2: "Completed",
+    3: "On-Hold",
+    4: "Dropped",
+    5: "Plan to Play"
+}
+
+export default function GameAddDropdown({ onUpdateListEntry, status }: GameAddDropdownProps) {
     const [showDropdown, setShowDropdown] = useState(false);
-    const [defaultText, setDefaultText] = useState("Select Status")
-    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+    const [currentStatus, setCurrentStatus] = useState(status);
 
-    const handleSelect = (gameStatus: string, label: string) => {
-        setDefaultText(label)
+    useEffect(() => {
+        setCurrentStatus(status);
+    }, [status]);
+
+
+    const handleSelect = (selectedStatus: number) => {
         setShowDropdown(false); // close dropdown after selection
-        setSelectedStatus(gameStatus)
-    };
-    const handleClick = () => {
-        if (selectedStatus) {
-            onSelect(selectedStatus)
-        }
 
-    }
+        if (selectedStatus === currentStatus) {
+            console.log("status is the same so no update")
+            return
+        }
+        setCurrentStatus(selectedStatus)
+        onUpdateListEntry(selectedStatus)
+        console.log("tried to update", selectedStatus, statusOptions[selectedStatus])
+
+    };
+
     return (
         <div className={styles.dropdown}>
             <button onClick={() => setShowDropdown(prev => !prev)} className={styles.dropbtn}>
-                {defaultText}
+                {statusOptions[currentStatus]}
             </button>
-            <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
-                {(
-                    [
-                        ["playing", "Playing"],
-                        ["completed", "Completed"],
-                        ["on-hold", "On-Hold"],
-                        ["dropped", "Dropped"],
-                        ["plan to play", "Plan to Play"],
-                    ] as const
-                ).map(([gameStatus, label]) => {
-                    return (<p
-                        key={label}
-                        onClick={() => handleSelect(gameStatus, label)}
-                    >
-                        {label}
-                    </p>)
-                })
-                }
-
-            </div>
-                        <button
-                onClick={handleClick}
-                disabled={!selectedStatus}
-                className={styles.addButton}
-                >
-                Add to List
-            </button>
+            {showDropdown && (
+                <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
+                    {Object.entries(statusOptions).map(([key, label]) => {
+                        const numericKey = Number(key);
+                        const isCurrent = numericKey === currentStatus;
+                        return (
+                            <p
+                                key={key}
+                                onClick={() => {
+                                    if (!isCurrent) handleSelect(numericKey)
+                                }}
+                                className={isCurrent ? styles.disabled : undefined}
+                            >
+                                {label}
+                            </p>
+                        )
+                    })}
+                </div>
+            )}
         </div>
     )
 }

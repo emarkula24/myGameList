@@ -25,8 +25,9 @@ func CreateUserSubrouter(router *mux.Router, user *handler.UserHandler) *mux.Rou
 func CreateListSubRouter(router *mux.Router, list *handler.ListHandler) *mux.Router {
 	s := router.PathPrefix("/list").Subrouter()
 	s.HandleFunc("", list.GetList).Methods("GET")
+	s.HandleFunc("/game", list.GetListItem).Methods("GET")
 	s.Handle("/add", middleware.VerifyJWTMiddleware(http.HandlerFunc(list.InsertToList))).Methods("POST")
-	s.HandleFunc("/update", list.UpdateList).Methods("PUT")
+	s.Handle("/update", middleware.VerifyJWTMiddleware(http.HandlerFunc(list.UpdateList))).Methods("PUT")
 
 	return s
 }

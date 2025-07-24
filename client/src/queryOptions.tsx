@@ -1,5 +1,5 @@
 import { queryOptions} from "@tanstack/react-query";
-import { fetchGame, fetchGameList, fetchGames } from "./game";
+import { fetchGame, fetchGameList, fetchGameListEntry, fetchGames } from "./game";
 
 export const gameQueryOptions = (guid: string) =>
     queryOptions({
@@ -12,8 +12,13 @@ export const gamesQueryOptions = (query: string) =>
         queryKey: ["games", { query }],
         queryFn: () => fetchGames(query),
     })
-export const fetchGameListQueryOptions = (username: string) =>
+export const gameListQueryOptions = (username: string) =>
     queryOptions({
         queryKey: ["gamelist", {username}],
         queryFn: () => fetchGameList(username)
+    })
+export const gameListEntryQueryOptions = (username: string | undefined, gameId: number) =>
+    queryOptions({
+        queryKey: ["gamelistsingle", { username, gameId}],
+        queryFn: () => fetchGameListEntry(username, gameId)
     })
