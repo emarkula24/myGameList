@@ -28,10 +28,13 @@ export interface Games {
 export interface Game {
         id: number;
         name: string;
+        guid: string;
+        status: number;
         deck: string;
         description: string;
         image: {
                 medium_url: string;
+                icon_url: string;
         }
         original_release_data: string;
         platforms: Array<object>;

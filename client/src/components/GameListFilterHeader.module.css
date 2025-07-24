@@ -1,0 +1,12 @@
+.statusContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 800px;
+    height: 200x;
+    
+}
+.statusItem {
+    width: 100;
+}

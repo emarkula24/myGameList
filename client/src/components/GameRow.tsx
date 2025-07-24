@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import GameUpdateDropdown from './GameUpdateDropdown'
-import { createUpdateGameMutation } from '../queryOptions'
+import { useUpdateGameMutation, useAddGameMutation } from '../queryOptions'
 import { useAuth } from '../utils/auth'
+import type { Game } from '../types/types'
+import GameAddButton from './GameAddButton'
 
 const statusOptions: { [key: number]: string } = {
     1: "Playing",
@@ -12,13 +14,15 @@ const statusOptions: { [key: number]: string } = {
     5: "Plan to Play"
 }
 
-export default function GameRow({ game, username, isEditing, toggleEditMode }: {
-    game: any
+export default function GameRow({ game, username, isEditing, toggleEditMode, isMissingFromLoggedInUserList }: {
+    game: Game
     username: string
     isEditing: boolean
     toggleEditMode: (id: number) => void
+    isMissingFromLoggedInUserList: boolean
 }) {
-    const updateMutation = createUpdateGameMutation(username)(game.id, game.name)
+    const updateMutation = useUpdateGameMutation(username, game.id, game.name)
+    const addMutation = useAddGameMutation(game.id, game.name)
     const auth = useAuth()
     const isLoggedInUser = auth.user?.username === username
     useEffect(() => {
@@ -51,10 +55,17 @@ export default function GameRow({ game, username, isEditing, toggleEditMode }: {
                     statusOptions[game.status]
                 )}
             </td>
-            {isLoggedInUser &&
+            {isLoggedInUser ? (
                 <td onClick={() => toggleEditMode(game.id)} style={{ cursor: 'pointer' }}>
                     {isEditing ? 'Cancel' : 'Edit'}
                 </td>
+            ) : isMissingFromLoggedInUserList && (
+                <td>
+                    <GameAddButton
+                        onNewListEntry={(status) => addMutation.mutate(status)}
+                    />
+                </td>
+            )
             }
         </tr>
     )

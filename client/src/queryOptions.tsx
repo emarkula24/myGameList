@@ -42,15 +42,14 @@ export function useAddGameMutation(gameId: number, gameName: string) {
         }
     })
 }
-export function createUpdateGameMutation(username: string | undefined) {
-    return (gameId: number, gameName: string) => {
+export function useUpdateGameMutation(username: string | undefined, gameId: number, gameName: string) {
         const auth = useAuth()
         const queryClient = useQueryClient()
         return useMutation({
 
             mutationFn: async (status: number) => {
                 if (auth.user?.username !== username) {
-                    return new Error("you are not this user")
+                    throw new Error("you are not this user")
                 }
                 return await updateGame(gameId, status, username, gameName)
             },
@@ -61,4 +60,3 @@ export function createUpdateGameMutation(username: string | undefined) {
 
         })
     }
-}

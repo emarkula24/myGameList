@@ -4,6 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import GameRow from '../components/GameRow'
 import { useAuth } from '../utils/auth'
+import GameListFilterHeader from '../components/GameListFilterHeader'
 
 export const Route = createFileRoute('/gamelist/$username')({
   loader: ({ context: { queryClient }, params: { username } }) => {
@@ -32,7 +33,8 @@ function GameListComponent() {
   }
   gamelist.sort((a, b) => a.name.localeCompare(b.name));
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column",alignItems: "center"}}>
+      <GameListFilterHeader />
       <h3>Viewing {username}'s Game List</h3>
       {gamelist.length > 0 ? (  
               <table>
@@ -41,6 +43,7 @@ function GameListComponent() {
                     <th>Image</th>
                     <th>Game Title</th>
                     <th>Status</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,6 +54,7 @@ function GameListComponent() {
                       username={username}
                       isEditing={editingGameIds.has(game.id)}
                       toggleEditMode={toggleEditMode}
+                      isMissingFromLoggedInUserList={!loggedInGameIds.has(game.id)}
                     />
                   ))}
            </tbody>

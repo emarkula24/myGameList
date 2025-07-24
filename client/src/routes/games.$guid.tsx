@@ -1,5 +1,5 @@
   import { createFileRoute, ErrorComponent, useRouter, type ErrorComponentProps } from '@tanstack/react-router'
-  import { createUpdateGameMutation, gameListEntryQueryOptions, gameQueryOptions, useAddGameMutation } from '../queryOptions'
+  import { gameListEntryQueryOptions, gameQueryOptions, useAddGameMutation, useUpdateGameMutation } from '../queryOptions'
   import { useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query'
   import { GameNotFoundError } from '../game'
   import React from 'react'
@@ -52,8 +52,7 @@ import GameUpdateDropdown from '../components/GameUpdateDropdown'
     const status = gameListEntry.gamedata?.status ?? false
 
     const addMutation = useAddGameMutation(game.id, game.name)
-    const getUpdateMutation = createUpdateGameMutation(auth.user?.username)
-    const updateMutation = getUpdateMutation(game.id, game.name)
+    const updateMutation = useUpdateGameMutation(auth.user?.username, game.id, game.name)
     
     return (
       <div>
