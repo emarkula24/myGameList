@@ -72,7 +72,7 @@ function GameListComponent() {
           {/* <span>Viewing {username}'s Game List</span> */}
           <span className={styles.text}>{statusOptions[selectedFilter]}</span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", width: "1000px" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "1000px", border: "solid lightgrey 1px"}}>
           {filteredGameList.length > 0 ? (
             <table>
               <thead>

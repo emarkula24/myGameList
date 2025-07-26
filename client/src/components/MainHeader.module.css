@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 1000px;
+  width: 75%;
 }
 
 .leftContent h1 {
@@ -12,4 +12,7 @@
 .rightContent {
   font-size: 14px;
   cursor: pointer; /* if clickable */
+}
+.sitelogo {
+  font-size: 24px;
 }

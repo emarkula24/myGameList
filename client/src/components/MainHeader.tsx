@@ -5,7 +5,7 @@ export default function MainHeader() {
     return (
         <div className={styles.headerContainer}>
             <div className={styles.leftContent}>
-                <Link to="/">myGameList</Link>
+                <Link to="/" className={styles.sitelogo}>myGameList</Link>
             </div>
             <div className={styles.rightContent}>
 

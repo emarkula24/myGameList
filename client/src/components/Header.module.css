@@ -1,8 +1,8 @@
 .headerContainer {
         display: flex;
-        justify-content:center;
+        justify-content:space-around;
         align-items: center;
-        width: 1000px;
+        width: 75%;
         background-color: green ;
 }
 .linkButton {
