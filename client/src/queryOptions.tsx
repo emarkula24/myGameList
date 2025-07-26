@@ -43,20 +43,20 @@ export function useAddGameMutation(gameId: number, gameName: string) {
     })
 }
 export function useUpdateGameMutation(username: string | undefined, gameId: number, gameName: string) {
-        const auth = useAuth()
-        const queryClient = useQueryClient()
-        return useMutation({
+    const auth = useAuth()
+    const queryClient = useQueryClient()
+    return useMutation({
 
-            mutationFn: async (status: number) => {
-                if (auth.user?.username !== username) {
-                    throw new Error("you are not this user")
-                }
-                return await updateGame(gameId, status, username, gameName)
-            },
-            onSettled: () => queryClient.invalidateQueries({ queryKey: ["gamelist"] }),
-            onError: (error) => {
-                console.error('Update game error:', error)
+        mutationFn: async (status: number) => {
+            if (auth.user?.username !== username) {
+                throw new Error("you are not this user")
             }
+            return await updateGame(gameId, status, auth.user?.username, gameName)
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["gamelist"] }),
+        onError: (error) => {
+            console.error('Update game error:', error)
+        }
 
-        })
-    }
+    })
+}

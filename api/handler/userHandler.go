@@ -136,7 +136,81 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 }
+func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	type LogoutRequest struct {
+		Username string `json:"username"`
+		UserId   string `json:"userId"`
+	}
+	var logoutReq LogoutRequest
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
 
+	if err := decoder.Decode(&logoutReq); err != nil {
+		log.Printf("failed to decode logoutreq: %s", err)
+		errorutils.WriteJSONError(w, "failed to logout", http.StatusInternalServerError)
+		return
+	}
+	if logoutReq.UserId == "" || logoutReq.Username == "" {
+		errorutils.WriteJSONError(w, "missing values from body", http.StatusBadRequest)
+		return
+	}
+	userIdInt, err := strconv.Atoi(logoutReq.UserId)
+	if err != nil {
+		errorutils.WriteJSONError(w, "failed to convert userId", http.StatusBadRequest)
+		return
+
+	}
+	cookie, err := r.Cookie("refreshToken")
+	log.Printf("cookie: %s", cookie)
+	if err != nil {
+		log.Printf("Failed to logout, missing refresh token: %s", err)
+		errorutils.WriteJSONError(w, "missing refresh token", http.StatusUnauthorized)
+		return
+	}
+	tokenStr := cookie.Value
+	log.Println(tokenStr)
+	k := os.Getenv("REFRESH_SECRET_KEY")
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
+		return []byte(k), nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+	if err != nil {
+		log.Printf("Failed to logout, invalid refresh token: %s", err)
+		errorutils.WriteJSONError(w, "invalid refresh token", http.StatusUnauthorized)
+		return
+	}
+
+	jtiFromDb, err := h.UserService.FetchRefreshToken(logoutReq.Username, userIdInt)
+	if err != nil {
+		log.Printf("Failed to logout, invalid user: %s", err)
+		errorutils.WriteJSONError(w, "invalid user", http.StatusUnauthorized)
+		return
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		log.Printf("Failed to logout, invalid token claims: %s", err)
+		errorutils.WriteJSONError(w, "invalid token claims", http.StatusUnauthorized)
+		return
+	}
+
+	jti, ok := claims["jti"].(string)
+
+	if !ok {
+		log.Printf("Failed to logout, invalid claims: %s", err)
+		errorutils.WriteJSONError(w, "jti claim missing or invalid", http.StatusUnauthorized)
+		return
+	}
+	if jti == jtiFromDb {
+		switch {
+		case token.Valid:
+			err := h.UserService.UserRepository.DeleteRefreshToken(userIdInt, jti)
+			if err != nil {
+				log.Printf("failed to detete refresh token from database: %s", err)
+				errorutils.WriteJSONError(w, "failed to logout", http.StatusBadRequest)
+			}
+
+		}
+	}
+}
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	type RefreshRequest struct {

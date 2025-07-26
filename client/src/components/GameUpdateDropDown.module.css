@@ -2,31 +2,42 @@
 .dropdown {
   position: relative;
   display: inline-block;
+
 }
 
 .dropbtn {
   border: none;
   cursor: pointer;
+  font-size: 18px;
+  border: black solid 1px;
+  padding: 3, 3, 3, 3;
 }
+
 /* Dropdown button on hover & focus */
-.dropbtn:hover, .dropbtn:focus {
-  background-color: #2980B9;
+.dropbtn:hover {
+  background-color: green;
 }
+
 .addButton {
   border: none;
   cursor: pointer;
 }
-.addButton:hover, .dropbtn:focus {
-  background-color: #2980B9;
+
+.addButton:hover,
+.dropbtn:focus {
+  background-color: green;
 }
+
 /* Dropdown Content (Hidden by Default) */
 .dropdownContent {
   display: none;
   position: absolute;
   background-color: #f1f1f1;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  right:0 ;
+
 }
 
 .dropdownContent p {
@@ -34,16 +45,21 @@
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+
 }
 
 /* Change color of dropdown links on hover */
-.dropdownContent p:hover {background-color: #ddd;}
+.dropdownContent p:hover {
+  background-color: green;
+}
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
+.show {
+  display: block;
+}
 
 .disabled {
-    opacity: 50;
-    pointer-events:stroke; 
-    cursor: default;
+  opacity: 50;
+  pointer-events: stroke;
+  cursor: default;
 }

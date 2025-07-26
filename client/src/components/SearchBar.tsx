@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import styles from "./SearchBar.module.css";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import SearchResult from "./SearchResult";
 import { fetchGames } from "../game";
 import { useSearch } from "../hooks/useSearchContext";
@@ -60,7 +60,6 @@ export default function SearchBar() {
     return (
         <div ref={containerRef} className={styles.searchResults}>
             <label>
-                Search:
                 <input
                     type="text"
                     name="searchInput"
@@ -74,19 +73,12 @@ export default function SearchBar() {
                 {gameQuery.isLoading && "Loading..."}
                 {gameQuery.isFetched && gameQuery.data && showResults && (
                     <ul
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            height: "600px",
-                            overflowY: "scroll",
-                            listStyleType: "none",
-                            padding: 0,
-                            margin: 0,
-                        }}
+                        className={styles.listContainer}
                     >
                         {gameQuery.data.map((game) => (
                             <SearchResult key={game.id} game={game} />
                         ))}
+                        <Link to="/results"><li>View all results for <b>{searchQuery}</b></li></Link>
                     </ul>
                 )}
             </div>

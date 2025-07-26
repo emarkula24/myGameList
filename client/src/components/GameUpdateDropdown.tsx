@@ -37,10 +37,11 @@ export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAd
     };
 
     return (
-        <div className={styles.dropdown}>
+        <div>
             <button onClick={() => setShowDropdown(prev => !prev)} className={styles.dropbtn}>
                 {statusOptions[currentStatus]}
             </button>
+            <div className={styles.dropdown}>
             {showDropdown && (
                 <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
                     {Object.entries(statusOptions).map(([key, label]) => {
@@ -48,7 +49,7 @@ export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAd
                         const isCurrent = numericKey === currentStatus;
                         return (
                             <p
-                                key={key}
+                                key={numericKey}
                                 onClick={() => {
                                     if (!isCurrent) handleSelect(numericKey)
                                 }}
@@ -60,6 +61,7 @@ export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAd
                     })}
                 </div>
             )}
+        </div>
         </div>
     )
 }

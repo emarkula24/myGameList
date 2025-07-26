@@ -7,6 +7,7 @@ import type { AuthContext } from '../utils/auth'
 import { useMemo, useState } from 'react'
 import type { Games } from '../types/types'
 import { SearchContext } from '../hooks/useSearchContext'
+import MainHeader from '../components/MainHeader'
 
 
 // function RouterSpinner() {
@@ -33,10 +34,11 @@ function RootComponent() {
   const [searchResults, setSearchResults] = useState<Games[]>([])
   const searchContextValue = useMemo(() => ({ searchResults, setSearchResults }), [searchResults])
   return (
-    <>
+    <div >
       <SearchContext value={searchContextValue}>
-        <div>
-
+        
+        <div style={{display:"flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+          < MainHeader />
           < Header />
 
         </div>
@@ -45,6 +47,6 @@ function RootComponent() {
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="right" />
       </SearchContext>
-    </>
+    </div>
   )
 }

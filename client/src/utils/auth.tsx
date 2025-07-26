@@ -1,7 +1,6 @@
 import axios from "axios"
 import type { RegisterResponse } from "../types/types"
 import React from "react"
-import { sleep } from "./utils"
 export class LoginFailedError extends Error { }
 export class RegisterFailedError extends Error { }
 export class UserNotLoggedInError extends Error { }
@@ -14,7 +13,7 @@ export type User = {
 export interface AuthContext {
   isAuthenticated: boolean
   login: (username: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  logout: (username?: string , userId?: string) => Promise<void>
   user: User | null
 }
 
@@ -51,11 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(getStoredUser())
   const isAuthenticated = !!user
 
-  const logout = React.useCallback(async () => {
-    await sleep(250)
-
-    setStoredUser(null)
-    setUser(null)
+  const logout = React.useCallback(async (username?: string, userId?: string ) => {
+      await logoutUser(username, userId)
+      setUser(null)
+      setStoredUser(null)
   }, [])
 
   const login = React.useCallback(async (username: string, password: string) => {
@@ -125,3 +123,23 @@ export const postRegister = async (email: string, password: string, username: st
   return response
 
 }
+
+export const logoutUser = async (username?: string, userId?: string) => {
+  if (!username || !userId) {
+    throw new Error("Missing username or userId for logout");
+  }
+  
+  await new Promise((r) => setTimeout(r, 500))
+  return await axios
+    .post(`/user/logout`, {
+      userId: userId,
+      username: username,
+    })
+    .then((r) => console.log(r))
+    .catch((err) => {
+      const errStatus = err.response?.status
+      if (errStatus === 400 || errStatus === 500) {
+        throw new Error
+      }
+    })
+} 

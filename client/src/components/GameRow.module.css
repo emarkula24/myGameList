@@ -1,0 +1,28 @@
+.block {
+    background-color: white;
+}
+
+.block:nth-child(even) {
+    background-color: lightgray;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    padding-left: 20px;
+    color: green;
+    padding: 30px;
+
+}
+
+.item {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 20px;
+
+}
+
+.editBtn {
+    cursor: pointer;
+}

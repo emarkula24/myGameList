@@ -42,7 +42,7 @@ export interface Game {
         similar_games: Array<object>;
         genres: Array<object>;
 
-        
+
 }
 export interface GameListEntries {
         status: number;
@@ -77,5 +77,5 @@ export interface RegisterResponse {
 }
 
 export type SubmitErrorProps = {
-  err: string | null;
+        err: string | null;
 };

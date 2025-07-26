@@ -1,12 +1,16 @@
 .searchResults {
-        position: absolute;
-        
-        right: 15%;
-        top: 1%;
-        width: 15%;
-
+        position: relative;
 }
 
-ul {
+.listContainer {
+        position:fixed;
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        max-height: 600px;
+        overflow-y:scroll;
         list-style-type: none;
-}
+        padding: 0;
+        margin: 0 auto;
+        background-color: aliceblue;
+}  

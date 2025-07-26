@@ -8,5 +8,17 @@
     
 }
 .statusItem {
-    width: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 40px;
+    font-size: 24px;
+}
+.statusItem:hover {
+    background-color: lightgray;
+}
+.activeSelection {
+    font-weight:600;
+    box-shadow: 0 6px green;
 }

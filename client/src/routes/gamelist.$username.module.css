@@ -1,0 +1,47 @@
+.divider {
+    width: 1000px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    background-color: green;
+}
+.text {
+    font-size: 24px;
+    font-weight:600;
+    color:aliceblue;
+}
+.headerTitleStatus {
+    box-shadow: 3px 0 green;
+}
+.headerNumber {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    border: 1px solid lightgray;
+}
+.headerImage {
+    font-size: 18px;
+    width: 30px;
+    height: 20px;
+    border: 1px solid lightgray;
+}
+.headerName {
+    font-size: 18px;
+    width: 500px;
+    height: 20px;
+    border: 1px solid lightgray;
+    padding: 1, 1, 1, 1;
+}
+.headerStatus {
+    font-size: 18px;
+    width: 100px;
+    height: 20px;
+    border: 1px solid lightgray;
+}
+.headerAction {
+    font-size: 18px;
+    width: 30px;
+    height: 20px;
+    border: 1px solid lightgray;
+}

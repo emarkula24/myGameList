@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Spinner } from './components/Spinner'
 import axios from 'axios'
 import { useAuth, AuthProvider } from './utils/auth'
-
+import "./main.css"
 
 
 const queryClient = new QueryClient()
