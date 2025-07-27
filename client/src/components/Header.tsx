@@ -1,6 +1,4 @@
-import { useAuth } from "../utils/auth"
 import styles from "./Header.module.css"
-import LogoutButton from "./LogoutButton"
 import SearchBar from "./SearchBar"
 import { Link, } from "@tanstack/react-router"
 
@@ -8,38 +6,35 @@ import { Link, } from "@tanstack/react-router"
 
 // Header component, consists of HeaderElements, searchbar, and logout button
 export default function Header() {
-        const auth = useAuth()
         return (
                 <div className={styles.headerContainer}>
+                        <div>
+                        {/* usually the address would be used as a key, index is for the sake of showing TBA items  */}
 
                         {(
                                 [
-                                        ["/about", "About"],
-                                        ["/community", "Community"],
-                                        ["/profile", "Profile"],
-                                        ["/login", "Login"],
-                                        ["/register", "Sign up"]
+                                        ["/community", "Community", 1],
+                                        ["", "TBA", 2],
+                                        ["", "TBA", 3],
+                                        ["", "TBA", 4],
+                                        
                                 ] as const
-                        ).map(([to, label]) => {
+                        ).map(([to, label, index]) => {
                                 return (
                                         <Link
-                                                key={to}
+                                                key={index}
                                                 to={to}
-                                                
                                                 activeProps={{ className: styles.active }}
                                                 className={styles.linkButton}
                                         >
-
                                                 {label}
-
                                         </Link>
                                 )
                         })}
+                        </div>
+                        <div>
                         <SearchBar />
-                        {auth.isAuthenticated && (
-                                <LogoutButton />
-                        )}
-
+                        </div>
                 </div>
         )
 }

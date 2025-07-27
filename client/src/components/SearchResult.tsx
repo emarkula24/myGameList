@@ -16,13 +16,22 @@ const SearchResult: React.FC<SearchResultProps> = ({ game }) => {
         })
     }
     return (
-        <> 
+        <div> 
             <li
                 key={game.id}
                 onClick={onMouseClick}
-                className={styles.resultItem}><img src={game.image?.icon_url}  className={styles.resultImage}/>{game.name}</li>
+                className={styles.container}
+                >
+                
+                <img src={game.image?.icon_url}  className={styles.resultImage}
+                />
+                
+                <div className={styles.textContainer}>
+                {game.name}
+                </div>
+                </li>
         
-        </>
+        </div>
     );
 };
 

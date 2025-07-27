@@ -20,7 +20,7 @@ export interface Games {
                 super_url: string;
         };
         original_release_date?: string;
-        platforms?: { abbreviation: string }[];
+        platforms?: { name: string }[];
         deck?: string;
         site_detail_url: string;
 }
@@ -35,6 +35,9 @@ export interface Game {
         image: {
                 medium_url: string;
                 icon_url: string;
+                tiny_url: string;
+                thumb_url: string;
+                small_url: string;
         }
         original_release_data: string;
         platforms: Array<object>;

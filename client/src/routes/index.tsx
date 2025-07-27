@@ -1,6 +1,7 @@
 
     import { createFileRoute, Link } from '@tanstack/react-router'
     import { useAuth } from '../utils/auth'
+import CommonDivider from '../components/CommonDivider'
 
     export const Route = createFileRoute('/')({
             component: IndexComponent,
@@ -9,11 +10,10 @@
     function IndexComponent() {
         const { user, isAuthenticated } = useAuth()    
         return (
-            <div style={{ padding: "2px" }}>
-                <h3>Welcome to myGameList!</h3>
-
+            <div className="routeContainer">
+                <CommonDivider routeName='Welcome to MyGameList!' />
                 {isAuthenticated && user && (
-                    <Link to="/gamelist/$username" params={{ username: user.username }}>
+                    <Link to="/gamelist/$username" params={{ username: user.username }} style={{fontSize: "2.4em"}}>
                         View your gamelist!
                     </Link>
                 )}

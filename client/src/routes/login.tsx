@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import { z } from 'zod'
 import SubmitError from '../components/SubmitError'
 import { useAuth } from '../utils/auth'
-
+import "../css/userForms.css"
+import CommonDivider from '../components/CommonDivider'
 const fallback = '/' as const
 
 export const Route = createFileRoute('/login')({
@@ -11,9 +12,9 @@ export const Route = createFileRoute('/login')({
                 redirect: z.string().optional(),
         }),
         beforeLoad: ({ context, search }) => {
-        if (context.auth.isAuthenticated) {
-        throw redirect({ to: search.redirect || fallback })
-        }
+                if (context.auth.isAuthenticated) {
+                        throw redirect({ to: search.redirect || fallback })
+                }
         },
         component: LoginComponent,
 
@@ -38,14 +39,14 @@ function LoginComponent() {
                 try {
                         await auth.login(loginFormData.username, loginFormData.password)
                         await router.invalidate()
-                        await router.navigate({to: search.redirect || fallback})
+                        await router.navigate({ to: search.redirect || fallback })
                 } catch (err: any) {
                         setError(err.message || 'Login failed');
                 } finally {
                         setIsSubmitting(false)
                 }
         };
-        
+
         function onChange(event: React.ChangeEvent<HTMLInputElement>) {
                 setLoginFormData({
                         ...loginFormData,
@@ -54,13 +55,8 @@ function LoginComponent() {
         }
         const isLoggingIn = isLoading || isSubmitting
         return (
-                <div>
-                        <h3>Login page</h3>
-                        {search.redirect ? (
-                                <p>login!</p>
-                        ) : (
-                                <p>Login to see all the cool content in here.</p>
-                        )}
+                <div className="routeContainer">
+                        <CommonDivider routeName="Login" />
                         <form className="formContainer">
                                 <label className="Label">Username:</label>
                                 <input name="username" value={loginFormData.username} onChange={onChange} type="text" placeholder="Enter username" required />
@@ -69,7 +65,7 @@ function LoginComponent() {
                                 <button onClick={onSubmit} type="submit">Login</button>
                         </form>
                         {isLoggingIn ? 'Loading...' : 'Login'}
-                        {error && <SubmitError err={error}/>}
+                        {error && <SubmitError err={error} />}
                 </div>
 
         )

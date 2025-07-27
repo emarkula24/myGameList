@@ -38,7 +38,7 @@ export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAd
 
     return (
         <div>
-            <div onClick={() => setShowDropdown(prev => !prev)} className={styles.dropbtn}>
+            <div onClick={() => setShowDropdown(prev => !prev)} className={`${styles.dropbtn} ${showDropdown ? styles.active : ""}`}>
                 {statusOptions[currentStatus]}
             </div>
             <div className={styles.dropdownContainer}>

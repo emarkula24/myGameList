@@ -1,0 +1,7 @@
+.btn {
+    color: green;
+    cursor: pointer;
+}
+.btn:hover {
+    text-decoration: underline;
+}

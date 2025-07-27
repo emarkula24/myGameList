@@ -1,6 +1,10 @@
 import styles from "./GameListFilterHeader.module.css"
 import { useState } from "react";
-export default function GameListFilterHeader({ onSelect }: { onSelect: React.Dispatch<React.SetStateAction<number>> }) {
+import searchIcon from '../assets/search_icon.png';
+export default function GameListFilterHeader({ onSelect, onSearch }: {
+    onSelect: React.Dispatch<React.SetStateAction<number>>,
+    onSearch: React.Dispatch<React.SetStateAction<string>>
+}) {
     const [currentSelection, setCurrentSelecton] = useState(0)
     const statusItems = [
         { id: 0, label: "All Games" },
@@ -15,6 +19,9 @@ export default function GameListFilterHeader({ onSelect }: { onSelect: React.Dis
         setCurrentSelecton(id)
         onSelect(id)
     }
+    const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        onSearch(event.currentTarget.value)
+    }
     return (
         <div className={styles.statusContainer}>
             {statusItems.map((item) =>
@@ -25,6 +32,8 @@ export default function GameListFilterHeader({ onSelect }: { onSelect: React.Dis
                     {item.label}
                 </div>
             )}
+            <input type="text" maxLength={20} onChange={handleInput}/>
+            <img src={searchIcon} />
         </div>
     )
 }

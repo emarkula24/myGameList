@@ -8,10 +8,8 @@ export const Route = createFileRoute('/_auth/profile')({
 function ProfileComponent() {
   const auth = useAuth()
   return (
-    <div className="p-2 space-y-2">
-      <div>
-        Username:<strong>{auth.user?.username}</strong>
-      </div>
+    <div className="routeContainer">
+      <h1>Username:<strong>{auth.user?.username}</strong></h1>
     </div>
   )
 }

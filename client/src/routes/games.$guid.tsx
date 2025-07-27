@@ -6,6 +6,7 @@
   import { useAuth } from '../utils/auth'
 import GameAddButton from '../components/GameAddButton'
 import GameUpdateDropdown from '../components/GameUpdateDropdown'
+import CommonDivider from '../components/CommonDivider'
 
 
   export const Route = createFileRoute('/games/$guid')({
@@ -55,8 +56,9 @@ import GameUpdateDropdown from '../components/GameUpdateDropdown'
     const updateMutation = useUpdateGameMutation(auth.user?.username, game.id, game.name)
     
     return (
-      <div>
-        <h2>{game.name}</h2>
+      <div className="routeContainer">
+        <CommonDivider routeName={game.name} />
+        <img src={game.image?.medium_url} />
         <p>{game.deck}</p>
 
         {addMutation.isError && (

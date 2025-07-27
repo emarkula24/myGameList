@@ -1,0 +1,8 @@
+.container {
+    border: 1px, lightgrey, solid;
+    width: 75%;
+    box-sizing: border-box;
+}
+.container:hover {
+    background-color: lightgray;
+}

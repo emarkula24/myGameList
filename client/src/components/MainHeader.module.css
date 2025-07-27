@@ -3,16 +3,64 @@
   justify-content: space-between;
   align-items: center;
   width: 75%;
+  background-color: white;
 }
 
 .leftContent h1 {
-  font-size: 16px; 
+  font-size: 20px;
 }
 
 .rightContent {
-  font-size: 14px;
-  cursor: pointer; /* if clickable */
+  font-size: 2em;
+  width: 11em;
 }
+
 .sitelogo {
-  font-size: 24px;
+  font-size: 4em;
+  text-decoration: none;
+  color: green;
+}
+
+.usermenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: middle;
+  text-align: center;
+
+}
+.profileContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  vertical-align: middle;
+  text-align: center;
+}
+.usermenuProfile {
+  color: green;
+  text-decoration: none;
+  width: 100px;
+  height: 1.5em;
+}
+
+.usermenuProfile:hover {
+  text-decoration: underline;
+}
+
+.usermenuLogin {
+  border: 0.5px solid lightgray;
+  color: green;
+  font-weight: 500;
+  width: 100px;
+  height: 1.5em;
+  text-decoration: none;
+}
+
+.usermenuRegister {
+  border: 2px solid lightgray;
+  background-color: green;
+  color: white;
+  width: 100px;
+  height: 1.5em;
+  text-decoration: none;
 }

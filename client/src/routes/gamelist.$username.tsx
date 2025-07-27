@@ -6,7 +6,8 @@ import GameRow from '../components/GameRow'
 import { useAuth } from '../utils/auth'
 import GameListFilterHeader from '../components/GameListFilterHeader'
 import React from 'react'
-import styles from "./gamelist.$username.module.css"
+import GameTableHeaderRow from '../components/GameTableHeaderRow'
+import CommonDivider from '../components/CommonDivider'
 export const Route = createFileRoute('/gamelist/$username')({
   loader: ({ context: { queryClient }, params: { username } }) => {
     return queryClient.ensureQueryData(gameListQueryOptions(username))
@@ -30,6 +31,7 @@ function GameListComponent() {
   const { data: gamelist } = useSuspenseQuery(gameListQueryOptions(username))
   const { data: loggedInUserGameList } = useSuspenseQuery(gameListQueryOptions(auth.user?.username))
   const [selectedFilter, setSelectedFilter] = useState(0)
+  const [searchQuery, setSearchQuery] = useState("")
   const [editingGameIds, setEditingGameIds] = useState<Set<number>>(new Set())
   const loggedInGameIds = new Set(loggedInUserGameList.map(g => g.id))
 
@@ -47,6 +49,7 @@ function GameListComponent() {
       return newSet
     })
   }
+
   React.useEffect(() => {
     setEditingGameIds(new Set())
   }, [selectedFilter])
@@ -63,32 +66,47 @@ function GameListComponent() {
     // If status is equal, compare names alphabetically
     return a.name.localeCompare(b.name)
   })
+  if (searchQuery != "") {
+    filteredGameList = filteredGameList.filter((game) => game.name.toLowerCase().includes(searchQuery.toLocaleLowerCase()))
+  }
   return (
-    <div>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <GameListFilterHeader onSelect={setSelectedFilter} />
+    <div className="routeContainer">
+      <div>
+        <div style={{
+          borderBottom: "0.5px solid lightgrey",
+          borderLeft: "0.5px solid lightgrey",
+          borderRight: "0.5px solid lightgrey",
+          boxSizing: "border-box",
+          color: "green",
+          fontSize: "2.4em",
+        }}>Viewing {username}'s Game List</div>
+        <GameListFilterHeader
+          onSelect={setSelectedFilter}
+          onSearch={setSearchQuery}
+        />
         <div style={{ padding: "8px" }}></div>
-        <div className={styles.divider}>
-          {/* <span>Viewing {username}'s Game List</span> */}
-          <span className={styles.text}>{statusOptions[selectedFilter]}</span>
+        <div style={{
+          width: '100%',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'green',
+          boxSizing: "border-box"
+        }}>
+
+          <span style={{ fontWeight: "600", color: 'aliceblue', fontSize: "2.4em" }}>{statusOptions[selectedFilter]}</span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", width: "1000px", border: "solid lightgrey 1px"}}>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", border: "solid lightgrey 1px" }}>
           {filteredGameList.length > 0 ? (
             <table>
               <thead>
-                <tr style={{backgroundColor: "lightgray"}}>
-                  {/* <th className={styles.headerTitleStatus}></th> */}
-                  <th className={styles.headerNumber}>#</th>
-                  <th className={styles.headerImage}>Image</th>
-                  <th className={styles.headerName}>Game Title</th>
-                  <th className={styles.headerStatus}>Status</th>
-                  <th className={styles.headerAction}>Actions</th>
-                </tr>
+                <GameTableHeaderRow />
               </thead>
               <tbody>
                 {filteredGameList.map((game, index) => (
                   <GameRow
-                    index={index}
+                    index={index + 1}
                     key={game.id}
                     game={game}
                     username={username}
@@ -101,9 +119,9 @@ function GameListComponent() {
                 ))}
               </tbody>
             </table>
-            
+
           ) : (
-            <p>This category is empty</p>
+            <p style={{ fontSize: "2em", textAlign: "center" }}>This category is empty</p>
           )}
         </div>
       </div>

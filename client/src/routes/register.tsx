@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import "../css/userForms.css"
 import { postRegister } from '../utils/auth';
 import SubmitError from '../components/SubmitError';
+import CommonDivider from '../components/CommonDivider';
 
 
 export const Route = createFileRoute('/register')({
@@ -39,7 +40,8 @@ function Register() {
         }
 
         return (
-                <>
+                <div className="routeContainer">
+                        <CommonDivider routeName={"Register"} />
                         <form className='formContainer'>
                                 <label className='Label'>Username:</label>
                                 <input name="username" value={registerFormData.username} onChange={handleChange} type="username" placeholder='Enter username' />
@@ -52,6 +54,6 @@ function Register() {
                                 <button onClick={handleSubmit} type="submit" >Register</button>
                         </form>
                         {error && <SubmitError err={error} />}
-                </>
+                </div>
         )
 }

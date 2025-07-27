@@ -39,14 +39,13 @@ function RootComponent() {
         
         <div style={{display:"flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
           < MainHeader />
-          < Header />
-
+          < Header /> 
         </div>
-        <hr />
         <Outlet />
+
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="right" />
       </SearchContext>
-    </div>
+      </div>
   )
 }

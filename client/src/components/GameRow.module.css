@@ -7,13 +7,16 @@
 }
 
 .title {
-    font-size: 20px;
+    font-size: 2em;
     font-weight: bold;
     text-decoration: none;
     padding-left: 20px;
     color: green;
     padding: 30px;
 
+}
+.title:hover {
+    text-decoration: underline;
 }
 
 .item {
@@ -28,5 +31,6 @@
     vertical-align: center;
     cursor: pointer;
     user-select: none;
+    font-size: 2em;
     -moz-user-select: none;
 }

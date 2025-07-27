@@ -1,4 +1,5 @@
 .searchResults {
+        padding: 10px 20px;
         position: relative;
 }
 
@@ -8,6 +9,7 @@
         flex-direction: column;
         height: auto;
         max-height: 600px;
+        max-width: 220px;
         overflow-y:scroll;
         list-style-type: none;
         padding: 0;

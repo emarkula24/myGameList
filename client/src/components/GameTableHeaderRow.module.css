@@ -1,16 +1,4 @@
-.divider {
-    width: 75%;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content:center;
-    background-color: green;
-}
-.text {
-    font-size: 24px;
-    font-weight:600;
-    color:aliceblue;
-}
+
 .headerTitleStatus {
     box-shadow: 3px 0 green;
 }
@@ -31,7 +19,9 @@
     width: 500px;
     height: 20px;
     border: 1px solid lightgray;
-    padding: 1, 1, 1, 1;
+    text-align: left;
+    padding-left: 30px;
+    
 }
 .headerStatus {
     font-size: 18px;

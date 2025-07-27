@@ -67,10 +67,10 @@ export default function SearchBar() {
                     value={searchQuery}
                     onChange={handleInputChange}
                     onKeyDown={handleEnterPress}
+                    autoComplete="off"
                 />
             </label>
             <div>
-                {gameQuery.isLoading && "Loading..."}
                 {gameQuery.isFetched && gameQuery.data && showResults && (
                     <ul
                         className={styles.listContainer}

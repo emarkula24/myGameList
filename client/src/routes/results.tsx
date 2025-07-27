@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSearch } from '../hooks/useSearchContext'
+import GameResultRow from '../components/GameResultRow'
 
 export const Route = createFileRoute('/results')({
   component: RouteComponent,
@@ -7,14 +8,12 @@ export const Route = createFileRoute('/results')({
 
 function RouteComponent() {
   const {searchResults} = useSearch()
+  console.log(searchResults)
   return (
-    <div>
+    <div className="routeContainer">
       {searchResults.length > 0 ? (
         searchResults.map((game) => (
-          <div key={game.id}>
-            <h3>{game.name}</h3>
-            <img src={game.image?.thumb_url} />
-          </div>
+          <GameResultRow game={game} />
         ))
       ) : (
         <p>No results found.</p>

@@ -14,11 +14,15 @@
   font-size: 20px;
   text-align: center;
   vertical-align: middle;
+  user-select: none;
+  -moz-user-select: none;
 
 }
 
-/* Dropdown button on hover & focus */
 .dropbtn:hover {
+  font-weight: bold
+}
+.active {
   font-weight: bold;
 }
 
@@ -46,6 +50,8 @@
   padding: 6px 8px;
   text-decoration: none;
   display: block;
+  user-select: none;
+  -moz-user-select: none;
 
 }
 

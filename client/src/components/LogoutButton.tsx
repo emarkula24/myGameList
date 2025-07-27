@@ -1,7 +1,7 @@
 import { useRouter, useRouterState } from "@tanstack/react-router"
 import { useAuth } from "../utils/auth"
 import React from "react";
-
+import styles from "./LogoutButton.module.css"
 
 export default function LogoutButton() {
     const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -29,7 +29,7 @@ export default function LogoutButton() {
     
     return (
         <div>
-            <div onClick={handleClick}>Logout</div>
+            <div onClick={handleClick} className={styles.btn}>Logout</div>
         </div>
     )
 }

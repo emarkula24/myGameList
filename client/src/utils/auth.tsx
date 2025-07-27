@@ -26,7 +26,7 @@ const USERID_KEY = "tanstack.auth.userId"
 function getStoredUser(): User | null {
   const accessToken = localStorage.getItem(TOKEN_KEY)
   const username = localStorage.getItem(USERNAME_KEY)
-  const userId = localStorage.getItem(USERID_KEY)
+  const userId = String(localStorage.getItem(USERID_KEY) ?? "")
   if (accessToken && username && userId) {
     return { username, userId, accessToken }
   }
@@ -128,7 +128,6 @@ export const logoutUser = async (username?: string, userId?: string) => {
   if (!username || !userId) {
     throw new Error("Missing username or userId for logout");
   }
-  
   await new Promise((r) => setTimeout(r, 500))
   return await axios
     .post(`/user/logout`, {
