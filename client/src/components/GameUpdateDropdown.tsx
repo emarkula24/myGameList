@@ -1,4 +1,4 @@
-import styles from './GameUpdateDropdown.module.css'
+import styles from './GameUpdateDropDown.module.css'
 import { useEffect, useState } from "react";
 
 type GameAddDropdownProps = {
