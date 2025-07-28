@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import type { Games } from "../types/types";
 import styles from "./GameResultRow.module.css"
 

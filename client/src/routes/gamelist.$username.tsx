@@ -71,20 +71,12 @@ function GameListComponent() {
   }
   return (
     <div className="routeContainer">
-      <div>
-        <div style={{
-          borderBottom: "0.5px solid lightgrey",
-          borderLeft: "0.5px solid lightgrey",
-          borderRight: "0.5px solid lightgrey",
-          boxSizing: "border-box",
-          color: "green",
-          fontSize: "2.4em",
-        }}>Viewing {username}'s Game List</div>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px, lightgrey solid", boxSizing: "border-box", width: "75%"}}>
         <GameListFilterHeader
           onSelect={setSelectedFilter}
-          onSearch={setSearchQuery}
+          setSearchQuery={setSearchQuery}
         />
-        <div style={{ padding: "8px" }}></div>
+        <div style={{ padding: "8px", borderTop: "1px solid lightgrey", width: "100%", boxSizing: "border-box"}}></div>
         <div style={{
           width: '100%',
           height: '40px',
