@@ -53,10 +53,10 @@ export default function SearchBar() {
         };
     }, []);
     useEffect(() => {
-        if (debouncedSearchQuery && !showResults) {
+        if (debouncedSearchQuery) {
             setShowResults(true);
         }
-    }, [debouncedSearchQuery, showResults])
+    }, [debouncedSearchQuery])
     return (
         <div ref={containerRef} className={styles.searchResults}>
             <label>
@@ -71,6 +71,7 @@ export default function SearchBar() {
                 />
             </label>
             <div>
+                {gameQuery.isLoading && <div>loading..</div>}
                 {gameQuery.isFetched && gameQuery.data && showResults && (
                     <ul
                         className={styles.listContainer}
