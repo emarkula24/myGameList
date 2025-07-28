@@ -7,39 +7,36 @@ import { Link, } from "@tanstack/react-router"
 
 // Header component, consists of HeaderElements, searchbar, and logout button
 export default function Header() {
-        const { user, isAuthenticated } = useAuth() 
-        let userParam: string | undefined
+        const { user, isAuthenticated } = useAuth()
+        let userParam: string = user?.username ?? ""
+        const links: [string, string, string][] = [[
+                "/community", "Community", ""
+        ]]
         if (isAuthenticated) {
-                userParam = user?.username
-        } else {
-                userParam = ""
+                links.push([`/gamelist/$username`, "GameList", userParam])
         }
+
         return (
                 <div className={styles.headerContainer}>
                         <div>
 
-                        {(
-                                [
-                                        ["/community", "Community", ""],
-                                        [`/gamelist/$username`, "GameList", userParam],
-                                        
-                                ] as const
-                        ).map(([to, label, params]) => {
-                                return (
-                                        <Link
-                                                key={to}
-                                                to={to}
-                                                params={{username: params}}
-                                                activeProps={{ className: styles.active }}
-                                                className={styles.linkButton}
-                                        >
-                                                {label}
-                                        </Link>
-                                )
-                        })}
+                                {
+                                        links.map(([to, label, params]) => {
+                                                return (
+                                                        <Link
+                                                                key={to}
+                                                                to={to}
+                                                                params={{ username: params }}
+                                                                activeProps={{ className: styles.active }}
+                                                                className={styles.linkButton}
+                                                        >
+                                                                {label}
+                                                        </Link>
+                                                )
+                                        })}
                         </div>
                         <div>
-                        <SearchBar />
+                                <SearchBar />
                         </div>
                 </div>
         )

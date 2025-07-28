@@ -14,7 +14,7 @@ function IndexComponent() {
         <div className="routeContainer">
             <CommonDivider routeName='Welcome to MyGameList!' />
             {isAuthenticated && user && (
-                <Link to="/gamelist/$username" params={{ username: user.username }} style={{ fontSize: "2.4em" }}>
+                <Link to="/gamelist/$username" params={{ username: user.username }} style={{ fontSize: "2.4em", color: "green", textDecoration: "none" }}>
                     View your gamelist!
                 </Link>
             )}

@@ -25,7 +25,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   notFoundComponent: () => {
     return (
       <div className='routeContainer' style={{ fontSize: "2em" }}>
-        <p >404 address not found</p>
+        <p style={{fontSize: "2em"}}>404 address not found</p>
         <Link to="/">Top Page</Link>
       </div>
     )
@@ -35,21 +35,26 @@ function RootComponent() {
   const [searchResults, setSearchResults] = useState<Games[]>([])
   const searchContextValue = useMemo(() => ({ searchResults, setSearchResults }), [searchResults])
   return (
-    <div >
+    <div>
       <SearchContext value={searchContextValue}>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           < MainHeader />
           < Header />
-         
         </div>
-        
         <Outlet />
-        <Footer />
+        <div style={{ borderTop: "1px solid lightgrey", width: "100%" }}></div>
+        <div style={{ display: 'flex', alignItems: "center", justifyContent: "center" }}>
+          <Footer />
+        </div>
+
+
+
+
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="right" />
       </SearchContext>
-       
+
     </div>
   )
 }

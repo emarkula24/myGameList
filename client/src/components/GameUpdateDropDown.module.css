@@ -2,9 +2,6 @@
 .dropdownContainer {
   position: relative;
   display: flex;
-
-
-
 }
 
 .dropbtn {
@@ -48,7 +45,7 @@
 
 .dropdownContent p {
   color: black;
-  padding: 6px 8px;
+  font-size: 20px;
   text-decoration: none;
   display: block;
   user-select: none;
@@ -62,7 +59,6 @@
   cursor: pointer;
 }
 
-/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {
   display: block;
 }

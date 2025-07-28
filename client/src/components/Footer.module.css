@@ -1,17 +1,36 @@
 .footerContainer {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 100%;
-    background-color: lightgray;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 75%;
+    margin: 20px;
 
     
 }
+.linkContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    width: 40%;
+}
+.link {
+    padding-left: 20px;
+    font-size: 2em;
+    text-decoration: none;
+    color: green;
 
+}
 .image {
     max-width: 50px;
     max-height: 50px;
     width: auto;
     height: auto;
+    opacity: 0.4;
+}
+.image:hover {
+    opacity: 1;
+    cursor: pointer;
 }

@@ -41,6 +41,8 @@
   text-decoration: none;
   width: 100px;
   height: 1.5em;
+  vertical-align: middle;
+  text-align: center;
 }
 
 .usermenuProfile:hover {

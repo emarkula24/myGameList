@@ -41,11 +41,16 @@
     -moz-user-select: none;
     width: 40%;
 }
+.editBtn:hover {
+    color: green;
+}
 .deleteBtn {
     cursor: pointer;
     user-select: none;
     -moz-user-select: none;
     font-size: 2em;
     width: 40%;
-
+}
+.deleteBtn:hover {
+    color: green;
 }
