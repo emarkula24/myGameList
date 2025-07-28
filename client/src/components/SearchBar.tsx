@@ -72,7 +72,6 @@ export default function SearchBar() {
                 />
             </label>
             <div>
-                {gameQuery.isLoading && <Spinner />}
                 {gameQuery.isFetched && gameQuery.data && showResults && (
                     <ul
                         className={styles.listContainer}
