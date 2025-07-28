@@ -54,10 +54,10 @@ export default function SearchBar() {
         };
     }, []);
     useEffect(() => {
-        if (debouncedSearchQuery) {
+        if (debouncedSearchQuery && !showResults) {
             setShowResults(true);
         }
-    }, [debouncedSearchQuery])
+    }, [debouncedSearchQuery, showResults])
     return (
         <div ref={containerRef} className={styles.searchResults}>
             <label>

@@ -13,7 +13,7 @@ function RouteComponent() {
     <div className="routeContainer">
       {searchResults.length > 0 ? (
         searchResults.map((game) => (
-          <GameResultRow game={game} />
+          <GameResultRow game={game} key={game.id}/>
         ))
       ) : (
         <p>No results found.</p>

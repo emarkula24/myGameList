@@ -40,8 +40,11 @@ function LoginComponent() {
                         await auth.login(loginFormData.username, loginFormData.password)
                         await router.invalidate()
                         await router.navigate({ to: search.redirect || fallback })
-                } catch (err: any) {
-                        setError(err.message || 'Login failed');
+                } catch (err: unknown) {
+                        if (err instanceof Error) {
+                                setError(err.message || 'Login failed');
+                        }
+                        
                 } finally {
                         setIsSubmitting(false)
                 }

@@ -12,7 +12,7 @@ export default function GameAddButton({ onNewListEntry }: GameAddButtonProps) {
     
     return (
         <div>
-            <button onClick={handleClick}>Add to GameList</button>
+            <button onClick={handleClick} type="button">Add to GameList</button>
         </div>
     )
 }

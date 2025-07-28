@@ -19,7 +19,10 @@ export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAd
     const [currentStatus, setCurrentStatus] = useState(status);
 
     useEffect(() => {
-        setCurrentStatus(status);
+        if (currentStatus !== status) {
+            setCurrentStatus(status);
+        }
+        
     }, [status]);
 
 
