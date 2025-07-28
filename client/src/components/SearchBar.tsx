@@ -6,7 +6,6 @@ import SearchResult from "./SearchResult";
 import { fetchGames } from "../game";
 import { useSearch } from "../hooks/useSearchContext";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { Spinner } from "./Spinner";
 
 export default function SearchBar() {
     const [searchQuery, setSearchQuery] = useState("");
