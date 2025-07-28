@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react'
 import type { Games } from '../types/types'
 import { SearchContext } from '../hooks/useSearchContext'
 import MainHeader from '../components/MainHeader'
+import Footer from '../components/Footer'
 
 
 // function RouterSpinner() {
@@ -23,9 +24,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
   notFoundComponent: () => {
     return (
-      <div>
-        <p>This is the notFoundComponent configured on root route</p>
-        <Link to="/">Start Over</Link>
+      <div className='routeContainer' style={{ fontSize: "2em" }}>
+        <p >404 address not found</p>
+        <Link to="/">Top Page</Link>
       </div>
     )
   },
@@ -36,16 +37,19 @@ function RootComponent() {
   return (
     <div >
       <SearchContext value={searchContextValue}>
-        
-        <div style={{display:"flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-          < MainHeader />
-          < Header /> 
-        </div>
-        <Outlet />
 
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          < MainHeader />
+          < Header />
+         
+        </div>
+        
+        <Outlet />
+        <Footer />
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="right" />
       </SearchContext>
-      </div>
+       
+    </div>
   )
 }

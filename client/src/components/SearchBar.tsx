@@ -6,13 +6,14 @@ import SearchResult from "./SearchResult";
 import { fetchGames } from "../game";
 import { useSearch } from "../hooks/useSearchContext";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { Spinner } from "./Spinner";
 
 export default function SearchBar() {
     const [searchQuery, setSearchQuery] = useState("");
     const [showResults, setShowResults] = useState(false);
     const navigate = useNavigate({});
     const { setSearchResults } = useSearch();
-    const debouncedSearchQuery = useDebounce(searchQuery, 1000);
+    const debouncedSearchQuery = useDebounce(searchQuery, 200);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     const gameQuery = useQuery({
@@ -71,6 +72,7 @@ export default function SearchBar() {
                 />
             </label>
             <div>
+                {gameQuery.isLoading && <Spinner />}
                 {gameQuery.isFetched && gameQuery.data && showResults && (
                     <ul
                         className={styles.listContainer}

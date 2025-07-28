@@ -59,24 +59,24 @@ function GameListComponent() {
     filteredGameList = gamelist.filter((game) => Number(game.status) === selectedFilter)
   }
   filteredGameList.sort((a, b) => {
-    //compare status numerically
-    if (a.status !== b.status) {
-      return a.status - b.status
-    }
-    // If status is equal, compare names alphabetically
+    // Initially sorts by status, then by name ascending
+    const statusDiff = a.status - b.status;
+    if (statusDiff !== 0) return statusDiff;
     return a.name.localeCompare(b.name)
   })
+
   if (searchQuery != "") {
     filteredGameList = filteredGameList.filter((game) => game.name.toLowerCase().includes(searchQuery.toLocaleLowerCase()))
   }
   return (
     <div className="routeContainer">
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px, lightgrey solid", boxSizing: "border-box", width: "75%"}}>
+      < CommonDivider routeName={`Viewing ${username}'s Game List`}/>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px, lightgrey solid", boxSizing: "border-box", width: "75%" }}>
         <GameListFilterHeader
           onSelect={setSelectedFilter}
           setSearchQuery={setSearchQuery}
         />
-        <div style={{ padding: "8px", borderTop: "1px solid lightgrey", width: "100%", boxSizing: "border-box"}}></div>
+        <div style={{ padding: "8px"}}></div>
         <div style={{
           width: '100%',
           height: '40px',
@@ -84,14 +84,13 @@ function GameListComponent() {
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: 'green',
-          boxSizing: "border-box"
+          border: "1px solid grey"
         }}>
-
           <span style={{ fontWeight: "600", color: 'aliceblue', fontSize: "2.4em" }}>{statusOptions[selectedFilter]}</span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", width: "100%", border: "solid lightgrey 1px" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", border: "solid lightgrey 1px", }}>
           {filteredGameList.length > 0 ? (
-            <table>
+            <table style={{ borderCollapse: "collapse", }}>
               <thead>
                 <GameTableHeaderRow />
               </thead>
@@ -111,7 +110,6 @@ function GameListComponent() {
                 ))}
               </tbody>
             </table>
-
           ) : (
             <p style={{ fontSize: "2em", textAlign: "center" }}>This category is empty</p>
           )}

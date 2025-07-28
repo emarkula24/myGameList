@@ -6,7 +6,7 @@ export const Route = createFileRoute('/about')({
 
 function About() {
   return (
-    <div className="routeContainer">
+    <div>
       <h1>Hello from About!</h1>
     </div>
   );

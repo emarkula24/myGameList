@@ -1,37 +1,48 @@
-
 .headerTitleStatus {
-    box-shadow: 3px 0 green;
+    width: 0.6%;
 }
 .headerNumber {
-    width: 30px;
+    width: 2%;
     height: 30px;
-    font-size: 18px;
-    border: 1px solid lightgray;
+    font-size: 1.5em;
+    
 }
 .headerImage {
     font-size: 18px;
-    width: 30px;
-    height: 20px;
-    border: 1px solid lightgray;
+    width: 10%;
+    height: 30px;
+    
 }
 .headerName {
     font-size: 18px;
-    width: 500px;
-    height: 20px;
-    border: 1px solid lightgray;
+    width: 50%;
+    height: 30px;
     text-align: left;
     padding-left: 30px;
+    
     
 }
 .headerStatus {
     font-size: 18px;
-    width: 100px;
-    height: 20px;
-    border: 1px solid lightgray;
+    width: 15%;
+    height: 30px;
 }
 .headerAction {
     font-size: 18px;
-    width: 30px;
+    width: 15%;
+    height: 30px;
+}
+.shortRightBorder {
+    position: relative;
+    border-right: none;
+}
+
+.shortRightBorder::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 0;
     height: 20px;
-    border: 1px solid lightgray;
+    width: 1px;
+    background-color: lightgrey;
 }

@@ -3,9 +3,12 @@
 }
 
 .block:nth-child(even) {
-    background-color: lightgray;
+    background-color: rgb(232, 241, 232);
 }
 
+.titleColor {
+    height: 82px;
+}
 .title {
     font-size: 2em;
     font-weight: bold;
@@ -22,15 +25,27 @@
 .item {
     text-align: center;
     vertical-align: middle;
-    font-size: 20px;
+    font-size: 2em;
 
 }
 
+.actionContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
 .editBtn {
-    text-align: center;
-    vertical-align: center;
     cursor: pointer;
     user-select: none;
     font-size: 2em;
     -moz-user-select: none;
+    width: 40%;
+}
+.deleteBtn {
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    font-size: 2em;
+    width: 40%;
+
 }

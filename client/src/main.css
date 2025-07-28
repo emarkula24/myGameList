@@ -1,11 +1,14 @@
 body {
     font-size: 62.5%;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    
 }
-
+html {
+    scrollbar-gutter: stable;
+}
 .routeContainer {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    align-items: center;
+    align-items: center; 
 }
