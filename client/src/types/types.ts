@@ -40,10 +40,10 @@ export interface Game {
                 small_url: string;
         }
         original_release_data: string;
-        platforms: Array<object>;
-        publishers: Array<object>;
-        similar_games: Array<object>;
-        genres: Array<object>;
+        platforms: object[];
+        publishers: object[];
+        similar_games: object[];
+        genres: object[];
 
 
 }
@@ -62,11 +62,14 @@ export interface GameListEntries {
                 small_url: string;
         }
         original_release_data: string;
-        platforms: Array<object>;
-        publishers: Array<object>;
-        similar_games: Array<object>;
-        genres: Array<object>;
+        platforms: object[];
+        publishers: object[];
+        similar_games: object[];
+        genres: object[];
 
+}
+export interface GameList {
+        gamelist: GameListEntries
 }
 export interface GameData {
         id?: number;
@@ -79,6 +82,6 @@ export interface RegisterResponse {
         user_id: number;
 }
 
-export type SubmitErrorProps = {
+export interface SubmitErrorProps {
         err: string | null;
-};
+}

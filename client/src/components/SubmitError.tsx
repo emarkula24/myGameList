@@ -1,7 +1,7 @@
 
-type SubmitErrorProps = {
+interface SubmitErrorProps {
   err: string | null;
-};
+}
 
 
 export default function SubmitError({err}:  SubmitErrorProps) {

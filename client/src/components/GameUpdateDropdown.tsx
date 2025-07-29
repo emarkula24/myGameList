@@ -6,7 +6,7 @@ interface GameAddDropdownProps {
     status: number
 }
 
-const statusOptions: { [key: number]: string } = {
+const statusOptions: Record<number, string> = {
     1: "Playing",
     2: "Completed",
     3: "On-Hold",

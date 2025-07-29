@@ -17,7 +17,7 @@ export const Route = createFileRoute('/gamelist/$username')({
 
 function GameListComponent() {
 
-  const statusOptions: { [key: number]: string } = {
+  const statusOptions: Record<number, string> = {
     0: "ALL GAMES",
     1: "PLAYING",
     2: "COMPLETED",

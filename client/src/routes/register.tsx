@@ -25,7 +25,7 @@ function Register() {
                 event.preventDefault()
                 try {
                         await postRegister(registerFormData.email, registerFormData.password, registerFormData.username)
-                        router.navigate({ to: "/login" })
+                        await router.navigate({ to: "/login" })
                 } catch (err: unknown) {
                         if (err instanceof Error) {
                                 setError(err.message || "Register failed.")

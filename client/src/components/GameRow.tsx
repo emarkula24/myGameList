@@ -7,14 +7,14 @@ import type { Game } from '../types/types'
 import GameAddButton from './GameAddButton'
 import styles from './GameRow.module.css'
 
-const statusOptions: { [key: number]: string } = {
+const statusOptions: Record<number, string> = {
     1: "Playing",
     2: "Completed",
     3: "On-Hold",
     4: "Dropped",
     5: "Plan to Play"
 }
-const statusColors: { [key: number]: string } = {
+const statusColors: Record<number, string> = {
     1: "green",      // Playing
     2: "blue",       // Completed
     3: "orange",     // On-Hold

@@ -1,11 +1,11 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import type { RegisterResponse } from "../types/types"
 import React from "react"
 export class LoginFailedError extends Error { }
 export class RegisterFailedError extends Error { }
 export class UserNotLoggedInError extends Error { }
 
-export type User = {
+export interface User {
   username: string
   userId: string
   accessToken: string
@@ -13,7 +13,7 @@ export type User = {
 export interface AuthContext {
   isAuthenticated: boolean
   login: (username: string, password: string) => Promise<void>
-  logout: (username?: string , userId?: string) => Promise<void>
+  logout: (username?: string, userId?: string) => Promise<void>
   user: User | null
 }
 
@@ -50,10 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(getStoredUser())
   const isAuthenticated = !!user
 
-  const logout = React.useCallback(async (username?: string, userId?: string ) => {
-      await logoutUser(username, userId)
-      setUser(null)
-      setStoredUser(null)
+  const logout = React.useCallback(async (username?: string, userId?: string) => {
+    await logoutUser(username, userId)
+    setUser(null)
+    setStoredUser(null)
   }, [])
 
   const login = React.useCallback(async (username: string, password: string) => {
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = React.useContext(AuthContext)
+  const context = React.use(AuthContext)
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
@@ -92,11 +92,14 @@ const postLogin = async (username: string, password: string): Promise<User> => {
     .post<User>(`/user/login`, loginData)
     .then((r) => r.data)
     .catch((err) => {
-      const errStatus = err.response?.status
-      if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
-        throw new LoginFailedError(`login failed for user ${username}`)
+      if (err instanceof AxiosError) {
+        const errStatus = err.response?.status
+        if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
+          throw new LoginFailedError(`login failed for user ${username}`)
+        }
+        throw err
       }
-      throw err
+
     })
 
   return response
@@ -136,9 +139,12 @@ export const logoutUser = async (username?: string, userId?: string) => {
     })
     .then((r) => console.log(r))
     .catch((err) => {
-      const errStatus = err.response?.status
-      if (errStatus === 400 || errStatus === 500) {
-        throw new Error
+      if (err instanceof AxiosError) {
+        const errStatus = err.response?.status
+        if (errStatus === 400 || errStatus === 500) {
+          throw new Error
+        }
       }
+
     })
 } 

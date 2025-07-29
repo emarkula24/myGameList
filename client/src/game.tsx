@@ -1,5 +1,5 @@
-import axios from "axios"
-import { type GameListEntry, type Game, type Games, type GameListEntries } from "./types/types"
+import axios, { AxiosError } from "axios"
+import { type GameListEntry, type Game, type Games, type GameListEntries} from "./types/types"
 import { UserNotLoggedInError } from "./utils/auth"
 import axiosAuthorizationInstance from "./utils/axios"
 
@@ -20,15 +20,18 @@ export const addGame = async (gameId: number, status: number, username: string |
 
         })
         .then((r) => console.log(r))
-        .catch((err) => {
-            const errStatus = err.response?.status
-            if (errStatus === 403) {
-                console.log(err.response)
-                throw new UserNotLoggedInError(`user not logged in when trying to add game ${gamename}`)
-            } else {
-                console.log(err.response)
-                throw new Error
+        .catch((err: unknown) => {
+            if (err instanceof AxiosError) {
+                const errStatus = err.response?.status
+                if (errStatus === 403) {
+                    console.log(err.response)
+                    throw new UserNotLoggedInError(`user not logged in when trying to add game ${gamename}`)
+                } else {
+                    console.log(err.response)
+                    throw new Error
+                }
             }
+
         })
     return result
 }
@@ -44,31 +47,36 @@ export const updateGame = async (gameId: number, status: number, username: strin
         })
         .then((r) => r.data)
         .catch((err) => {
-            const errStatus = err.response?.status
-            if (errStatus === 403) {
-                console.log(err.response)
-                throw new UserNotLoggedInError(`user not logged in when trying to update game ${gamename}`)
-            } else {
-                console.log(err.response)
-                throw new Error
+            if (err instanceof AxiosError) {
+                const errStatus = err.response?.status
+                if (errStatus === 403) {
+                    console.log(err.response)
+                    throw new UserNotLoggedInError(`user not logged in when trying to update game ${gamename}`)
+                } else {
+                    console.log(err.response)
+                    throw new Error
+                }
             }
+
         })
     return result
 }
 // Fetches info on a game based on a guid
-export const fetchGame = async (guid: string) => {
-    await new Promise((r) => setTimeout(r, 500))
-    const game = axios
-        .get<{ results: Game }>(`/games/game?guid=${guid}`)
-        .then((r) => r.data.results)
-        .catch((err) => {
-            if (err.status === 404) {
-                throw new GameNotFoundError(`Game with id ${guid} not found!`)
+export const fetchGame = async (guid: string): Promise<Game> => {
+    await new Promise((r) => setTimeout(r, 500));
+    try {
+        const response = await axios.get<{ results: Game }>(`/games/game?guid=${guid}`);
+        return response.data.results;
+    } catch (err) {
+        if (err instanceof AxiosError) {
+            if (err.response?.status === 404) {
+                throw new GameNotFoundError(`Game with id ${guid} not found!`);
             }
-            throw err
-        })
-    return game
-}
+        }
+        throw err;
+    }
+};
+
 // Fetches a list of games based on query string
 export const fetchGames = async (searchQuery: string) => {
     const encodedSearchQuery = encodeURIComponent(searchQuery)
@@ -77,29 +85,35 @@ export const fetchGames = async (searchQuery: string) => {
         .get<{ results: Games[] }>(`/games/search?query=${encodedSearchQuery}`)
         .then((response) => response.data.results)
         .catch((err) => {
-            if (err.status === 500) {
-                throw new GamesNotFoundError(`Games with query ${encodedSearchQuery} not found`)
+            if (err instanceof AxiosError) {
+                if (err.status === 500) {
+                    throw new GamesNotFoundError(`Games with query ${encodedSearchQuery} not found`)
+                }
+                if (err.status === 400) {
+                    throw new GameListEmptyError
+                }
+                throw err
             }
-            if (err.status === 400) {
-                throw new GameListEmptyError
-            }
-            throw err
+
         })
 
 }
 
-export const fetchGameList = async (username: string | undefined, page: number = 1, limit: number = 20) => {
+export const fetchGameList = async (username: string | undefined, page = 1, limit = 20): Promise<GameListEntries> => {
     await new Promise((r) => setTimeout(r, 500))
-    return axios
-        .get<{ results: GameListEntries[] }>(`/list?username=${username}&page=${page}&limit=${limit}`)
-        .then((response) => response.data.results)
-        .catch((err) => {
+    try {
+        const response = await axios.get<{ results: GameListEntries }>(`/list?username=${username}&page=${page}&limit=${limit}`)
+        return response.data.results
+    } catch (err) {
+        if (err instanceof AxiosError) {
             const errStatus = err.response?.status
             if (errStatus === 500 || errStatus == 404) {
                 throw new GameListNotFoundError(`no gamelist found for user`)
             }
-            throw err
-        })
+            
+        }
+        throw err
+    }
 }
 export const fetchGameListEntry = async (username: string | undefined, gameId: number) => {
     await new Promise((r) => setTimeout(r, 500))
@@ -107,10 +121,13 @@ export const fetchGameListEntry = async (username: string | undefined, gameId: n
         .get<GameListEntry>(`list/game?username=${username}&gameId=${gameId}`)
         .then((response) => response.data)
         .catch((err) => {
-            const errStatus = err.response?.status
-            if (errStatus === 500 || errStatus === 404) {
-                throw new GameListEntryNotFoundError(`no game entry found for user`)
+            if (err instanceof AxiosError) {
+                const errStatus = err.response?.status
+                if (errStatus === 500 || errStatus === 404) {
+                    throw new GameListEntryNotFoundError(`no game entry found for user`)
+                }
+                throw err
             }
-            throw err
+
         })
 }

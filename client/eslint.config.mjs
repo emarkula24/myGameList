@@ -3,8 +3,12 @@ import eslintJs from "@eslint/js";
 import eslintReact from "@eslint-react/eslint-plugin";
 import tseslint from "typescript-eslint";
 export default tseslint.config(
+  {
+    ignores: ["**/dist/**", "eslint.config.mjs"]
+  },
   eslintJs.configs.recommended,
   tseslint.configs.recommended,
+  tseslint.configs.strict,
   tseslint.configs.stylistic,
   tseslint.configs.recommendedTypeChecked,
   eslintReact.configs["recommended-typescript"],
@@ -13,7 +17,6 @@ export default tseslint.config(
       "@eslint-react/no-missing-key": "warn",
     },
     files: ["**/*.ts", "**/*.tsx"],
-    ignores: ["dist"],
   },
     {
     languageOptions: {

@@ -1,7 +1,7 @@
 import { createContext, use } from 'react'
 import type { Games } from '../types/types'
 
-type SearchContextType = {
+interface SearchContextType {
   searchResults: Games[]
   setSearchResults: React.Dispatch<React.SetStateAction<Games[]>>
 }
