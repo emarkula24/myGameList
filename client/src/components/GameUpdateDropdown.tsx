@@ -1,7 +1,7 @@
 import styles from './GameUpdateDropDown.module.css'
 import { useEffect, useState } from "react";
 
-type GameAddDropdownProps = {
+interface GameAddDropdownProps {
     onUpdateListEntry: (status: number) => void
     status: number
 }
