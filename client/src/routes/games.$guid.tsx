@@ -33,7 +33,7 @@ import CommonDivider from '../components/CommonDivider'
       <div>
         <button
           onClick={() => {
-            router.invalidate()
+            void router.invalidate()
           }}
           type="button"
         >
@@ -58,7 +58,7 @@ import CommonDivider from '../components/CommonDivider'
     return (
       <div className="routeContainer">
         <CommonDivider routeName={game.name} />
-        <img src={game.image?.medium_url} />
+        <img src={game.image?.medium_url} style={{width: "30%", height: "auto"}}/>
         <p>{game.deck}</p>
 
         {addMutation.isError && (

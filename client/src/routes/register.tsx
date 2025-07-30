@@ -45,7 +45,7 @@ function Register() {
         return (
                 <div className="routeContainer">
                         <CommonDivider routeName={"Register"} />
-                        <form className='formContainer'>
+                        <form className='formContainer' onSubmit={(e) => void handleSubmit(e)}>
                                 <label className='Label'>Username:</label>
                                 <input name="username" value={registerFormData.username} onChange={handleChange} type="username" placeholder='Enter username' />
                                 <label className='Label'>Email:</label>
@@ -54,7 +54,7 @@ function Register() {
                                 <input name="password" value={registerFormData.password} onChange={handleChange} type='password' placeholder='Enter Password' />
                                 <label className='Label'>Confirm Password:</label>
                                 <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm Password' />
-                                <button onClick={handleSubmit} type="submit" >Register</button>
+                                <button type="submit" >Register</button>
                         </form>
                         {error && <SubmitError err={error} />}
                 </div>

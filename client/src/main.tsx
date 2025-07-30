@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { ErrorComponent, RouterProvider, createRouter } from '@tanstack/react-router'

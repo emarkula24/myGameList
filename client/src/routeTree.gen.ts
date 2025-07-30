@@ -11,24 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ResultsImport } from './routes/results'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as CommunityImport } from './routes/community'
 import { Route as AboutImport } from './routes/about'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
+import { Route as ResultsQueryImport } from './routes/results.$query'
 import { Route as GamesGuidImport } from './routes/games.$guid'
 import { Route as GamelistUsernameImport } from './routes/gamelist.$username'
 import { Route as AuthProfileImport } from './routes/_auth.profile'
 
 // Create/Update Routes
-
-const ResultsRoute = ResultsImport.update({
-  id: '/results',
-  path: '/results',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const RegisterRoute = RegisterImport.update({
   id: '/register',
@@ -62,6 +56,12 @@ const AuthRoute = AuthImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ResultsQueryRoute = ResultsQueryImport.update({
+  id: '/results/$query',
+  path: '/results/$query',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -129,13 +129,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
-    '/results': {
-      id: '/results'
-      path: '/results'
-      fullPath: '/results'
-      preLoaderRoute: typeof ResultsImport
-      parentRoute: typeof rootRoute
-    }
     '/_auth/profile': {
       id: '/_auth/profile'
       path: '/profile'
@@ -155,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/games/$guid'
       fullPath: '/games/$guid'
       preLoaderRoute: typeof GamesGuidImport
+      parentRoute: typeof rootRoute
+    }
+    '/results/$query': {
+      id: '/results/$query'
+      path: '/results/$query'
+      fullPath: '/results/$query'
+      preLoaderRoute: typeof ResultsQueryImport
       parentRoute: typeof rootRoute
     }
   }
@@ -179,10 +179,10 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/results': typeof ResultsRoute
   '/profile': typeof AuthProfileRoute
   '/gamelist/$username': typeof GamelistUsernameRoute
   '/games/$guid': typeof GamesGuidRoute
+  '/results/$query': typeof ResultsQueryRoute
 }
 
 export interface FileRoutesByTo {
@@ -192,10 +192,10 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/results': typeof ResultsRoute
   '/profile': typeof AuthProfileRoute
   '/gamelist/$username': typeof GamelistUsernameRoute
   '/games/$guid': typeof GamesGuidRoute
+  '/results/$query': typeof ResultsQueryRoute
 }
 
 export interface FileRoutesById {
@@ -206,10 +206,10 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/results': typeof ResultsRoute
   '/_auth/profile': typeof AuthProfileRoute
   '/gamelist/$username': typeof GamelistUsernameRoute
   '/games/$guid': typeof GamesGuidRoute
+  '/results/$query': typeof ResultsQueryRoute
 }
 
 export interface FileRouteTypes {
@@ -221,10 +221,10 @@ export interface FileRouteTypes {
     | '/community'
     | '/login'
     | '/register'
-    | '/results'
     | '/profile'
     | '/gamelist/$username'
     | '/games/$guid'
+    | '/results/$query'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -233,10 +233,10 @@ export interface FileRouteTypes {
     | '/community'
     | '/login'
     | '/register'
-    | '/results'
     | '/profile'
     | '/gamelist/$username'
     | '/games/$guid'
+    | '/results/$query'
   id:
     | '__root__'
     | '/'
@@ -245,10 +245,10 @@ export interface FileRouteTypes {
     | '/community'
     | '/login'
     | '/register'
-    | '/results'
     | '/_auth/profile'
     | '/gamelist/$username'
     | '/games/$guid'
+    | '/results/$query'
   fileRoutesById: FileRoutesById
 }
 
@@ -259,9 +259,9 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
-  ResultsRoute: typeof ResultsRoute
   GamelistUsernameRoute: typeof GamelistUsernameRoute
   GamesGuidRoute: typeof GamesGuidRoute
+  ResultsQueryRoute: typeof ResultsQueryRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -271,9 +271,9 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
-  ResultsRoute: ResultsRoute,
   GamelistUsernameRoute: GamelistUsernameRoute,
   GamesGuidRoute: GamesGuidRoute,
+  ResultsQueryRoute: ResultsQueryRoute,
 }
 
 export const routeTree = rootRoute
@@ -292,9 +292,9 @@ export const routeTree = rootRoute
         "/community",
         "/login",
         "/register",
-        "/results",
         "/gamelist/$username",
-        "/games/$guid"
+        "/games/$guid",
+        "/results/$query"
       ]
     },
     "/": {
@@ -318,9 +318,6 @@ export const routeTree = rootRoute
     "/register": {
       "filePath": "register.tsx"
     },
-    "/results": {
-      "filePath": "results.tsx"
-    },
     "/_auth/profile": {
       "filePath": "_auth.profile.tsx",
       "parent": "/_auth"
@@ -330,6 +327,9 @@ export const routeTree = rootRoute
     },
     "/games/$guid": {
       "filePath": "games.$guid.tsx"
+    },
+    "/results/$query": {
+      "filePath": "results.$query.tsx"
     }
   }
 }

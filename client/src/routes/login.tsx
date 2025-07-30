@@ -60,12 +60,12 @@ function LoginComponent() {
         return (
                 <div className="routeContainer">
                         <CommonDivider routeName="Login" />
-                        <form className="formContainer">
+                        <form className="formContainer" onSubmit={(e) =>  void onSubmit(e)}>
                                 <label className="Label">Username:</label>
                                 <input name="username" value={loginFormData.username} onChange={onChange} type="text" placeholder="Enter username" required />
                                 <label className="Label">Password:</label>
                                 <input name="password" value={loginFormData.password} onChange={onChange} type="password" placeholder="Enter password" required />
-                                <button onClick={onSubmit} type="submit">Login</button>
+                                <button type="submit">Login</button>
                         </form>
                         {isLoggingIn ? 'Loading...' : 'Login'}
                         {error && <SubmitError err={error} />}

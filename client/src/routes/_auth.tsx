@@ -1,5 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth')({
   // Before loading, authenticate the user via our auth context

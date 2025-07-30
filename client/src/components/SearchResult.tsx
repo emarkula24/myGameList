@@ -9,7 +9,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ game }) => {
     const navigate = useNavigate({})
     const guid = game.guid.toString()
     const onMouseClick = () => {
-        navigate({
+        void navigate({
             // guid is the value that is used to call for game specific information
             to: `/games/$guid`,
             params: { guid },

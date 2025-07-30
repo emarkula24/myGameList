@@ -65,6 +65,6 @@
 
 .disabled {
   opacity: 50;
-  pointer-events: stroke;
-  cursor: default;
+  pointer-events: none;
+  background-color: green;
 }

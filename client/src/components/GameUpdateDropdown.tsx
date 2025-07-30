@@ -1,5 +1,5 @@
 import styles from './GameUpdateDropDown.module.css'
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface GameAddDropdownProps {
     onUpdateListEntry: (status: number) => void
@@ -16,55 +16,48 @@ const statusOptions: Record<number, string> = {
 
 export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAddDropdownProps) {
     const [showDropdown, setShowDropdown] = useState(false);
-    const [currentStatus, setCurrentStatus] = useState(status);
-
-    useEffect(() => {
-        if (currentStatus !== status) {
-            setCurrentStatus(status);
-        }
-        
-    }, [status]);
-
-
+    const numericStatus = Number(status)
     const handleSelect = (selectedStatus: number) => {
-        setShowDropdown(false); // close dropdown after selection
+        setShowDropdown(false);
 
-        if (selectedStatus === currentStatus) {
-            console.log("status is the same so no update")
-            return
+        if (selectedStatus === status) {
+            console.log("status is the same so no update");
+            return;
         }
-        setCurrentStatus(selectedStatus)
-        onUpdateListEntry(selectedStatus)
-        console.log("tried to update", selectedStatus, statusOptions[selectedStatus])
 
+        onUpdateListEntry(selectedStatus);
+        console.log("tried to update", selectedStatus, statusOptions[selectedStatus]);
     };
 
     return (
         <div>
-            <div onClick={() => setShowDropdown(prev => !prev)} className={`${styles.dropbtn} ${showDropdown ? styles.active : ""}`}>
-                {statusOptions[currentStatus]}
+            <div
+                onClick={() => setShowDropdown(prev => !prev)}
+                className={`${styles.dropbtn} ${showDropdown ? styles.active : ""}`}
+            >
+                {statusOptions[status]}
             </div>
             <div className={styles.dropdownContainer}>
-            {showDropdown && (
-                <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
-                    {Object.entries(statusOptions).map(([key, label]) => {
-                        const numericKey = Number(key);
-                        const isCurrent = numericKey === currentStatus;
-                        return (
-                            <p
-                                key={numericKey}
-                                onClick={() => {
-                                    if (!isCurrent) handleSelect(numericKey)
-                                }}
-                                className={isCurrent ? styles.disabled : undefined}
-                            >
-                                {label}
-                            </p>
-                        )
-                    })}
-                </div>
-            )}
+                {showDropdown && (
+                    <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
+                        {Object.entries(statusOptions).map(([key, label]) => {
+                            const numericKey = Number(key);
+                            const isCurrent = numericKey === numericStatus;
+                            return (
+                                <p
+                                    key={numericKey}
+                                    onClick={() => {
+                                        if (!isCurrent) handleSelect(numericKey)
+                                    }}
+                                    className={`${styles.option} ${isCurrent ? styles.disabled : ""}`}
+                                >
+                                    {label}
+                                </p>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
-        </div>
-    )
+    );
 }

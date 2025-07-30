@@ -4,9 +4,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Header from '../components/Header'
 import { QueryClient } from '@tanstack/react-query'
 import type { AuthContext } from '../utils/auth'
-import { useMemo, useState } from 'react'
-import type { Games } from '../types/types'
-import { SearchContext } from '../hooks/useSearchContext'
 import MainHeader from '../components/MainHeader'
 import Footer from '../components/Footer'
 
@@ -32,11 +29,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   },
 })
 function RootComponent() {
-  const [searchResults, setSearchResults] = useState<Games[]>([])
-  const searchContextValue = useMemo(() => ({ searchResults, setSearchResults }), [searchResults])
   return (
     <div>
-      <SearchContext value={searchContextValue}>
+      
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           < MainHeader />
@@ -53,7 +48,6 @@ function RootComponent() {
 
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="right" />
-      </SearchContext>
 
     </div>
   )

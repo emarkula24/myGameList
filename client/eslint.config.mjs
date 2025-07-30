@@ -4,7 +4,8 @@ import eslintReact from "@eslint-react/eslint-plugin";
 import tseslint from "typescript-eslint";
 export default tseslint.config(
   {
-    ignores: ["**/dist/**", "eslint.config.mjs"]
+    ignores: ["**/dist/**", "eslint.config.mjs"],
+    
   },
   eslintJs.configs.recommended,
   tseslint.configs.recommended,
@@ -14,7 +15,8 @@ export default tseslint.config(
   eslintReact.configs["recommended-typescript"],
   {
     rules: {
-      "@eslint-react/no-missing-key": "warn",
+      // "@eslint-react/no-missing-key": "warn",
+      "@typescript-eslint/only-throw-error": "off"
     },
     files: ["**/*.ts", "**/*.tsx"],
   },

@@ -33,7 +33,7 @@ export default function LogoutButton() {
     
     return (
         <div>
-            <div onClick={handleClick} className={styles.btn}>Logout</div>
+            <div onClick={() => {void handleClick()}} className={styles.btn}>Logout</div>
             {isSubmitting && <span></span>}
             {isLoading && < Spinner />}
             {error && <div>{error}</div>}

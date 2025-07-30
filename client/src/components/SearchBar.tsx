@@ -1,19 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import styles from "./SearchBar.module.css";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import SearchResult from "./SearchResult";
 import { fetchGames } from "../game";
-import { useSearch } from "../hooks/useSearchContext";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 export default function SearchBar() {
     const [searchQuery, setSearchQuery] = useState("");
     const [showResults, setShowResults] = useState(false);
-    const navigate = useNavigate({});
-    const { setSearchResults } = useSearch();
     const debouncedSearchQuery = useDebounce(searchQuery, 200);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const router = useRouter()
 
     const gameQuery = useQuery({
         queryKey: ["games", debouncedSearchQuery],
@@ -22,20 +20,16 @@ export default function SearchBar() {
         placeholderData: keepPreviousData,
     });
 
-    useEffect(() => {
-        if (gameQuery.isSuccess) {
-            setSearchResults(gameQuery.data);
-            
-        }
-    }, [gameQuery.data]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        setSearchQuery(event.currentTarget.value);
+        setSearchQuery(event.currentTarget.value)
+        setShowResults(true)
     };
 
     const handleEnterPress = (event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
-            navigate({ to: "/results" });
+            setShowResults(false)
+            void router.navigate({ to: "/results/$query", params: {query : searchQuery}});
         }
     };
 
@@ -52,11 +46,7 @@ export default function SearchBar() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-    useEffect(() => {
-        if (debouncedSearchQuery) {
-            setShowResults(true);
-        }
-    }, [debouncedSearchQuery])
+
     return (
         <div ref={containerRef} className={styles.searchResults}>
             <label>
@@ -67,19 +57,22 @@ export default function SearchBar() {
                     value={searchQuery}
                     onChange={handleInputChange}
                     onKeyDown={handleEnterPress}
+                    onBlur={() => setSearchQuery("")}
                     autoComplete="off"
+                    spellCheck="false"
                 />
             </label>
             <div>
                 {gameQuery.isLoading && <div>loading..</div>}
-                {gameQuery.isFetched && gameQuery.data && showResults && (
+                {gameQuery.isFetched && gameQuery.data && gameQuery.data.length > 1 && showResults && (
                     <ul
                         className={styles.listContainer}
                     >
                         {gameQuery.data.map((game) => (
                             <SearchResult key={game.id} game={game} />
                         ))}
-                        <Link to="/results"><li>View all results for <b>{searchQuery}</b></li></Link>
+                        
+                        <Link to="/results/$query" params={{query: searchQuery}}><li>View all results for <b>{searchQuery}</b></li></Link>
                     </ul>
                 )}
             </div>

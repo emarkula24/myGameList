@@ -5,7 +5,6 @@ import { useState } from 'react'
 import GameRow from '../components/GameRow'
 import { useAuth } from '../utils/auth'
 import GameListFilterHeader from '../components/GameListFilterHeader'
-import React from 'react'
 import GameTableHeaderRow from '../components/GameTableHeaderRow'
 import CommonDivider from '../components/CommonDivider'
 export const Route = createFileRoute('/gamelist/$username')({
@@ -32,7 +31,7 @@ function GameListComponent() {
   const { data: loggedInUserGameList } = useSuspenseQuery(gameListQueryOptions(auth.user?.username))
   const [selectedFilter, setSelectedFilter] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
-  const [editingGameIds, setEditingGameIds] = useState<Set<number>>(new Set())
+  const [editingGameIds, setEditingGameIds] = useState<Set<number>>(() => new Set())
   const loggedInGameIds = new Set(loggedInUserGameList.map(g => g.id))
 
   const startEditing = (gameId: number) => {
@@ -49,10 +48,11 @@ function GameListComponent() {
       return newSet
     })
   }
-
-  React.useEffect(() => {
+  const handleFilterChange = (filter: number) => {
+    setSelectedFilter(filter)
     setEditingGameIds(new Set())
-  }, [selectedFilter])
+    
+  }
 
   let filteredGameList = gamelist
   if (selectedFilter !== 0) {
@@ -73,7 +73,7 @@ function GameListComponent() {
       < CommonDivider routeName={`Viewing ${username}'s Game List`}/>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px, lightgrey solid", boxSizing: "border-box", width: "75%" }}>
         <GameListFilterHeader
-          onSelect={setSelectedFilter}
+          onSelect={handleFilterChange}
           setSearchQuery={setSearchQuery}
         />
         <div style={{ padding: "8px"}}></div>

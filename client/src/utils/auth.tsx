@@ -47,7 +47,7 @@ function setStoredUser(user: User | null) {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<User | null>(getStoredUser())
+  const [user, setUser] = React.useState<User | null>(() => getStoredUser())
   const isAuthenticated = !!user
 
   const logout = React.useCallback(async (username?: string, userId?: string) => {
@@ -61,15 +61,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setStoredUser(user)
     setUser(user)
   }, [])
+  const authContextValue = React.useMemo(() => ({
+    isAuthenticated,
+    user,
+    login,
+    logout,
+  }), [isAuthenticated, user, login, logout])
 
   React.useEffect(() => {
     setUser(getStoredUser())
   }, [])
 
   return (
-    <AuthContext value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={authContextValue}>
       {children}
-    </AuthContext>
+    </AuthContext.Provider>
   )
 }
 
@@ -87,23 +93,18 @@ const postLogin = async (username: string, password: string): Promise<User> => {
     "username": username,
     "password": password,
   }
-  await new Promise((r) => setTimeout(r, 500))
-  const response = await axios
-    .post<User>(`/user/login`, loginData)
-    .then((r) => r.data)
-    .catch((err) => {
-      if (err instanceof AxiosError) {
-        const errStatus = err.response?.status
-        if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
-          throw new LoginFailedError(`login failed for user ${username}`)
-        }
-        throw err
+  try {
+    const response = await axios.post<User>(`/user/login`, loginData)
+    return response.data
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      const errStatus = err.response?.status
+      if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
+        throw new LoginFailedError(`login failed for user ${username}`)
       }
-
-    })
-
-  return response
-
+    }
+    throw err
+  }
 }
 
 export const postRegister = async (email: string, password: string, username: string): Promise<RegisterResponse> => {
@@ -112,39 +113,36 @@ export const postRegister = async (email: string, password: string, username: st
     "password": password,
     "username": username,
   }
-  await new Promise((r) => setTimeout(r, 500))
-  const response = await axios
-    .post<RegisterResponse>(`/user/register`, registerData)
-    .then((r) => r.data)
-    .catch((err) => {
+  try {
+    const response = await axios.post<RegisterResponse>(`/user/register`, registerData)
+    return response.data
+  } catch (err) {
+    if (err instanceof AxiosError) {
       const errStatus = err.response?.status
       if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
         throw new RegisterFailedError(`login failed for user ${username}`)
       }
-      throw err
-    })
-  return response
-
+    }
+    throw err
+  }
 }
 
-export const logoutUser = async (username?: string, userId?: string) => {
+export const logoutUser = async (username?: string, userId?: string): Promise<void> => {
   if (!username || !userId) {
     throw new Error("Missing username or userId for logout");
   }
-  await new Promise((r) => setTimeout(r, 500))
-  return await axios
-    .post(`/user/logout`, {
-      userId: userId,
+  try {
+    await axios.post(`/user/logout`, {
+      userId: String(userId),
       username: username,
     })
-    .then((r) => console.log(r))
-    .catch((err) => {
-      if (err instanceof AxiosError) {
-        const errStatus = err.response?.status
-        if (errStatus === 400 || errStatus === 500) {
-          throw new Error
-        }
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      const errStatus = err.response?.status
+      if (errStatus === 400 || errStatus === 500) {
+        throw new Error
       }
-
-    })
-} 
+    }
+    throw new Error
+  }
+}

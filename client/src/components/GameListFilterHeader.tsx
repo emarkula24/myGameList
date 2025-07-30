@@ -2,7 +2,7 @@ import styles from "./GameListFilterHeader.module.css"
 import { useRef, useState } from "react";
 import searchIcon from '../assets/search_icon.png';
 export default function GameListFilterHeader({ onSelect, setSearchQuery }: {
-    onSelect: React.Dispatch<React.SetStateAction<number>>,
+    onSelect: (filter: number) => void
     setSearchQuery: React.Dispatch<React.SetStateAction<string>>
 }) {
     const [currentSelection, setCurrentSelecton] = useState(0)
