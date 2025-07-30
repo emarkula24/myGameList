@@ -18,6 +18,6 @@ export default function GameResultRow({ game }: { game: Games }) {
                 <h3 style={{fontSize: "1.6em"}}>{game.name}</h3>
                 <img src={game.image?.thumb_url} style={{maxWidth: "100%", height: "auto"}}/>
             </div>
-        </div>
+        </div> 
     )
 }

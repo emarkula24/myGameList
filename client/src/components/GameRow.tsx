@@ -22,14 +22,13 @@ const statusColors: Record<number, string> = {
     5: "gray"        // Plan to Play
 };
 
-export default function GameRow({ index, game, username, isEditing, startEditing, stopEditing, onUpdateSuccess, isMissingFromLoggedInUserList }: {
+export default function GameRow({ index, game, username, isEditing, startEditing, stopEditing, isMissingFromLoggedInUserList }: {
     index: number
     game: Game
     username: string
     isEditing: boolean
     startEditing: (id: number) => void
     stopEditing: (id: number) => void
-    onUpdateSuccess: (id: number) => void
     isMissingFromLoggedInUserList: boolean
 }) {
     const updateMutation = useUpdateGameMutation(username, game.id, game.name)
@@ -38,7 +37,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
     const isLoggedInUser = auth.user?.username === username
     useEffect(() => {
         if (updateMutation.isSuccess) {
-            onUpdateSuccess(game.id)  // Exit edit mode on success
+            stopEditing(game.id)  // Exit edit mode on success
 
         }
     }, [updateMutation.isSuccess])
@@ -46,7 +45,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
     return (
         <tr className={styles.block}>
             <td><div style={{backgroundColor: statusColor}} className={styles.titleColor}></div></td>
-            <td className={styles.item}>{index}</td>
+            <td className={styles.indexNumber}>{index}</td>
             <td className={styles.item}><img src={game.image.icon_url} /></td>
             <td>
                 <Link to="/games/$guid" params={{ guid: game.guid }} className={styles.title}>

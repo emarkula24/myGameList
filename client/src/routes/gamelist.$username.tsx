@@ -2,11 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { gameListQueryOptions } from '../queryOptions'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import GameRow from '../components/GameRow'
 import { useAuth } from '../utils/auth'
 import GameListFilterHeader from '../components/GameListFilterHeader'
-import GameTableHeaderRow from '../components/GameTableHeaderRow'
 import CommonDivider from '../components/CommonDivider'
+import { useFilteredGameList } from '../hooks/useGameListFilter'
+import { GameListStatusHeader } from '../components/GameListStatusHeader'
+import GameListContainer from '../components/GameListContainer'
+import { GameListTable } from '../components/GameListTable'
 export const Route = createFileRoute('/gamelist/$username')({
   loader: ({ context: { queryClient }, params: { username } }) => {
     return queryClient.ensureQueryData(gameListQueryOptions(username))
@@ -17,12 +19,7 @@ export const Route = createFileRoute('/gamelist/$username')({
 function GameListComponent() {
 
   const statusOptions: Record<number, string> = {
-    0: "ALL GAMES",
-    1: "PLAYING",
-    2: "COMPLETED",
-    3: "ON-HOLD",
-    4: "DROPPED",
-    5: "PLAN TO PLAY"
+    0: "ALL GAMES", 1: "PLAYING", 2: "COMPLETED", 3: "ON-HOLD", 4: "DROPPED", 5: "PLAN TO PLAY"
   }
 
   const username = Route.useParams().username
@@ -33,88 +30,38 @@ function GameListComponent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [editingGameIds, setEditingGameIds] = useState<Set<number>>(() => new Set())
   const loggedInGameIds = new Set(loggedInUserGameList.map(g => g.id))
+  const filteredGameList = useFilteredGameList(gamelist, selectedFilter, searchQuery)
 
-  const startEditing = (gameId: number) => {
-    setEditingGameIds(prev => {
-      const newSet = new Set(prev)
-      newSet.add(gameId)
-      return newSet
-    });
-  };
-  const stopEditing = (gameId: number) => {
-    setEditingGameIds(prev => {
-      const newSet = new Set(prev)
-      newSet.delete(gameId)
-      return newSet
-    })
-  }
   const handleFilterChange = (filter: number) => {
     setSelectedFilter(filter)
     setEditingGameIds(new Set())
-    
-  }
 
-  let filteredGameList = gamelist
-  if (selectedFilter !== 0) {
-    filteredGameList = gamelist.filter((game) => Number(game.status) === selectedFilter)
-  }
-  filteredGameList.sort((a, b) => {
-    // Initially sorts by status, then by name ascending
-    const statusDiff = a.status - b.status;
-    if (statusDiff !== 0) return statusDiff;
-    return a.name.localeCompare(b.name)
-  })
-
-  if (searchQuery != "") {
-    filteredGameList = filteredGameList.filter((game) => game.name.toLowerCase().includes(searchQuery.toLocaleLowerCase()))
   }
   return (
     <div className="routeContainer">
-      < CommonDivider routeName={`Viewing ${username}'s Game List`}/>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "1px, lightgrey solid", boxSizing: "border-box", width: "75%" }}>
+      < CommonDivider routeName={`Viewing ${username}'s Game List`} />
+      <GameListContainer>
         <GameListFilterHeader
           onSelect={handleFilterChange}
           setSearchQuery={setSearchQuery}
         />
-        <div style={{ padding: "8px"}}></div>
-        <div style={{
-          width: '100%',
-          height: '40px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'green',
-          border: "1px solid grey"
-        }}>
-          <span style={{ fontWeight: "600", color: 'aliceblue', fontSize: "2.4em" }}>{statusOptions[selectedFilter]}</span>
-        </div>
+        <div style={{ padding: "8px" }}></div>
+        <GameListStatusHeader statusText={statusOptions[selectedFilter]} />
         <div style={{ display: "flex", flexDirection: "column", width: "100%", border: "solid lightgrey 1px", }}>
-          {filteredGameList.length > 0 ? (
-            <table style={{ borderCollapse: "collapse", }}>
-              <thead>
-                <GameTableHeaderRow />
-              </thead>
-              <tbody>
-                {filteredGameList.map((game, index) => (
-                  <GameRow
-                    index={index + 1}
-                    key={game.id}
-                    game={game}
-                    username={username}
-                    isEditing={editingGameIds.has(game.id)}
-                    startEditing={startEditing}
-                    stopEditing={stopEditing}
-                    onUpdateSuccess={() => stopEditing(game.id)}
-                    isMissingFromLoggedInUserList={!loggedInGameIds.has(game.id)}
-                  />
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p style={{ fontSize: "2em", textAlign: "center" }}>This category is empty</p>
-          )}
+          <GameListTable
+            games={filteredGameList}
+            username={username}
+            editingGameIds={editingGameIds}
+            startEditing={(id) => setEditingGameIds(new Set(editingGameIds).add(id))}
+            stopEditing={(id) => {
+              const newSet = new Set(editingGameIds)
+              newSet.delete(id)
+              setEditingGameIds(newSet)
+            }}
+            loggedInGameIds={loggedInGameIds}
+          />
         </div>
-      </div>
+      </GameListContainer>
     </div>
   )
 }

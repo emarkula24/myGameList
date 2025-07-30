@@ -3,8 +3,8 @@ import React, { useState } from 'react'
 import { z } from 'zod'
 import SubmitError from '../components/SubmitError'
 import { useAuth } from '../utils/auth'
-import "../css/userForms.css"
 import CommonDivider from '../components/CommonDivider'
+import LoginForm from '../components/LoginForm'
 const fallback = '/' as const
 
 export const Route = createFileRoute('/login')({
@@ -57,16 +57,11 @@ function LoginComponent() {
                 })
         }
         const isLoggingIn = isLoading || isSubmitting
+        
         return (
                 <div className="routeContainer">
                         <CommonDivider routeName="Login" />
-                        <form className="formContainer" onSubmit={(e) =>  void onSubmit(e)}>
-                                <label className="Label">Username:</label>
-                                <input name="username" value={loginFormData.username} onChange={onChange} type="text" placeholder="Enter username" required />
-                                <label className="Label">Password:</label>
-                                <input name="password" value={loginFormData.password} onChange={onChange} type="password" placeholder="Enter password" required />
-                                <button type="submit">Login</button>
-                        </form>
+                        <LoginForm onChange={onChange} onSubmit={onSubmit} loginFormData={loginFormData} />
                         {isLoggingIn ? 'Loading...' : 'Login'}
                         {error && <SubmitError err={error} />}
                 </div>

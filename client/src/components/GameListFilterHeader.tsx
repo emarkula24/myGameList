@@ -47,9 +47,9 @@ export default function GameListFilterHeader({ onSelect, setSearchQuery }: {
             )}
             </div>
             <div className={styles.searchContainer}>
-            <input ref={inputRef}type="text" maxLength={20} onChange={handleInput} className={`${styles.input} ${searchActive ? styles.searchActive : styles.searchInActive
+            <input ref={inputRef}type="text" maxLength={20} placeholder="Search list" onChange={handleInput} className={`${styles.input} ${searchActive ? styles.searchInActive : styles.searchActive
                 }`} />
-            <img src={searchIcon} onClick={handleSearchClick} />
+            <img src={searchIcon} onClick={handleSearchClick} className={styles.searchIcon}/>
             </div>
         </div>
     )

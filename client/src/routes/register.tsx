@@ -1,9 +1,9 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import React, { useState } from 'react'
-import "../css/userForms.css"
 import { postRegister } from '../utils/auth';
 import SubmitError from '../components/SubmitError';
 import CommonDivider from '../components/CommonDivider';
+import RegisterForm from '../components/RegisterForm';
 
 
 export const Route = createFileRoute('/register')({
@@ -45,17 +45,7 @@ function Register() {
         return (
                 <div className="routeContainer">
                         <CommonDivider routeName={"Register"} />
-                        <form className='formContainer' onSubmit={(e) => void handleSubmit(e)}>
-                                <label className='Label'>Username:</label>
-                                <input name="username" value={registerFormData.username} onChange={handleChange} type="username" placeholder='Enter username' />
-                                <label className='Label'>Email:</label>
-                                <input name="email" value={registerFormData.email} onChange={handleChange} type='email' placeholder='Enter Email' />
-                                <label className='Label'>Password:</label>
-                                <input name="password" value={registerFormData.password} onChange={handleChange} type='password' placeholder='Enter Password' />
-                                <label className='Label'>Confirm Password:</label>
-                                <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm Password' />
-                                <button type="submit" >Register</button>
-                        </form>
+                        <RegisterForm handleSubmit={handleSubmit} handleChange={handleChange} registerFormData={registerFormData} />
                         {error && <SubmitError err={error} />}
                 </div>
         )
