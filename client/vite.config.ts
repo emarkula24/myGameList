@@ -7,11 +7,7 @@ export default defineConfig({
         test: {
                 environment: "jsdom",
                 globals: true,
-                setupFiles: "./testSetup.ts",
-                // css: {
-                //         modules: {classNameStrategy: "non-scoped"},
-                //         include: /.+/
-                // }
+                setupFiles: "./src/testSetup.ts",
         },
         plugins: [
                 TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),

@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import styles from './GameUpdateDropDown.module.css'
 import { useState } from "react";
 
@@ -16,6 +17,7 @@ const statusOptions: Record<number, string> = {
 
 export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAddDropdownProps) {
     const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
     const numericStatus = Number(status)
     const handleSelect = (selectedStatus: number) => {
         setShowDropdown(false);
@@ -29,35 +31,46 @@ export default function GameUpdateDropdown({ onUpdateListEntry, status }: GameAd
         console.log("tried to update", selectedStatus, statusOptions[selectedStatus]);
     };
 
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
     return (
-        <div>
+        <div className={styles.dropdownContainer} ref={dropdownRef}>
             <div
                 onClick={() => setShowDropdown(prev => !prev)}
                 className={`${styles.dropbtn} ${showDropdown ? styles.active : ""}`}
             >
                 {statusOptions[status]}
             </div>
-            <div className={styles.dropdownContainer}>
-                {showDropdown && (
-                    <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
-                        {Object.entries(statusOptions).map(([key, label]) => {
-                            const numericKey = Number(key);
-                            const isCurrent = numericKey === numericStatus;
-                            return (
-                                <p
-                                    key={numericKey}
-                                    onClick={() => {
-                                        if (!isCurrent) handleSelect(numericKey)
-                                    }}
-                                    className={`${styles.option} ${isCurrent ? styles.disabled : ""}`}
-                                >
-                                    {label}
-                                </p>
-                            )
-                        })}
-                    </div>
-                )}
-            </div>
+
+            {showDropdown && (
+                <div className={`${styles.dropdownContent} ${showDropdown ? styles.show : ""}`}>
+                    {Object.entries(statusOptions).map(([key, label]) => {
+                        const numericKey = Number(key);
+                        const isCurrent = numericKey === numericStatus;
+                        return (
+                            <p
+                                key={numericKey}
+                                onClick={() => {
+                                    if (!isCurrent) handleSelect(numericKey)
+                                }}
+                                className={`${styles.option} ${isCurrent ? styles.disabled : ""}`}
+                            >
+                                {label}
+                            </p>
+                        )
+                    })}
+                </div>
+            )}
         </div>
     );
 }

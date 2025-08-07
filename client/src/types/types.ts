@@ -11,7 +11,7 @@ export interface Games {
         id: number;
         guid: string;
         name: string;
-        image?: {
+        image: {
                 medium_url: string;
                 icon_url: string;
                 tiny_url: string;
@@ -19,9 +19,9 @@ export interface Games {
                 small_url: string;
                 super_url: string;
         };
-        original_release_date?: string;
-        platforms?: { name: string }[];
-        deck?: string;
+        original_release_date: string;
+        platforms: { name: string }[];
+        deck: string;
         site_detail_url: string;
 }
 
@@ -40,7 +40,7 @@ export interface Game {
                 small_url: string;
         }
         original_release_data: string;
-        platforms: object[];
+        platforms: { name: string }[];
         publishers: object[];
         similar_games: object[];
         genres: object[];
@@ -62,7 +62,7 @@ export interface GameListEntries {
                 small_url: string;
         }
         original_release_data: string;
-        platforms: object[];
+        platforms: { name: string }[];
         publishers: object[];
         similar_games: object[];
         genres: object[];

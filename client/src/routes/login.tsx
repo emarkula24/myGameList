@@ -62,7 +62,7 @@ function LoginComponent() {
                 <div className="routeContainer">
                         <CommonDivider routeName="Login" />
                         <LoginForm onChange={onChange} onSubmit={onSubmit} loginFormData={loginFormData} />
-                        {isLoggingIn ? 'Loading...' : 'Login'}
+                        {isLoggingIn && 'Loading...'}
                         {error && <SubmitError err={error} />}
                 </div>
 

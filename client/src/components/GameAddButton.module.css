@@ -1,3 +1,15 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .addBtn {
-    font-size: 1em;
+    font-size: 2em;
+    border: none;
+    color: green;
+    background: none;
+}
+.addBtn:hover {
+    text-decoration: underline;
+    cursor: pointer;
 }

@@ -24,6 +24,9 @@ describe("<GameResultRow />", () => {
       super_url: "",
     },
     site_detail_url: "https://example.com/game",
+    original_release_date: "",
+    platforms: [],
+    deck: ""
   }
 
   test("clicking the row triggers navigation with correct route", async () => {

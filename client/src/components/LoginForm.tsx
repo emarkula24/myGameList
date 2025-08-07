@@ -1,3 +1,5 @@
+import styles from "./LoginForm.module.css"
+
 
 export default function LoginForm({onSubmit, onChange, loginFormData}: {
     onSubmit: (e: React.FormEvent) => void
@@ -6,7 +8,7 @@ export default function LoginForm({onSubmit, onChange, loginFormData}: {
 }) {
     return (
         <>
-            <form className="formContainer" onSubmit={(e) => void onSubmit(e)}>
+            <form className={styles.formContainer} onSubmit={(e) => void onSubmit(e)}>
                 <label className="Label">Username:</label>
                 <input name="username" value={loginFormData.username} onChange={(e) => onChange(e)} type="text" placeholder="Enter username" required />
                 <label className="Label">Password:</label>
