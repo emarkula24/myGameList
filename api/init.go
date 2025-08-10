@@ -16,13 +16,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Defines application handlers.
 type Handlers struct {
 	user *handler.UserHandler
 	game *handler.GameHandler
 	list *handler.ListHandler
 }
 
-func setUpDependencies(db *sql.DB) *Handlers {
+// SetUp initializes new application handler dependencies.
+func SetUp(db *sql.DB) *Handlers {
 	client := &service.GiantBombClient{}
 	auth := &utils.AuthService{}
 	repo := repository.NewRepository(db)
@@ -44,7 +46,8 @@ func setUpDependencies(db *sql.DB) *Handlers {
 
 }
 
-func setUpDatabase() *sql.DB {
+// NewDatabase creates a new database pool.
+func NewDatabase() *sql.DB {
 
 	u := os.Getenv("MYSQL_USER")
 	p := os.Getenv("MYSQL_PASSWORD")
@@ -68,7 +71,8 @@ func setUpDatabase() *sql.DB {
 	return db
 }
 
-func initializeServer() *mux.Router {
+// Router creates a new router instance with subroutes.
+func Router() *mux.Router {
 	mode := os.Getenv("MODE")
 
 	// Development: load from file
@@ -81,8 +85,8 @@ func initializeServer() *mux.Router {
 		log.Println("Running in production mode.")
 	}
 
-	db := setUpDatabase()
-	handlers := setUpDependencies(db)
+	db := NewDatabase()
+	handlers := SetUp(db)
 
 	router := mux.NewRouter()
 	router.Use(middleware.LoggingMiddleware)

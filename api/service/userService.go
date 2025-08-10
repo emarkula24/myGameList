@@ -11,17 +11,21 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// UserService defines a user service controller.
 type UserService struct {
 	UserRepository interfaces.UserRepository
 	AuthService    interfaces.AuthService
 }
 
+// NewUserService creates a new user service controller.
 func NewUserService(repo interfaces.UserRepository, auth interfaces.AuthService) *UserService {
 	return &UserService{
 		UserRepository: repo,
 		AuthService:    auth,
 	}
 }
+
+// RegisterUser authenticates user.
 func (s *UserService) RegisterUser(username, email, password string) (int64, error) {
 
 	isUser, err := s.UserRepository.SelectUserByUsername(username)
@@ -46,6 +50,7 @@ func (s *UserService) RegisterUser(username, email, password string) (int64, err
 	return userId, nil
 }
 
+// LoginUser authorizes user.
 func (s *UserService) LoginUser(username, password string) (string, int, error) {
 	k := os.Getenv("JWT_SECRET_KEY")
 	var secretKey = []byte(k)
@@ -76,6 +81,7 @@ func (s *UserService) LoginUser(username, password string) (string, int, error) 
 
 }
 
+// StoreRefreshToken adds refreshtoken for a given user.
 func (s *UserService) StoreRefreshToken(username, refreshToken, jti string) error {
 	userId, err := s.UserRepository.SelectUserIdByUsername(username)
 	if err != nil {
@@ -89,6 +95,8 @@ func (s *UserService) StoreRefreshToken(username, refreshToken, jti string) erro
 
 	return nil
 }
+
+// FetchRefreshToken retrieves refreshtoken for a given user.
 func (s *UserService) FetchRefreshToken(username string, userId int) (string, error) {
 	_, jtiFromDb, err := s.UserRepository.RefreshTokenById(userId)
 	if err != nil {

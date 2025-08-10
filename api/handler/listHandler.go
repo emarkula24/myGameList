@@ -17,16 +17,19 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+// ListHandler defines a list HTTP handler.
 type ListHandler struct {
 	ListService *service.ListService
 	Cache       *cache.Cache
 }
 
+// NewListHandler creates a new list HTTP handler.
 func NewListHandler(ls *service.ListService) *ListHandler {
 	c := cache.New(10*time.Minute, 15*time.Minute)
 	return &ListHandler{ListService: ls, Cache: c}
 }
 
+// ListRequest defines a request requested by a user.
 type ListRequest struct {
 	GameId   int    `json:"game_id"`
 	Status   int    `json:"status"`
@@ -34,6 +37,7 @@ type ListRequest struct {
 	GameName string `json:"gamename"`
 }
 
+// InserToList handles POST /list/add requests.
 func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
 
 	var listReq ListRequest
@@ -60,6 +64,7 @@ func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// UpdateList handles POST list/update requests.
 func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 	var updateReq ListRequest
 	decoder := json.NewDecoder(r.Body)
@@ -85,7 +90,7 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Handler for GET /list.
+// GetList handles GET /list requests.
 //
 // URL Parameters:
 //   - username (string, required): The username whose game list is being requested.
@@ -108,14 +113,14 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		errorutils.WriteJSONError(w, "no query parameter for username or gamename", http.StatusBadRequest)
 		return
 	}
-	// Extract 'page' and 'limit' query parameters
+	// Extract 'page' and 'limit' query parameters.
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil || page < 1 {
-		page = 1 // Default to page 1
+		page = 1 // Default to page 1.
 	}
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 	if err != nil || limit < 1 {
-		limit = 20 // Default to 20 items per page
+		limit = 20 // Default to 20 items per page.
 	}
 
 	cacheKey := fmt.Sprintf("%s,%d,%d", username, page, limit)
@@ -198,6 +203,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetListItem handles GET /list/game requests.
 func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	gameId := r.URL.Query().Get("gameId")

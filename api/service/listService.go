@@ -9,33 +9,28 @@ import (
 	"example.com/mygamelist/repository"
 )
 
+// ListService defines a list service controller.
 type ListService struct {
 	ListRepository *repository.ListRepository
 	Cbc            interfaces.GiantBombClient
 }
 
+// NewListService creates a list service controller.
 func NewListService(repo *repository.ListRepository, client interfaces.GiantBombClient) *ListService {
 	return &ListService{ListRepository: repo, Cbc: client}
 }
 
+// PostGame adds given game to list.
 func (s *ListService) PostGame(gameId, status int, username, gamename string) error {
-	err := s.ListRepository.InsertGame(gameId, status, username, gamename)
-	if err != nil {
-		log.Printf("failed to add game %s", err)
-		return fmt.Errorf("%w", err)
-	}
-	return nil
+	return s.ListRepository.InsertGame(gameId, status, username, gamename)
 }
 
+// PutGame writes a game for a given list.
 func (s *ListService) PutGame(gameId, status int, username string) error {
-	err := s.ListRepository.UpdateGame(gameId, status, username)
-	if err != nil {
-		log.Printf("failed to update game %s", err)
-		return fmt.Errorf("%w", err)
-	}
-	return nil
+	return s.ListRepository.UpdateGame(gameId, status, username)
 }
 
+// GetGameList returns list for a given user.
 func (s *ListService) GetGameList(username string, page, limit int) (*http.Response, []repository.Game, error) {
 	gamelist, err := s.ListRepository.FetchGames(username, page, limit)
 	if err != nil {
@@ -50,7 +45,8 @@ func (s *ListService) GetGameList(username string, page, limit int) (*http.Respo
 	return fullGameList, gamelist, nil
 
 }
+
+// GetGameFromList returns a game for a given list.
 func (s *ListService) GetGameFromList(username string, gameId int) *repository.Game {
-	gameListItem := s.ListRepository.FetchGame(username, gameId)
-	return gameListItem
+	return s.ListRepository.FetchGame(username, gameId)
 }

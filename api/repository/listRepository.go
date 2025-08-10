@@ -5,14 +5,17 @@ import (
 	"fmt"
 )
 
+// ListRepository defines a list repository.
 type ListRepository struct {
 	Db *sql.DB
 }
 
+// NewListRepository creates a new list repository.
 func NewListRepository(Db *sql.DB) *ListRepository {
 	return &ListRepository{Db: Db}
 }
 
+// InsertGame inserts game and checks for duplicates.
 func (r *ListRepository) InsertGame(gameId, status int, username, gamename string) error {
 
 	// ON DUPLICATE KEY is used to keep from inserting duplicates
@@ -29,6 +32,7 @@ func (r *ListRepository) InsertGame(gameId, status int, username, gamename strin
 	return nil
 }
 
+// UpdateGame
 func (r *ListRepository) UpdateGame(gameId, status int, username string) error {
 
 	query := `

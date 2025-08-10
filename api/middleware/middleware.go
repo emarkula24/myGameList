@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// VerifyJWTMiddleware middleware handles JWT Authorization Bearer verification.
 func VerifyJWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
@@ -19,7 +20,7 @@ func VerifyJWTMiddleware(next http.Handler) http.Handler {
 			errorutils.WriteJSONError(w, "Authorization header missing or invalid access token", http.StatusUnauthorized)
 			return
 		}
-		// Expecting header format: "Bearer <token>"
+		// Expecting header format: "Bearer <token>".
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
 			errorutils.WriteJSONError(w, "Authorization header format must be Bearer {token}", http.StatusUnauthorized)
@@ -54,6 +55,7 @@ func VerifyJWTMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// LogginMiddleware handles logging endpoint access.
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Do stuff here

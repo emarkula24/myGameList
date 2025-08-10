@@ -14,20 +14,20 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-// Defines dependencies for GameHandler struct
+// Defines a game HTTP handler.
 type GameHandler struct {
 	Gbc   interfaces.GiantBombClient
 	Cache *cache.Cache
 }
 
-// Creates a new instance of GameHandler.
+// NewGameHandler creates a new game HTTP handler.
 // The handler uses go-cache to store api responses because the amount of API requests per hour is limited.
 func NewGameHandler(gbc interfaces.GiantBombClient) *GameHandler {
 	c := cache.New(10*time.Minute, 15*time.Minute)
 	return &GameHandler{Gbc: gbc, Cache: c}
 }
 
-// GET /games/?query=string
+// Search handles GET /games/search requests.
 // Requests GameBomb API for a list of game entries based on a query string and relays the received json to the client.
 func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
@@ -81,8 +81,8 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
 	// status_code received is not the HTTP status code, it is a code that the API sends with the JSON.
 	// It is safe to assume HTTP code 404 is not a likely scenario but countermeasures are taken.
-	// status_code 1 = success
-	// status_code 100 = wrong api key
+	// status_code 1 = success.
+	// status_code 100 = wrong api key.
 
 	switch gameJSON.StatusCode {
 	case 1:
@@ -105,6 +105,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 
 }
 
+// SearchGame handles GET /games/game requests.
 // Requests GameBomb API for the information of a game-entry based on GUID, and relays it to the client.
 // Uses go-cache to store response data due to the request amount to gamebomb API being limited
 func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {

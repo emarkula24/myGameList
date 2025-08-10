@@ -16,16 +16,17 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Defines dependencies for UserHandler struct
+// UserHandler defines a user HTTP handler.
 type UserHandler struct {
 	UserService *service.UserService
 }
 
-// Creates a new instance of UserHandler
+// NewUserHandler creates a new user HTTP handler.
 func NewUserHandler(us *service.UserService) *UserHandler {
 	return &UserHandler{UserService: us}
 }
 
+// Register handles POST /user/register requests.
 func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 
 	if req.Header.Get("Content-Type") != "application/json" {
@@ -74,6 +75,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Login handles POST /user/login requests.
 func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	type LoginRequest struct {
@@ -136,6 +138,8 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 }
+
+// Logout handles POST user/logout requests.
 func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	type LogoutRequest struct {
 		Username string `json:"username"`
@@ -211,6 +215,8 @@ func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+// Refresh handles POST /user/refresh requests.
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	type RefreshRequest struct {

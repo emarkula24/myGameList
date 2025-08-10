@@ -11,8 +11,10 @@ import (
 	"example.com/mygamelist/repository"
 )
 
+// Defines a giantbomb service controller.
 type GiantBombClient struct{}
 
+// GetGames returns game search data from Giantbomb APi.
 func (c *GiantBombClient) SearchGames(query string) (*http.Response, error) {
 	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 	if apiKey == "" {
@@ -22,12 +24,14 @@ func (c *GiantBombClient) SearchGames(query string) (*http.Response, error) {
 	return http.Get(url)
 }
 
+// GetGame returns game data from Giantbomb API.
 func (c *GiantBombClient) SearchGame(guid string) (*http.Response, error) {
 	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 	url := "https://www.giantbomb.com/api/game/" + guid + "/?api_key=" + apiKey + "&format=json"
 	return http.Get(url)
 }
 
+// GetGameList returns the gamedata for a users list.
 func (c *GiantBombClient) SearchGameList(games []repository.Game, limit int) (*http.Response, error) {
 	apiKey := os.Getenv("GIANT_BOMB_API_KEY")
 	baseURL := "https://www.giantbomb.com/api/games/"
@@ -49,6 +53,7 @@ func (c *GiantBombClient) SearchGameList(games []repository.Game, limit int) (*h
 	return http.Get(url)
 }
 
+// BuildUrl creates a query string with user gamelist id content.
 func BuildUrl(ids []string, limit int) string {
 	if len(ids) == 0 {
 		return ""
@@ -56,7 +61,7 @@ func BuildUrl(ids []string, limit int) string {
 	if limit <= 0 {
 		limit = len(ids)
 	}
-	// Return the first N IDs joined by pipe
+	// Return the first N IDs joined by pipe.
 	chunk := ids
 	if len(ids) > limit {
 		chunk = ids[:limit]

@@ -14,18 +14,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Defines an auth service controller.
 type AuthService struct{}
 
+// HashPassword hashes password
 func (AuthService) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
+// CheckPasswordHash validates password.
 func CheckPasswordHash(hashed, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
 	return err == nil
 }
 
+// VerifyToken verifies JWT token.
 func VerifyToken(tokenString string) error {
 	k := os.Getenv("JWT_SECRET_KEY")
 	var secretKey = []byte(k)
