@@ -52,6 +52,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, errorutils.ErrUserExists):
+			log.Printf("user alreadt exists %s", err)
 			errorutils.WriteJSONError(w, "User already exists", http.StatusBadRequest)
 			return
 		default:

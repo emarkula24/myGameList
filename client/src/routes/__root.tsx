@@ -31,8 +31,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootComponent() {
   return (
     <div>
-      
-
+      <title>myGameList</title>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           < MainHeader />
           < Header />

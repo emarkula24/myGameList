@@ -16,7 +16,7 @@ export default function RegisterForm({ handleSubmit, handleChange, registerFormD
                 <input name="password" value={registerFormData.password} onChange={handleChange} type='password' placeholder='Enter password' />
                 <label className='Label'>Confirm Password:</label>
                 <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm password' />
-                <button type="submit" >Register</button>
+                <button type="submit" name="register">Register</button>
             </form>
         </>
     )
