@@ -1,0 +1,23 @@
+{
+  "name": "mygamelist",
+  "version": "1.0.0",
+  "description": "> [!WARNING]\r > This project is in a work in progress state\r ## Table of contents\r - [Overview](Overview)\r - [Technologies](Technologies)\r - [Requirements](Requirements)\r - [Install & Run](Install--Run)\r - [Design Philosophy](Design&nbsp;philosophy)\r - [Test Suite](Test&nbsp;suite)\r ## Overview\r myGameList is an open source platform built to help gaming enthusiasts to keep track of their gaming backlog and connect with a community while doing so. \r The platform is currently self-hosted on a private linux server, and a containerized version is provided for local hosting.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emarkula24/myGameList.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/emarkula24/myGameList/issues"
+  },
+  "homepage": "https://github.com/emarkula24/myGameList#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^24.2.0"
+  }
+}

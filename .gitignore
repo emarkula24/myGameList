@@ -30,3 +30,9 @@ go-database-test/
 .vscode
 
 cloudflare.ini
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
