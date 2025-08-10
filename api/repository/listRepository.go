@@ -107,3 +107,15 @@ func (r *ListRepository) FetchGame(username string, gameId int) *Game {
 	return &game
 
 }
+func (r *ListRepository) RemoveGame(username string, gameId int) error {
+	query := `
+			DELETE from user_games
+			WHERE username = ? game_id = ?
+	`
+	_, err := r.Db.Exec(query, username, gameId)
+	if err != nil {
+		return fmt.Errorf("failed to remove game: %w", err)
+	}
+	return nil
+
+}

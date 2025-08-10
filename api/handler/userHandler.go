@@ -91,6 +91,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	jwtToken, userId, err := h.UserService.LoginUser(loginReq.Username, loginReq.Password)
+	userIDStr := strconv.Itoa(userId)
 	if err != nil {
 		switch {
 		case errors.Is(err, errorutils.ErrPasswordMatch):
@@ -106,7 +107,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	type LoginResponse struct {
 		AccessToken string `json:"accessToken"`
-		UserId      int    `json:"userId"`
+		UserId      string `json:"userId"`
 		Username    string `json:"username"`
 	}
 	username := loginReq.Username
@@ -131,7 +132,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	}
 	http.SetCookie(w, refreshTokenCookie)
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userId, Username: username})
+	err = json.NewEncoder(w).Encode(LoginResponse{AccessToken: jwtToken, UserId: userIDStr, Username: username})
 	if err != nil {
 		log.Printf("Failed to login user: %s", err)
 		errorutils.WriteJSONError(w, "authentication failed", http.StatusUnauthorized)

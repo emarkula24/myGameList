@@ -5,18 +5,21 @@ import (
 	"log"
 	"net/http"
 
-	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/repository"
 )
 
 // ListService defines a list service controller.
 type ListService struct {
 	ListRepository *repository.ListRepository
-	Cbc            interfaces.GiantBombClient
+	Cbc            GameListFetcher
+}
+
+type GameListFetcher interface {
+	SearchGameList(games []repository.Game, limit int) (*http.Response, error)
 }
 
 // NewListService creates a list service controller.
-func NewListService(repo *repository.ListRepository, client interfaces.GiantBombClient) *ListService {
+func NewListService(repo *repository.ListRepository, client GameListFetcher) *ListService {
 	return &ListService{ListRepository: repo, Cbc: client}
 }
 
@@ -49,4 +52,9 @@ func (s *ListService) GetGameList(username string, page, limit int) (*http.Respo
 // GetGameFromList returns a game for a given list.
 func (s *ListService) GetGameFromList(username string, gameId int) *repository.Game {
 	return s.ListRepository.FetchGame(username, gameId)
+}
+
+// DeleteGame deletes a game from a given list.
+func (s *ListService) DeleteGame(username string, gameId int) error {
+	return s.ListRepository.RemoveGame(username, gameId)
 }

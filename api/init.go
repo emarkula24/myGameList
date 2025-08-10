@@ -29,6 +29,7 @@ func SetUp(db *sql.DB) *Handlers {
 	auth := &utils.AuthService{}
 	repo := repository.NewRepository(db)
 	listRepo := repository.NewListRepository(db)
+
 	userService := service.NewUserService(repo, auth)
 	listService := service.NewListService(listRepo, client)
 

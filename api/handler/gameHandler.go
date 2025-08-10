@@ -9,20 +9,26 @@ import (
 	"time"
 
 	"example.com/mygamelist/errorutils"
-	"example.com/mygamelist/interfaces"
+	"example.com/mygamelist/repository"
 	"example.com/mygamelist/utils"
 	"github.com/patrickmn/go-cache"
 )
 
+type GameService interface {
+	SearchGames(query string) (*http.Response, error)
+	SearchGame(guid string) (*http.Response, error)
+	SearchGameList(games []repository.Game, limit int) (*http.Response, error)
+}
+
 // Defines a game HTTP handler.
 type GameHandler struct {
-	Gbc   interfaces.GiantBombClient
+	Gbc   GameService
 	Cache *cache.Cache
 }
 
 // NewGameHandler creates a new game HTTP handler.
 // The handler uses go-cache to store api responses because the amount of API requests per hour is limited.
-func NewGameHandler(gbc interfaces.GiantBombClient) *GameHandler {
+func NewGameHandler(gbc GameService) *GameHandler {
 	c := cache.New(10*time.Minute, 15*time.Minute)
 	return &GameHandler{Gbc: gbc, Cache: c}
 }

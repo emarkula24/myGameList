@@ -11,33 +11,42 @@ import (
 	"example.com/mygamelist/repository"
 	"example.com/mygamelist/routes"
 	"example.com/mygamelist/service"
+	"example.com/mygamelist/utils"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 type ListTestSuite struct {
-	DB      *sql.DB
-	Server  *httptest.Server
-	Router  *mux.Router
-	Handler *handler.ListHandler
+	DB          *sql.DB
+	Server      *httptest.Server
+	Router      *mux.Router
+	ListHandler *handler.ListHandler
+	UserHandler *handler.UserHandler
 }
 
 func NewListTestSuite(db *sql.DB) *ListTestSuite {
 	client := &service.GiantBombClient{}
 	repo := repository.NewListRepository(db)
-	service := service.NewListService(repo, client)
-	handler := handler.NewListHandler(service)
+	listService := service.NewListService(repo, client)
+	listHandler := handler.NewListHandler(listService)
+
+	userRepo := repository.NewRepository(db)
+	auth := &utils.AuthService{}
+	userService := service.NewUserService(userRepo, auth)
+	userHandler := handler.NewUserHandler(userService)
 
 	router := mux.NewRouter()
-	router = routes.CreateListSubRouter(router, handler)
+	router = routes.CreateListSubRouter(router, listHandler)
+	router = routes.CreateUserSubrouter(router, userHandler)
 	server := httptest.NewServer(router)
 
 	return &ListTestSuite{
-		DB:      db,
-		Server:  server,
-		Handler: handler,
-		Router:  router,
+		DB:          db,
+		Server:      server,
+		ListHandler: listHandler,
+		UserHandler: userHandler,
+		Router:      router,
 	}
 }
 func (s *ListTestSuite) GetServerURL() string {
@@ -74,7 +83,7 @@ func TestUpdateList(t *testing.T) {
 	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listupdatest", "listupdate@test.com", "1234567@M")
 	require.NoError(t, err)
 	body := `{
-		"game_id":34126,
+		"game_id":"34126",
 		"status":"completed",
 		"username":"mies"
 	}`

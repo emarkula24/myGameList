@@ -6,19 +6,32 @@ import (
 	"time"
 
 	"example.com/mygamelist/errorutils"
-	"example.com/mygamelist/interfaces"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type UserRepository interface {
+	SelectUserByUsername(username string) (bool, error)
+	InsertUser(username, email, hashedPassword string) (int64, error)
+	PasswordByUsername(username string) (string, error)
+	SelectUserIdByUsername(username string) (int, error)
+	InsertRefreshToken(userId int, refreshtoken, jti string) error
+	RefreshTokenById(userId int) (string, string, error)
+	DeleteRefreshToken(userId int, jti string) error
+}
+
+type AuthService interface {
+	HashPassword(password string) (string, error)
+}
+
 // UserService defines a user service controller.
 type UserService struct {
-	UserRepository interfaces.UserRepository
-	AuthService    interfaces.AuthService
+	UserRepository UserRepository
+	AuthService    AuthService
 }
 
 // NewUserService creates a new user service controller.
-func NewUserService(repo interfaces.UserRepository, auth interfaces.AuthService) *UserService {
+func NewUserService(repo UserRepository, auth AuthService) *UserService {
 	return &UserService{
 		UserRepository: repo,
 		AuthService:    auth,

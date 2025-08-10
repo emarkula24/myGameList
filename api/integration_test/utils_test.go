@@ -13,12 +13,16 @@ import (
 	"sync"
 	"time"
 
-	"example.com/mygamelist/interfaces"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
+
+type TestSuiteWithServer interface {
+	GetServerURL() string
+	GetClient() *http.Client
+}
 
 type TestDatabase struct {
 	DbInstance *sql.DB
@@ -87,65 +91,66 @@ func (tdb *TestDatabase) TearDown() {
 }
 
 func RegisterAndLoginTestUser(
-	suite interfaces.TestSuiteWithServer,
-	username, email, password string) (accessToken string, userId int, Username string, err error) {
+	suite TestSuiteWithServer,
+	username, email, password string) (accessToken string, userId string, Username string, err error) {
 
-	registerData := map[string]interface{}{
+	registerData := map[string]any{
 		"username": username,
 		"email":    email,
 		"password": password,
 	}
 	registerBody, err := json.Marshal(registerData)
 	if err != nil {
-		return "", 0, "", fmt.Errorf("marshal register data: %w", err)
+		return "", "", "", fmt.Errorf("marshal register data: %w", err)
 	}
 
 	registerResp, err := suite.GetClient().Post(suite.GetServerURL()+"/user/register", "application/json", bytes.NewReader(registerBody))
 	if err != nil {
-		return "", 0, "", fmt.Errorf("register failed: %w", err)
+		return "", "", "", fmt.Errorf("register failed: %w", err)
 	}
 
 	if registerResp.StatusCode != http.StatusCreated {
 		body, _ := io.ReadAll(registerResp.Body)
-		return "", 0, "", fmt.Errorf("register bad status: %d, body: %s", registerResp.StatusCode, string(body))
+		return "", "", "", fmt.Errorf("register bad status: %d, body: %s", registerResp.StatusCode, string(body))
 	}
 
 	err = registerResp.Body.Close()
 	if err != nil {
-		return "", 0, "", fmt.Errorf("failed to close body: %w", err)
+		return "", "", "", fmt.Errorf("failed to close body: %w", err)
 	}
 
-	loginData := map[string]interface{}{
+	loginData := map[string]any{
 		"username": username,
 		"password": password,
 	}
 	loginBody, err := json.Marshal(loginData)
 	if err != nil {
-		return "", 0, "", fmt.Errorf("marshal login data: %w", err)
+		return "", "", "", fmt.Errorf("marshal login data: %w", err)
 	}
 
 	loginResp, err := suite.GetClient().Post(suite.GetServerURL()+"/user/login", "application/json", bytes.NewReader(loginBody))
+	log.Println(suite.GetServerURL())
 	if err != nil {
-		return "", 0, "", fmt.Errorf("login failed: %w", err)
+		return "", "", "", fmt.Errorf("login failed: %w", err)
 	}
 
 	if loginResp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(loginResp.Body)
-		return "", 0, "", fmt.Errorf("login bad status: %d, body: %s", loginResp.StatusCode, string(body))
+		return "", "", "", fmt.Errorf("login bad status: %d, body: %s", loginResp.StatusCode, string(body))
 	}
 
 	var response struct {
 		AccessToken string `json:"accessToken"`
-		UserId      int    `json:"userId"`
+		UserId      string `json:"userId"`
 		UserName    string `json:"username"`
 	}
 	if err := json.NewDecoder(loginResp.Body).Decode(&response); err != nil {
-		return "", 0, "", fmt.Errorf("decode login response: %w", err)
+		return "", "", "", fmt.Errorf("decode login response: %w", err)
 	}
 
 	err = loginResp.Body.Close()
 	if err != nil {
-		return "", 0, "", fmt.Errorf("failed to close body: %w", err)
+		return "", "", "", fmt.Errorf("failed to close body: %w", err)
 	}
 
 	return response.AccessToken, response.UserId, response.UserName, nil

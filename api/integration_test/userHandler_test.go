@@ -95,7 +95,7 @@ func TestLogin(t *testing.T) {
 
 	var response struct {
 		AccessToken string `json:"accessToken"`
-		UserID      int    `json:"userId"`
+		UserID      string `json:"userId"`
 	}
 	err = json.NewDecoder(r.Body).Decode(&response)
 	require.NoError(t, err)
@@ -128,7 +128,7 @@ func TestRefresh(t *testing.T) {
 
 	var response struct {
 		AccessToken string `json:"accessToken"`
-		UserId      int    `json:"userId"`
+		UserId      string `json:"userId"`
 	}
 
 	cookies := r.Cookies()

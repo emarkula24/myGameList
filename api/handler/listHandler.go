@@ -237,3 +237,29 @@ func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 }
+
+// DeleteListItem handles DELETE /list/game requests.
+func (h *ListHandler) DeleteListItem(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
+	gameId := r.URL.Query().Get("gameId")
+	if username == "" || gameId == "" {
+		log.Printf("query parameter for username or gameId is missing")
+		errorutils.WriteJSONError(w, "no query parameter for username or gameId", http.StatusBadRequest)
+		return
+	}
+	gameIdInt, err := strconv.Atoi(gameId)
+	if err != nil {
+		log.Printf("failed to convert gameId to int")
+		errorutils.WriteJSONError(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
+		return
+	}
+	err = h.ListService.DeleteGame(username, gameIdInt)
+	if err != nil {
+		log.Printf("delete request failed")
+		errorutils.WriteJSONError(w, "failed to delete game from list", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+}
