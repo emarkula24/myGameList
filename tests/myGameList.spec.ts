@@ -1,27 +1,26 @@
 import { test, expect } from '@playwright/test';
 import { text } from 'stream/consumers';
 
-test("Has content", async ({page}) => {
-    await page.goto('http://127.0.0.1:5173')
+test("Has content", async ({ page }) => {
+    await page.goto('/')
     await expect(page).toHaveTitle(/myGameList/)
 })
 
 test.describe("Register", () => {
-    test("Should be able to register with approved values",  async ({ page }) => {
-        await page.goto("/register")
-        const oldUrl = page.url()
-        const textboxes = await page.getByRole("textbox").all()
-        await textboxes[0].fill("tester")
-        await textboxes[1].fill("tester@gmail.com")
-        await textboxes[2].fill("aB123456@")
-        await textboxes[3].fill("aB123456@")
+    test("Should be able to register with approved values", async ({ page }) => {
+        await page.goto("register")
 
-        await page.getByRole("button", {name: "register"}).click()
+        // Fill form
+        await page.getByPlaceholder("Enter username").fill("tester");
+        await page.getByPlaceholder("Enter email").fill("tester@gmail.com");
+        await page.getByPlaceholder("Enter password").fill("aB123456@");
+        await page.getByPlaceholder("Confirm password").fill("aB123456@");
 
-        expect(page.getByText("Register Success!")).toBeVisible()
+        await page.getByRole("button", { name: "register" }).click()
 
-        await page.waitForTimeout(800)
-        const newUrl = page.url()
-        expect(newUrl).not.toBe(oldUrl)
+        // expect(page.getByText("Register Success!")).toBeVisible()
+        await page.waitForURL('**/login')
+
+        expect(page.url()).toContain('/login')
     })
 })

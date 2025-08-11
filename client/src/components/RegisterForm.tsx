@@ -9,7 +9,7 @@ export default function RegisterForm({ handleSubmit, handleChange, registerFormD
         <>
             <form className={styles.formContainer} onSubmit={(e) => void handleSubmit(e)}>
                 <label className='Label'>Username:</label>
-                <input name="username" value={registerFormData.username} onChange={handleChange} type="username" placeholder='Enter username' />
+                <input name="username" value={registerFormData.username} onChange={handleChange} type="text" placeholder='Enter username' />
                 <label className='Label'>Email:</label>
                 <input name="email" value={registerFormData.email} onChange={handleChange} type='email' placeholder='Enter email' />
                 <label className='Label'>Password:</label>

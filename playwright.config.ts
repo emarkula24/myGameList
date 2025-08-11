@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
 /**
  * Read environment variables from file.
@@ -12,7 +13,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 
-//TODO CURRENTLY THESE ARE NOT BEING READ BY TESTS, THEY DO WORK IF YOU START UP SERVICES MANUALLY
+//PLAYWRIGHT THESE NEED TO BE RUN FROM THE SAME FOLDER AS THIS CONFIG FILE!!!!!
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
@@ -27,11 +28,32 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  /* Run your local dev server before starting the tests */
+  webServer: [
+    {
+      command: 'go run .',
+      port: 8081,
+      name: 'Backend',
+      reuseExistingServer: !process.env.CI,
+      gracefulShutdown: { signal: 'SIGTERM', timeout: 1000 },
+      cwd: path.resolve(__dirname, 'api'),
+      stderr: 'pipe',
+    },
+    {
+      command: 'npm run dev',
+      port: 5173,
+      name: 'Frontend',
+      reuseExistingServer: !process.env.CI,
+      cwd: path.resolve(__dirname, 'client'),
+      stdout: "pipe",
+      stderr: 'pipe',
+    },
+  ],
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:5173',
-    storageState: 'state.json',
-    actionTimeout: 5000,
+    baseURL: 'http://127.0.0.1:5173/',
+    // storageState: 'state.json',
+    actionTimeout: 1000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -76,29 +98,5 @@ export default defineConfig({
     // },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-    command: 'go run .',
-    url: 'http://127.0.0.1:8081',
-    name: 'Backend',
-    timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI,
-    gracefulShutdown: {signal: 'SIGTERM', timeout: 1000},
-    cwd: './api',
-  },
-  {
-    command: 'vite',
-    url: 'http://127.0.0.1:5173',
-    name: 'Frontend',
-    timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI,
-    cwd:'./client',
-  }, 
-  // TODO future CI pipeline integration for database ?
-  // { command: 'docker compose up -f -d . ',
-  //   cwd: '/api'
-  // }
-],
 
 });
