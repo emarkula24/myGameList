@@ -45,7 +45,7 @@ function Register() {
         return (
                 <div className="routeContainer">
                         <CommonDivider routeName={"Register"} />
-                        <RegisterForm handleSubmit={() => void handleSubmit} handleChange={() => void handleChange} registerFormData={registerFormData} />
+                        <RegisterForm handleSubmit={(e) => void handleSubmit(e)} handleChange={(e) => void handleChange(e)} registerFormData={registerFormData} />
                         {error && <SubmitError err={error} />}
                 </div>
         )
