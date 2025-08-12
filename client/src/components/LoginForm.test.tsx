@@ -11,8 +11,8 @@ describe("< LoginForm />", () => {
 
     it("correctly updates form data on text input and submits", async () => {
         render(<LoginForm onSubmit={onSubmitMock} onChange={onChangeMock} loginFormData={loginFormData} />)
-        const usernameInput = screen.getByPlaceholderText('Enter username') as HTMLInputElement
-        const passwordInput = screen.getByPlaceholderText('Enter password') as HTMLInputElement
+        const usernameInput = screen.getByPlaceholderText('Enter username') 
+        const passwordInput = screen.getByPlaceholderText('Enter password')
 
         await user.type(usernameInput, 'test')
         await user.type(passwordInput, 'secure123')
