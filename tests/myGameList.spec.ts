@@ -23,4 +23,7 @@ test.describe("Register", () => {
 
         expect(page.url()).toContain('/login')
     })
+    test("Should not be able to register with short password", async ({page}) => {
+        
+    })
 })
