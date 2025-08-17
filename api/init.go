@@ -2,7 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"example.com/mygamelist/handler"
@@ -74,23 +76,58 @@ func NewDatabase() *sql.DB {
 
 // Router creates a new router instance with subroutes.
 func Router() *mux.Router {
-	mode := os.Getenv("MODE")
 
-	// Development: load from file
-	if mode != "production" {
-		if err := godotenv.Load(".env"); err != nil {
-			log.Println("Running in development mode, local .env file needed")
-		}
-	} else {
-		// Optional: print loaded mode
-		log.Println("Running in production mode.")
+	if err := godotenv.Load(".env"); err != nil {
+		log.Println("error loading env")
 	}
+	log.Println("Loaded env")
+	mode := os.Getenv("MODE")
+	// // Development: load from file
+	// if mode != "production" {
+	// 	if err := godotenv.Load(".env"); err != nil {
+	// 		log.Println("Running in development mode, local .env file needed")
+	// 	}
+	// } else {
+	// 	// Optional: print loaded mode
+	// 	log.Println("Running in production mode.")
+	// }
 
 	db := NewDatabase()
 	handlers := SetUp(db)
-
 	router := mux.NewRouter()
 	router.Use(middleware.LoggingMiddleware)
+	if mode == "development" {
+
+		router.HandleFunc("/reset", func(w http.ResponseWriter, r *http.Request) {
+			// Deletes all data in the development table if called in tests
+			_, err := db.Exec("SET FOREIGN_KEY_CHECKS=0")
+			if err != nil {
+				log.Fatalf("Failed to disable FK checks: %v", err)
+			}
+
+			tables := []string{"user_games", "refreshtokens", "games", "users"}
+			for _, t := range tables {
+				_, err := db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", t))
+				if err != nil {
+					log.Fatalf("Failed to truncate %s: %v", t, err)
+				}
+			}
+
+			_, err = db.Exec("SET FOREIGN_KEY_CHECKS=1")
+			if err != nil {
+				log.Fatalf("Failed to enable FK checks: %v", err)
+			}
+
+			if err != nil {
+				log.Printf("Failed to reset database: %v", err)
+				w.WriteHeader(500)
+				w.Write([]byte("Failed to reset database"))
+				return
+			}
+			w.WriteHeader(200)
+			w.Write([]byte("Database reset successfully"))
+		}).Methods("POST")
+	}
 
 	routes.CreateGameSubrouter(router, handlers.game)
 	routes.CreateUserSubrouter(router, handlers.user)

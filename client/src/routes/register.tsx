@@ -31,13 +31,13 @@ function Register() {
                         await router.navigate({ to: "/login" })
                 } catch (err: unknown) {
                         if (err instanceof UserExistsError) {
-                                setError("User already exists")
+                                setError("User already exists.")
                         } 
                         else if (err instanceof InvalidRegisterError) {
-                                setError("Insuffucient password length")
+                                setError("Insufficient password length.")
                         }
                         else {
-                                setError("Register failed")
+                                setError("Register failed.")
                         }
 
                 }
