@@ -2,7 +2,7 @@ import { createFileRoute, redirect, useRouter, useRouterState } from '@tanstack/
 import React, { useState } from 'react'
 import { z } from 'zod'
 import SubmitError from '../components/SubmitError'
-import { useAuth } from '../utils/auth'
+import { LoginFailedError, useAuth } from '../utils/auth'
 import CommonDivider from '../components/CommonDivider'
 import LoginForm from '../components/LoginForm'
 const fallback = '/' as const
@@ -41,7 +41,8 @@ function LoginComponent() {
                         await router.invalidate()
                         await router.navigate({ to: search.redirect || fallback })
                 } catch (err: unknown) {
-                        if (err instanceof Error) {
+
+                        if (err instanceof LoginFailedError) {
                                 setError(err.message || 'Login failed');
                         }
                         

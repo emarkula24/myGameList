@@ -1,17 +1,19 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import React, { useState } from 'react'
-import { postRegister } from '../utils/auth';
+import { InvalidRegisterError, postRegister, UserExistsError } from '../utils/auth';
 import SubmitError from '../components/SubmitError';
 import CommonDivider from '../components/CommonDivider';
 import RegisterForm from '../components/RegisterForm';
+
 
 export const Route = createFileRoute('/register')({
         component: Register,
 })
 
+
 function Register() {
         const router = useRouter()
-        const [error, setError] = React.useState<string | null>(null);
+        const [error, setError] = React.useState< string | null>(null);
         
         const [registerFormData, setRegisterFormData] = useState({
                 username: "",
@@ -27,8 +29,14 @@ function Register() {
                         await postRegister(registerFormData.email, registerFormData.password, registerFormData.username)
                         await router.navigate({ to: "/login" })
                 } catch (err: unknown) {
-                        if (err instanceof Error) {
-                                setError(err.message || "Register failed.")
+                        if (err instanceof UserExistsError) {
+                                setError("User already exists")
+                        } 
+                        else if (err instanceof InvalidRegisterError) {
+                                setError("Insuffucient password length")
+                        }
+                        else {
+                                setError("Register failed")
                         }
 
                 }
@@ -46,7 +54,7 @@ function Register() {
                 <div className="routeContainer">
                         <CommonDivider routeName={"Register"} />
                         <RegisterForm handleSubmit={(e) => void handleSubmit(e)} handleChange={(e) => void handleChange(e)} registerFormData={registerFormData} />
-                        {error && <SubmitError err={error} />}
+                        { error  && < SubmitError  err={error} /> } 
                 </div>
         )
 }

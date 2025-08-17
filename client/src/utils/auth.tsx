@@ -1,9 +1,12 @@
 import axios, { AxiosError } from "axios"
 import type { RegisterResponse } from "../types/types"
 import React from "react"
+
 export class LoginFailedError extends Error { }
 export class RegisterFailedError extends Error { }
+export class UserExistsError extends Error { }
 export class UserNotLoggedInError extends Error { }
+export class InvalidRegisterError extends Error { }
 
 export interface User {
   username: string
@@ -119,8 +122,14 @@ export const postRegister = async (email: string, password: string, username: st
   } catch (err) {
     if (err instanceof AxiosError) {
       const errStatus = err.response?.status
-      if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
-        throw new RegisterFailedError(`login failed for user ${username}`)
+      if (errStatus === 400) {
+        throw new InvalidRegisterError("unacceptable password")
+      } 
+      if (errStatus === 409) {
+        throw new UserExistsError(`an account named ${username} already exists.`)
+      }
+      if (errStatus === 404 || errStatus === 500) {
+        throw new RegisterFailedError(`register failed`)
       }
     }
     throw err

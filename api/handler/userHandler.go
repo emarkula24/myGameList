@@ -44,20 +44,23 @@ func (h *UserHandler) Register(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&regReq); err != nil {
-		errorutils.Write(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+		errorutils.Write(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	if len(regReq.Password) <= 6 {
+		errorutils.Write(w, "password too short", http.StatusBadRequest)
+		return
+	}
 	userId, err := h.UserService.RegisterUser(regReq.Username, regReq.Email, regReq.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, errorutils.ErrUserExists):
-			log.Printf("user alreadt exists %s", err)
-			errorutils.Write(w, "User already exists", http.StatusBadRequest)
+			log.Printf("user already exists %s", err)
+			errorutils.Write(w, "user already exists", http.StatusConflict)
 			return
 		default:
-			log.Printf("Failed to register user: %s", err)
-			errorutils.Write(w, "Error adding user: "+err.Error(), http.StatusInternalServerError)
+			log.Printf("failed to register user: %s", err)
+			errorutils.Write(w, "error adding user: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 

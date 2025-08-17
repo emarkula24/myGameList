@@ -4,11 +4,10 @@ interface SubmitErrorProps {
 }
 
 
-export default function SubmitError({err}:  SubmitErrorProps) {
-    
+export default function SubmitError({ err}: SubmitErrorProps) {
 
-
-    return (
-        <div style={{ color: 'red' }}>{err}</div>
-    )
+  console.log(err)
+  return (
+    <div style={{ textAlign: "center", color: 'red' , fontSize: "2em", width: "20%", height: "10%"}}>{err}</div>
+  )
 } 
