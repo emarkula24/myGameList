@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -31,7 +31,6 @@ jobs:
         echo "${{secrets.GIANT_BOMB_API_KEY }}" > .env
         echo "${{secrets.JWT_SECRET_KEY }}" > .env
         echo "${{secrets.REFRESH_SECRET_KEY }}" > .env
-      
     - name: Test
       working-directory: ./api
       run: go test -v ./...
