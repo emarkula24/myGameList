@@ -45,13 +45,13 @@ func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&listReq); err != nil {
 		log.Printf("failed to insert game: %s", err)
-		errorutils.WriteJSONError(w, "Invalid JSON", http.StatusBadRequest)
+		errorutils.Write(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 	err := h.ListService.PostGame(listReq.GameId, listReq.Status, listReq.UserName, listReq.GameName)
 	if err != nil {
 		log.Printf("failed to insert game: %s", err)
-		errorutils.WriteJSONError(w, "failed to add game to list", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to add game to list", http.StatusInternalServerError)
 		return
 	}
 	for k := range h.Cache.Items() {
@@ -71,13 +71,13 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&updateReq); err != nil {
 		log.Printf("failed to update game: %s", err)
-		errorutils.WriteJSONError(w, "Invalid JSON", http.StatusBadRequest)
+		errorutils.Write(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 	err := h.ListService.PutGame(updateReq.GameId, updateReq.Status, updateReq.UserName)
 	if err != nil {
 		log.Printf("failed to update game: %s", err)
-		errorutils.WriteJSONError(w, "failed to update list", http.StatusBadRequest)
+		errorutils.Write(w, "failed to update list", http.StatusBadRequest)
 		return
 	}
 	for k := range h.Cache.Items() {
@@ -110,7 +110,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	if username == "" {
 		log.Printf("query parameter for username or gamename is missing")
-		errorutils.WriteJSONError(w, "no query parameter for username or gamename", http.StatusBadRequest)
+		errorutils.Write(w, "no query parameter for username or gamename", http.StatusBadRequest)
 		return
 	}
 	// Extract 'page' and 'limit' query parameters.
@@ -138,36 +138,36 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	response, gameListDb, err := h.ListService.GetGameList(username, page, limit)
 	if len(gameListDb) == 0 {
 		log.Printf("gamelist is empty: %s", err)
-		errorutils.WriteJSONError(w, "gamelist is empty", http.StatusBadRequest)
+		errorutils.Write(w, "gamelist is empty", http.StatusBadRequest)
 	}
 	if err != nil {
 		log.Printf("failed to get gamelist: %s", err)
-		errorutils.WriteJSONError(w, "failed to get list", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to get list", http.StatusInternalServerError)
 		return
 	}
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Printf("failed to read response body: %s", err)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 	combinedApiResponse, err := utils.CombineGameListJSON(gameListDb, bodyBytes)
 	if err != nil {
 		log.Printf("failed to inject values in apiResp: %s", err)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 	finalResponse, err := json.Marshal(combinedApiResponse)
 	if err != nil {
 		log.Printf("failed to marshal combined response: %s", err)
-		errorutils.WriteJSONError(w, "failed to getch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to getch gamedata", http.StatusInternalServerError)
 		return
 	}
 	err = response.Body.Close()
 
 	if err != nil {
 		log.Printf("failed to close body: %s", err)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
@@ -179,7 +179,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(bytes.NewReader(finalResponse)).Decode(&gameJSON)
 	if err != nil {
 		log.Printf("failed to decode json body: %s", err)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	}
 
@@ -189,16 +189,16 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if _, err := w.Write(finalResponse); err != nil {
 			log.Printf("failed to write response: %s", err)
-			errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+			errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 			return
 		}
 	case 100:
 		log.Printf("Invalid API key %s", err)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 		return
 	default:
 		log.Printf("Gamebomb API status != 200: %d", gameJSON.StatusCode)
-		errorutils.WriteJSONError(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
 	}
 
 }
@@ -209,13 +209,13 @@ func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
 	gameId := r.URL.Query().Get("gameId")
 	if username == "" || gameId == "" {
 		log.Printf("query parameter for username or gameId is missing")
-		errorutils.WriteJSONError(w, "no query parameter for username or gameId", http.StatusBadRequest)
+		errorutils.Write(w, "no query parameter for username or gameId", http.StatusBadRequest)
 		return
 	}
 	gameIdInt, err := strconv.Atoi(gameId)
 	if err != nil {
 		log.Printf("failed to convert gameId to int")
-		errorutils.WriteJSONError(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
 		return
 	}
 	type GameResponse struct {
@@ -231,7 +231,7 @@ func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Printf("failed to encode into json")
-		errorutils.WriteJSONError(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -244,19 +244,19 @@ func (h *ListHandler) DeleteListItem(w http.ResponseWriter, r *http.Request) {
 	gameId := r.URL.Query().Get("gameId")
 	if username == "" || gameId == "" {
 		log.Printf("query parameter for username or gameId is missing")
-		errorutils.WriteJSONError(w, "no query parameter for username or gameId", http.StatusBadRequest)
+		errorutils.Write(w, "no query parameter for username or gameId", http.StatusBadRequest)
 		return
 	}
 	gameIdInt, err := strconv.Atoi(gameId)
 	if err != nil {
 		log.Printf("failed to convert gameId to int")
-		errorutils.WriteJSONError(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
 		return
 	}
 	err = h.ListService.DeleteGame(username, gameIdInt)
 	if err != nil {
 		log.Printf("delete request failed")
-		errorutils.WriteJSONError(w, "failed to delete game from list", http.StatusInternalServerError)
+		errorutils.Write(w, "failed to delete game from list", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

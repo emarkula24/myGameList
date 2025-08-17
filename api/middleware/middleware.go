@@ -17,13 +17,13 @@ func VerifyJWTMiddleware(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 
 		if authHeader == "" {
-			errorutils.WriteJSONError(w, "Authorization header missing or invalid access token", http.StatusUnauthorized)
+			errorutils.Write(w, "Authorization header missing or invalid access token", http.StatusUnauthorized)
 			return
 		}
 		// Expecting header format: "Bearer <token>".
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			errorutils.WriteJSONError(w, "Authorization header format must be Bearer {token}", http.StatusUnauthorized)
+			errorutils.Write(w, "Authorization header format must be Bearer {token}", http.StatusUnauthorized)
 			return
 		}
 
@@ -34,19 +34,19 @@ func VerifyJWTMiddleware(next http.Handler) http.Handler {
 			switch {
 			case errors.Is(err, jwt.ErrTokenExpired):
 				log.Printf("%s", err)
-				errorutils.WriteJSONError(w, "token expired", http.StatusForbidden)
+				errorutils.Write(w, "token expired", http.StatusForbidden)
 				return
 			case errors.Is(err, jwt.ErrTokenMalformed):
 				log.Printf("%s", err)
-				errorutils.WriteJSONError(w, "token malformed", http.StatusForbidden)
+				errorutils.Write(w, "token malformed", http.StatusForbidden)
 				return
 			case errors.Is(err, jwt.ErrTokenSignatureInvalid):
 				log.Printf("%s", err)
-				errorutils.WriteJSONError(w, "token signature invalid", http.StatusForbidden)
+				errorutils.Write(w, "token signature invalid", http.StatusForbidden)
 				return
 			default:
 				log.Printf("%s", err)
-				errorutils.WriteJSONError(w, "failed to verify token", http.StatusInternalServerError)
+				errorutils.Write(w, "failed to verify token", http.StatusInternalServerError)
 				return
 			}
 		}
@@ -71,7 +71,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 // 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 // 		if err := h(w, r); err != nil {
 // 			log.Printf("handling %q: %v", r.RequestURI, err)
-// 			errorutils.WriteJSONError(w, "something went wrong", http.StatusInternalServerError)
+// 			errorutils.Write(w, "something went wrong", http.StatusInternalServerError)
 // 		}
 // 	})
 // }

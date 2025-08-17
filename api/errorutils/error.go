@@ -14,11 +14,15 @@ var (
 	ErrRefreshTokenExists = errors.New("refreshtoken already in db")
 )
 
-func WriteJSONError(w http.ResponseWriter, message string, code int) {
+// Write sends a specified HTTP response with message
+func Write(w http.ResponseWriter, message string, code int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 
+	if message == "" {
+		message = "Internal Server Error"
+	}
 	err := json.NewEncoder(w).Encode(map[string]any{
 		"error": message,
 		"code":  code,
