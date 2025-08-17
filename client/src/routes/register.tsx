@@ -15,6 +15,7 @@ function Register() {
         const router = useRouter()
         const [error, setError] = React.useState< string | null>(null);
         
+ 
         const [registerFormData, setRegisterFormData] = useState({
                 username: "",
                 email: "",

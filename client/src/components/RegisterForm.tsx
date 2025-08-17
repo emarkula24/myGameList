@@ -1,3 +1,4 @@
+import React from "react"
 import styles from "./RegisterForm.module.css"
 
 export default function RegisterForm({ handleSubmit, handleChange, registerFormData }: {
@@ -5,8 +6,13 @@ export default function RegisterForm({ handleSubmit, handleChange, registerFormD
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     registerFormData: { username: string, email: string, password: string, confirmPassword: string }
 }) {
+    const [match, setMatch] = React.useState(false);
+    React.useEffect(() => {
+        setMatch(registerFormData.password === registerFormData.confirmPassword);
+    }, [registerFormData.password, registerFormData.confirmPassword]);
     return (
         <>
+            <div style={{fontSize: "2em"}}>Password needs to be atleast 6 characters long. </div>
             <form className={styles.formContainer} onSubmit={(e) => void handleSubmit(e)}>
                 <label className='Label'>Username:</label>
                 <input name="username" value={registerFormData.username} onChange={handleChange} type="text" placeholder='Enter username' />
@@ -16,7 +22,8 @@ export default function RegisterForm({ handleSubmit, handleChange, registerFormD
                 <input name="password" value={registerFormData.password} onChange={handleChange} type='password' placeholder='Enter password' />
                 <label className='Label'>Confirm Password:</label>
                 <input name="confirmPassword" value={registerFormData.confirmPassword} onChange={handleChange} type='password' placeholder='Confirm password' />
-                <button type="submit" name="register">Register</button>
+                <button type="submit" name="register" disabled={!match}>Register</button>
+                { !match && <span style={{fontSize: "1.5em"}}>Passwords do not match</span>}
             </form>
         </>
     )
