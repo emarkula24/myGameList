@@ -108,7 +108,7 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 //   - 500 Internal Server Error: API failure, data unmarshalling errors, or other unexpected issues.
 func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
-	if username == "" {
+	if username == "" || username == "undefined" {
 		log.Printf("query parameter for username or gamename is missing")
 		errorutils.Write(w, "no query parameter for username or gamename", http.StatusBadRequest)
 		return
@@ -139,6 +139,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	if len(gameListDb) == 0 {
 		log.Printf("gamelist is empty: %s", err)
 		errorutils.Write(w, "gamelist is empty", http.StatusBadRequest)
+		return
 	}
 	if err != nil {
 		log.Printf("failed to get gamelist: %s", err)

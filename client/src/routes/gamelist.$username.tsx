@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter, type ErrorComponentProps } from '@tanstack/react-router'
 import { gameListQueryOptions } from '../queryOptions'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useAuth } from '../utils/auth'
 import GameListFilterHeader from '../components/GameListFilterHeader'
@@ -9,12 +9,41 @@ import { useFilteredGameList } from '../hooks/useGameListFilter'
 import { GameListStatusHeader } from '../components/GameListStatusHeader'
 import GameListContainer from '../components/GameListContainer'
 import { GameListTable } from '../components/GameListTable'
+import React from 'react'
+import { GameListEmptyError } from '../game'
 export const Route = createFileRoute('/gamelist/$username')({
   loader: ({ context: { queryClient }, params: { username } }) => {
     return queryClient.ensureQueryData(gameListQueryOptions(username))
   },
   component: GameListComponent,
+  errorComponent: GameListErrorComponent,
 })
+
+function GameListErrorComponent({error}: ErrorComponentProps) {
+  const router = useRouter()
+
+
+  const queryErrorResetBoundary = useQueryErrorResetBoundary()
+
+  React.useEffect(() => {
+    queryErrorResetBoundary.reset()
+  }, [queryErrorResetBoundary])
+  if (error instanceof GameListEmptyError) {
+    return <div className='routeContainer'><div style={{ textAlign: "center", fontSize: "2.5em", marginTop: "3%", height: "100%", width: "75%"}}>{error.message}</div></div>
+  }
+  return (
+    <div className='routeContainer'>
+      <button
+        onClick={() => {
+          void router.invalidate()
+        }}
+        type="button"
+      >
+        retry
+      </button>
+    </div>
+  )
+}
 
 function GameListComponent() {
 
@@ -40,6 +69,7 @@ function GameListComponent() {
   return (
     <div className="routeContainer">
       < CommonDivider routeName={`Viewing ${username}'s Game List`} />
+      
       <GameListContainer>
         <GameListFilterHeader
           onSelect={handleFilterChange}

@@ -87,11 +87,9 @@ export const fetchGames = async (searchQuery: string): Promise<Games[]> => {
         return response.data.results
     } catch (err) {
         if (err instanceof AxiosError) {
-            if (err.status === 500) {
+            const errStatus = err.response?.status
+            if (errStatus === 500) {
                 throw new GamesNotFoundError(`Games with query ${encodedSearchQuery} not found`)
-            }
-            if (err.status === 400) {
-                throw new GameListEmptyError
             }
 
         }
@@ -109,6 +107,9 @@ export const fetchGameList = async (username: string | undefined, page = 1, limi
             const errStatus = err.response?.status
             if (errStatus === 500 || errStatus == 404) {
                 throw new GameListNotFoundError(`no gamelist found for user`)
+            }
+            else if (errStatus === 400) {
+                throw new GameListEmptyError("Gamelist is empty")
             }
 
         }
