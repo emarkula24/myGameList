@@ -17,6 +17,7 @@ export default function GameResultRow({ game }: { game: Games }) {
             <div key={game.id}>
                 <h3 style={{fontSize: "1.6em"}}>{game.name}</h3>
                 <img src={game.image?.thumb_url} style={{maxWidth: "100%", height: "auto"}}/>
+                <h2>{game.original_release_date}</h2>
             </div>
         </div> 
     )

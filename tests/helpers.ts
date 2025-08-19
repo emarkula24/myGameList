@@ -15,3 +15,7 @@ export const registerWith = async (page: Page, username: string, email: string, 
 
     await page.getByRole("button", { name: "register" }).click()
 }
+
+export const searchGame = async (page: Page, query: string) => {
+    await page.getByPlaceholder("Search for games").fill(query)
+}

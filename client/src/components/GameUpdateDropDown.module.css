@@ -46,15 +46,6 @@
 
 }
 
-.dropdownContent p {
-  color: black;
-  font-size: 20px;
-  text-decoration: none;
-  display: block;
-  user-select: none;
-  -moz-user-select: none;
-
-}
 
 /* Change color of dropdown links on hover */
 .dropdownContent p:hover {
@@ -62,6 +53,14 @@
   cursor: pointer;
 }
 
+.option {
+  color: black;
+  font-size: 20px;
+  text-decoration: none;
+  display: block;
+  user-select: none;
+  -moz-user-select: none;
+}
 .show {
   display: block;
 }

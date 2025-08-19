@@ -3,6 +3,7 @@ import type { RegisterResponse } from "../types/types"
 import React from "react"
 
 export class LoginFailedError extends Error { }
+export class IncorrectCredentialsError extends Error { }
 export class RegisterFailedError extends Error { }
 export class UserExistsError extends Error { }
 export class UserNotLoggedInError extends Error { }
@@ -102,8 +103,11 @@ const postLogin = async (username: string, password: string): Promise<User> => {
   } catch (err) {
     if (err instanceof AxiosError) {
       const errStatus = err.response?.status
-      if (errStatus === 401 || errStatus === 404 || errStatus === 500) {
-        throw new LoginFailedError(`login failed for user ${username}`)
+      if (errStatus === 401) {
+        throw new IncorrectCredentialsError("Incorrect password or username.")
+      }
+      else if (errStatus === 404 || errStatus === 500) {
+        throw new LoginFailedError(`Login failed.`)
       }
     }
     throw err
