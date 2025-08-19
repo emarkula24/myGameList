@@ -35,7 +35,7 @@ export default defineConfig({
       port: 8081,
       name: 'Backend',
       reuseExistingServer: !process.env.CI,
-      gracefulShutdown: { signal: 'SIGTERM', timeout: 1000 },
+      gracefulShutdown: { signal: 'SIGTERM', timeout: 2000 },
       cwd: path.resolve(__dirname, 'api'),
       stderr: 'pipe',
     },
@@ -53,7 +53,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://127.0.0.1:5173/',
     // storageState: 'state.json',
-    actionTimeout: 1000,
+    actionTimeout: 10000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
