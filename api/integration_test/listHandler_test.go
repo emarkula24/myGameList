@@ -37,8 +37,8 @@ func NewListTestSuite(db *sql.DB) *ListTestSuite {
 	userHandler := handler.NewUserHandler(userService)
 
 	router := mux.NewRouter()
-	router = routes.CreateListSubRouter(router, listHandler)
-	router = routes.CreateUserSubrouter(router, userHandler)
+	routes.CreateListSubRouter(router, listHandler)
+	routes.CreateUserSubrouter(router, userHandler)
 	server := httptest.NewServer(router)
 
 	return &ListTestSuite{
@@ -57,22 +57,23 @@ func (s *ListTestSuite) GetClient() *http.Client {
 }
 
 var listTestSuite *ListTestSuite
+var accesstoken string
 
 func TestAddToList(t *testing.T) {
-	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listaddtest", "listadd@test.com", "1234567@M")
+	accessToken, _, _, err := RegisterAndLoginTestUser("list", "listadd@test.com", "1234567@M")
 	require.NoError(t, err)
-
+	accesstoken = accessToken
 	body := `{
 		"game_id":34126,
-		"status":"playing",
-		"username":"mies",
+		"status": 2,
+		"username":"list",
 		"gamename":"metroid"
 	}`
 	client := listTestSuite.Server.Client()
-	listAddRequest, err := http.NewRequest("POST", listTestSuite.Server.URL+"list/add", strings.NewReader(body))
+	listAddRequest, err := http.NewRequest("POST", listTestSuite.Server.URL+"/list/add", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, listAddRequest)
-	listAddRequest.Header.Set("Authorization", accessToken)
+	listAddRequest.Header.Set("Authorization", "Bearer "+accessToken)
 	listAddRequest.Header.Set("Content-Type", "application/json")
 	r, err := client.Do(listAddRequest)
 	require.NoError(t, err)
@@ -80,18 +81,16 @@ func TestAddToList(t *testing.T) {
 }
 
 func TestUpdateList(t *testing.T) {
-	accessToken, _, _, err := RegisterAndLoginTestUser(listTestSuite, "listupdatest", "listupdate@test.com", "1234567@M")
-	require.NoError(t, err)
 	body := `{
-		"game_id":"34126",
-		"status":"completed",
-		"username":"mies"
+		"game_id": 34126,
+		"status": 1,
+		"username":"list"
 	}`
 	client := listTestSuite.Server.Client()
-	updateReq, err := http.NewRequest("PUT", listTestSuite.Server.URL+"list/update", strings.NewReader(body))
+	updateReq, err := http.NewRequest("PUT", listTestSuite.Server.URL+"/list/update", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, updateReq)
-	updateReq.Header.Set("Authorization", accessToken)
+	updateReq.Header.Set("Authorization", "Bearer "+accesstoken)
 	updateReq.Header.Set("Content-Type", "application/json")
 
 	updateResp, err := client.Do(updateReq)

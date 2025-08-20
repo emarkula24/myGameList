@@ -19,11 +19,6 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-type TestSuiteWithServer interface {
-	GetServerURL() string
-	GetClient() *http.Client
-}
-
 type TestDatabase struct {
 	DbInstance *sql.DB
 	container  testcontainers.Container
@@ -91,7 +86,6 @@ func (tdb *TestDatabase) TearDown() {
 }
 
 func RegisterAndLoginTestUser(
-	suite TestSuiteWithServer,
 	username, email, password string) (accessToken string, userId string, Username string, err error) {
 
 	registerData := map[string]any{
@@ -104,7 +98,7 @@ func RegisterAndLoginTestUser(
 		return "", "", "", fmt.Errorf("marshal register data: %w", err)
 	}
 
-	registerResp, err := suite.GetClient().Post(suite.GetServerURL()+"/user/register", "application/json", bytes.NewReader(registerBody))
+	registerResp, err := userTestSuite.GetClient().Post(userTestSuite.GetServerURL()+"/user/register", "application/json", bytes.NewReader(registerBody))
 	if err != nil {
 		return "", "", "", fmt.Errorf("register failed: %w", err)
 	}
@@ -128,8 +122,7 @@ func RegisterAndLoginTestUser(
 		return "", "", "", fmt.Errorf("marshal login data: %w", err)
 	}
 
-	loginResp, err := suite.GetClient().Post(suite.GetServerURL()+"/user/login", "application/json", bytes.NewReader(loginBody))
-	log.Println(suite.GetServerURL())
+	loginResp, err := userTestSuite.GetClient().Post(userTestSuite.GetServerURL()+"/user/login", "application/json", bytes.NewReader(loginBody))
 	if err != nil {
 		return "", "", "", fmt.Errorf("login failed: %w", err)
 	}

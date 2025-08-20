@@ -34,7 +34,7 @@ func NewUserTestSuite(db *sql.DB) *UserTestSuite {
 	h := handler.NewUserHandler(svc)
 
 	router := mux.NewRouter()
-	router = routes.CreateUserSubrouter(router, h)
+	routes.CreateUserSubrouter(router, h)
 	server := httptest.NewServer(router)
 
 	return &UserTestSuite{
@@ -65,7 +65,7 @@ func TestRegister(t *testing.T) {
 	}`
 
 	// Send HTTP POST to /register
-	r, err := http.Post(userTestSuite.Server.URL+"/user/register", "application/json", strings.NewReader(body))
+	r, err := http.Post(userTestSuite.GetServerURL()+"/user/register", "application/json", strings.NewReader(body))
 	require.NoError(t, err)
 	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
