@@ -19,3 +19,10 @@ export const registerWith = async (page: Page, username: string, email: string, 
 export const searchGame = async (page: Page, query: string) => {
     await page.getByPlaceholder("Search for games").fill(query)
 }
+export const addGame = async (page: Page, query: string) => {
+    await searchGame(page, query)
+    const results = page.getByRole("img")
+    await results[0].click()
+    await page.waitForURL(/\/games\/.*/)
+    await page.getByRole("button", { name: "Add to GameList" }).click()
+}

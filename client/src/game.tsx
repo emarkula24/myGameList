@@ -109,7 +109,7 @@ export const fetchGameList = async (username: string | undefined, page = 1, limi
                 throw new GameListNotFoundError(`no gamelist found for user`)
             }
             else if (errStatus === 400) {
-                throw new GameListEmptyError("Gamelist is empty")
+                throw new GameListEmptyError("Gamelist is empty.")
             }
 
         }

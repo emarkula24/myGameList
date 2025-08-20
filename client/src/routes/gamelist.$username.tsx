@@ -10,7 +10,7 @@ import { GameListStatusHeader } from '../components/GameListStatusHeader'
 import GameListContainer from '../components/GameListContainer'
 import { GameListTable } from '../components/GameListTable'
 import React from 'react'
-import { GameListEmptyError } from '../game'
+import { GameListEmptyError, GameListNotFoundError } from '../game'
 export const Route = createFileRoute('/gamelist/$username')({
   loader: ({ context: { queryClient }, params: { username } }) => {
     return queryClient.ensureQueryData(gameListQueryOptions(username))
@@ -29,6 +29,9 @@ function GameListErrorComponent({error}: ErrorComponentProps) {
     queryErrorResetBoundary.reset()
   }, [queryErrorResetBoundary])
   if (error instanceof GameListEmptyError) {
+    return <div className='routeContainer'><div style={{ textAlign: "center", fontSize: "2.5em", marginTop: "3%", height: "100%", width: "75%"}}>{error.message}</div></div>
+  }
+  if (error instanceof GameListNotFoundError) {
     return <div className='routeContainer'><div style={{ textAlign: "center", fontSize: "2.5em", marginTop: "3%", height: "100%", width: "75%"}}>{error.message}</div></div>
   }
   return (

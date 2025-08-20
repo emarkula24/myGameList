@@ -44,7 +44,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
     const statusColor = statusColors[game.status] || "lightgray";
     return (
         <tr className={styles.block}>
-            <td><div style={{backgroundColor: statusColor}} className={styles.titleColor}></div></td>
+            <td><div style={{ backgroundColor: statusColor }} className={styles.titleColor}></div></td>
             <td className={styles.indexNumber}>{index}</td>
             <td className={styles.item}><img src={game.image.icon_url} /></td>
             <td>
@@ -55,32 +55,32 @@ export default function GameRow({ index, game, username, isEditing, startEditing
             <td className={styles.item}>
                 {isEditing ? (
                     <>
-                        <GameUpdateDropdown
-                            onUpdateListEntry={(status) => updateMutation.mutate(status)}
-                            status={game.status}
-                        />
-                        {updateMutation.isPending && <span>Updating...</span>}
-                        {updateMutation.isError && (
-                            <span style={{ color: 'red' }}>{updateMutation.error.message}</span>
+                        {updateMutation.isError ? (
+                            <span style={{ color: "red" }}>Error</span>
+                        ) : updateMutation.isPending ? (
+                            <span style={{ color: "blue" }}>Updating...</span>
+                        ) : (
+                            <GameUpdateDropdown
+                                onUpdateListEntry={(status) => updateMutation.mutate(status)}
+                                status={game.status}
+                            />
                         )}
-                        {updateMutation.isSuccess && isEditing}
                     </>
                 ) : (
-
                     statusOptions[game.status]
                 )}
             </td>
             {isLoggedInUser ? (
 
-                    <td>
-                        <div className={styles.actionContainer}>
+                <td>
+                    <div className={styles.actionContainer}>
                         <div onClick={() => isEditing ? stopEditing(game.id) : startEditing(game.id)} className={styles.editBtn}>
-                        {isEditing ? 'Cancel' : 'Edit'}
+                            {isEditing ? 'Cancel' : 'Edit'}
                         </div>
                         <div className={styles.deleteBtn}>Delete</div>
-                        </div>
-                    </td>
-                    
+                    </div>
+                </td>
+
             ) : isMissingFromLoggedInUserList && (
                 <td>
                     <GameAddButton

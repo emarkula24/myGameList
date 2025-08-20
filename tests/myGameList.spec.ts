@@ -106,4 +106,17 @@ test.describe("GameList", () => {
         expect(page.getByText("Game successfully updated!")).toBeVisible()
         expect(page.getByText("Playing")).not.toBeVisible()
     })
+    test("Should render warning when gamelist is empty", async ({page}) => {
+        await page.goto("/gamelist/tester123")
+        expect(page.getByText("Gamelist is empty.")).toBeVisible()
+    })
+    test("Should delete game from list", async ({page}) => {
+        await addGame(page, "metroid")
+        await page.goto("/gamelist/tester123")
+        let entries = page.getByText("Delete")
+        expect.soft(entries.count()).toBeGreaterThan(0)
+        await entries[0].click()
+        entries = page.getByText("Delete")
+        console.log("entries on page:" + entries)
+    })
 })
