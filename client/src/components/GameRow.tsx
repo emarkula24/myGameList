@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import GameUpdateDropdown from './GameUpdateDropdown'
-import { useUpdateGameMutation, useAddGameMutation } from '../queryOptions'
+import { useUpdateGameMutation, useAddGameMutation, useDeleteGameMutation } from '../queryOptions'
 import { useAuth } from '../utils/auth'
 import type { Game } from '../types/types'
 import GameAddButton from './GameAddButton'
@@ -33,6 +33,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
 }) {
     const updateMutation = useUpdateGameMutation(username, game.id, game.name)
     const addMutation = useAddGameMutation(game.id, game.name)
+    const deleteMutation = useDeleteGameMutation(game.id, username)
     const auth = useAuth()
     const isLoggedInUser = auth.user?.username === username
     useEffect(() => {
@@ -42,6 +43,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
         }
     }, [updateMutation.isSuccess])
     const statusColor = statusColors[game.status] || "lightgray";
+
     return (
         <tr className={styles.block}>
             <td><div style={{ backgroundColor: statusColor }} className={styles.titleColor}></div></td>
@@ -77,7 +79,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
                         <div onClick={() => isEditing ? stopEditing(game.id) : startEditing(game.id)} className={styles.editBtn}>
                             {isEditing ? 'Cancel' : 'Edit'}
                         </div>
-                        <div className={styles.deleteBtn}>Delete</div>
+                        <div onClick={() => deleteMutation.mutate()} className={styles.deleteBtn}>Delete</div>
                     </div>
                 </td>
 

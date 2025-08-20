@@ -215,7 +215,7 @@ func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
 	}
 	gameIdInt, err := strconv.Atoi(gameId)
 	if err != nil {
-		log.Printf("failed to convert gameId to int")
+		log.Printf("failed to convert gameId to int %s", err)
 		errorutils.Write(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
 		return
 	}
@@ -231,7 +231,7 @@ func (h *ListHandler) GetListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		log.Printf("failed to encode into json")
+		log.Printf("failed to encode into json %s", err)
 		errorutils.Write(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
 		return
 	}
@@ -250,15 +250,20 @@ func (h *ListHandler) DeleteListItem(w http.ResponseWriter, r *http.Request) {
 	}
 	gameIdInt, err := strconv.Atoi(gameId)
 	if err != nil {
-		log.Printf("failed to convert gameId to int")
+		log.Printf("failed to convert gameId to int %s", err)
 		errorutils.Write(w, "failed to fetch game status from gamelist", http.StatusInternalServerError)
 		return
 	}
 	err = h.ListService.DeleteGame(username, gameIdInt)
 	if err != nil {
-		log.Printf("delete request failed")
+		log.Printf("delete request failed %s", err)
 		errorutils.Write(w, "failed to delete game from list", http.StatusInternalServerError)
 		return
+	}
+	for k := range h.Cache.Items() {
+		if strings.HasPrefix(k, username+",") {
+			h.Cache.Delete(k)
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

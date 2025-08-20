@@ -1,5 +1,5 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import { addGame, fetchGame, fetchGameList, fetchGameListEntry, fetchGames, updateGame } from "./game";
+import { addGame, deleteGame, fetchGame, fetchGameList, fetchGameListEntry, fetchGames, updateGame } from "./game";
 import { useAuth } from "./utils/auth";
 
 export const gameQueryOptions = (guid: string) =>
@@ -58,5 +58,22 @@ export function useUpdateGameMutation(username: string | undefined, gameId: numb
             console.error('Update game error:', error)
         }
 
+    })
+}
+
+export function useDeleteGameMutation (gameId: number, username: string | undefined ) {
+    const auth = useAuth()
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: async () => {
+            if (auth.user?.username !== username) {
+                throw new Error("you are not this user")
+            }
+            return await deleteGame(gameId, username)
+        },
+        onSettled: () => queryClient.invalidateQueries({queryKey: ["gamelist"]}),
+        onError: (error) => {
+            console.error("Delete game error:", error)
+        }
     })
 }

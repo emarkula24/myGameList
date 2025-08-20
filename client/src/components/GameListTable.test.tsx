@@ -4,9 +4,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { GameListTable } from './GameListTable'
 import type { Game } from '../types/types'
 
-// You can mock GameRow and GameTableHeaderRow if you want to isolate logic
+
 vi.mock('./GameRow', () => ({
-  default: ({ game }: any) => <tr data-testid="game-row"><td>{game.name}</td></tr>
+  default: ({ game }: {game: Game} ) => <tr data-testid="game-row"><td>{game.name}</td></tr>
 }))
 vi.mock('./GameTableHeaderRow', () => ({
   default: () => <tr><th>Header</th></tr>
@@ -17,6 +17,8 @@ const mockGames: Game[] = [
   { id: 2, name: 'Game Two' }
 ] as Game[]
 
+const o = (_id: number) => { void _id}
+
 describe('<GameListTable />', () => {
   it('renders empty message when no games are provided', () => {
     render(
@@ -24,8 +26,8 @@ describe('<GameListTable />', () => {
         games={[]}
         username="testUser"
         editingGameIds={new Set()}
-        startEditing={() => {}}
-        stopEditing={() => {}}
+        startEditing={o}
+        stopEditing={o}
         loggedInGameIds={new Set()}
       />
     )
@@ -39,8 +41,8 @@ describe('<GameListTable />', () => {
         games={mockGames}
         username="testUser"
         editingGameIds={new Set()}
-        startEditing={() => {}}
-        stopEditing={() => {}}
+        startEditing={o}
+        stopEditing={o}
         loggedInGameIds={new Set([1, 2])}
       />
     )

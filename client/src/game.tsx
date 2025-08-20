@@ -8,33 +8,33 @@ export class GamesNotFoundError extends Error { }
 export class GameListNotFoundError extends Error { }
 export class GameListEntryNotFoundError extends Error { }
 export class GameListEmptyError extends Error { }
+export class GameDeleteError extends Error { }
 
-export const addGame = async (gameId: number, status: number, username: string | undefined, gamename: string) => {
-    const result = axiosAuthorizationInstance
-        .post(`list/add`, {
-            game_id: gameId,
-            status: status,
-            username: username,
-            gamename: gamename,
+// Adds a new game to gamelist
+export const addGame = async (gameId: number, status: number, username: string | undefined, gamename: string): Promise<void> => {
+    try {
+        await axiosAuthorizationInstance
+            .post(`list/add`, {
+                game_id: gameId,
+                status: status,
+                username: username,
+                gamename: gamename,
 
-        })
-        .then((r) => console.log(r))
-        .catch((err: unknown) => {
-            if (err instanceof AxiosError) {
-                const errStatus = err.response?.status
-                if (errStatus === 403) {
-                    console.log(err.response)
-                    throw new UserNotLoggedInError(`user not logged in when trying to add game ${gamename}`)
-                } else {
-                    console.log(err.response)
-                    throw new Error
-                }
+            })
+    } catch (err) {
+        if (err instanceof AxiosError) {
+            const errStatus = err.response?.status
+            if (errStatus === 403) {
+                console.log(err.response)
+                throw new UserNotLoggedInError(`user not logged in when trying to add game ${gamename}`)
+            } else {
+                console.log(err.response)
+                throw new Error
             }
-
-        })
-    return result
+        }
+    }
 }
-
+// Updates game status
 export const updateGame = async (gameId: number, status: number, username: string | undefined, gamename: string): Promise<void> => {
     try {
         await axiosAuthorizationInstance.put(`/list/update`,
@@ -54,7 +54,7 @@ export const updateGame = async (gameId: number, status: number, username: strin
             } else {
                 console.log(err.response)
                 throw new Error
-                
+
             }
         }
         throw new Error
@@ -67,14 +67,32 @@ export const fetchGame = async (guid: string): Promise<Game> => {
         return response.data.results;
     } catch (err) {
         if (err instanceof AxiosError) {
-            if (err.response?.status === 404) {
+            const errStatus = err.response?.status
+            if (errStatus === 404) {
                 throw new GameNotFoundError(`Game with id ${guid} not found!`);
             }
         }
         throw err;
     }
 };
-
+export const deleteGame = async (gameId: number, username: string | undefined): Promise<void> => {
+    try {
+        await axiosAuthorizationInstance.delete(`/list/delete`, {
+            params: {
+                gameId: gameId,
+                username: username
+            }
+        })
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            const errStatus = error.response?.status
+            if (errStatus === 500) {
+                throw new GameDeleteError(`failed to delete game`)
+            }
+        }
+        throw error
+    }
+}
 // Fetches a list of games based on query string
 export const fetchGames = async (searchQuery: string): Promise<Games[]> => {
     const encodedSearchQuery = encodeURIComponent(searchQuery)
