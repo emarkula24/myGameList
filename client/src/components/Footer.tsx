@@ -7,7 +7,7 @@ export default function Footer() {
             <div className={styles.footerContainer}>
                 <div className={styles.linkContainer}>
                     <a 
-                    href="https://github.com/emarkula24"
+                    href="https://github.com/emarkula24/"
                     target="_blank"
                     rel="noopener noreferrer"
                     >
@@ -16,7 +16,7 @@ export default function Footer() {
                     <Link to="/about" className={styles.link}>About</Link>
                 </div>
                 <footer style={{fontSize: "1.2em"}}>
-                    @{new Date().getFullYear()} rankkaribull@gmail.com
+                    @{new Date().getFullYear()} partavesipirtelo@protonmail.com
                 </footer>
             </div>
         </>
