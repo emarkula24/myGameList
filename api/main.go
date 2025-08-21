@@ -42,6 +42,7 @@ func main() {
 
 	router := Router()
 	frontUrl := os.Getenv("VITE_FRONTEND_URL")
+	log.Println(frontUrl)
 	if frontUrl == "" {
 		log.Fatal("VITE_FRONTEND_URL is not set")
 	}
