@@ -3,14 +3,19 @@
 > This project is in a work in progress state
 ## Table of contents
 - [Overview](Overview)
+- [API documentation](API&nbsp;documentation)
 - [Technologies](Technologies)
 - [Requirements](Requirements)
 - [Install & Run](Install--Run)
-- [Design Philosophy](Design&nbsp;philosophy)
 - [Test Suite](Test&nbsp;suite)
+- [Design Philosophy](Design&nbsp;philosophy)
+
 ## Overview
 myGameList is a website built to help gaming enthusiasts to keep track of their gaming backlog and connect with a community while doing so. 
 The website is currently self-hosted on a private linux server, and a containerized version is provided for local hosting.
+
+## API documentation
+https://vekkuli.stoplight.io/docs/mygamelist/t2d3ja8uauouw-my-game-list
 
 ***All game data used in the project is provided by [Giantbomb](https://www.giantbomb.com/)***
 ## Technologies
