@@ -30,7 +30,6 @@ func CreateListSubRouter(router *mux.Router, list *handler.ListHandler) *mux.Rou
 	s.Handle("/add", middleware.VerifyJWTMiddleware(http.HandlerFunc(list.InsertToList))).Methods("POST")
 	s.Handle("/update", middleware.VerifyJWTMiddleware(http.HandlerFunc(list.UpdateList))).Methods("PUT")
 	s.Handle("/delete", middleware.VerifyJWTMiddleware(http.HandlerFunc(list.DeleteListItem))).Methods("DELETE")
-	// s.HandleFunc("/delete", list.DeleteListItem).Methods("DELETE")
 
 	return s
 }

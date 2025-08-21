@@ -14,18 +14,17 @@ var (
 	ErrRefreshTokenExists = errors.New("refreshtoken already in db")
 )
 
-// Write sends a specified HTTP response with message
+// Write sends a specified HTTP response with message.
+// If string is empty a generic error message is written.
 func Write(w http.ResponseWriter, message string, code int) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 
 	if message == "" {
-		message = "Internal Server Error"
+		message = "something went wrong"
 	}
 	err := json.NewEncoder(w).Encode(map[string]any{
 		"error": message,
-		"code":  code,
 	})
 	if err != nil {
 		fmt.Printf("failed to encode error message %s", err)

@@ -52,25 +52,25 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	resp, err := h.Gbc.SearchGames(query)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 	}
 
 	type GameJSON struct {
@@ -81,7 +81,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 
@@ -97,16 +97,16 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {
 			log.Printf("failed to write response: %s", err)
-			errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+			errorutils.Write(w, "", http.StatusInternalServerError)
 			return
 		}
 	case 100:
 		log.Printf("Invalid API key %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	default:
 		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 	}
 
 }
@@ -130,20 +130,20 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	response, err := h.Gbc.SearchGame(guid)
 	if err != nil {
 		log.Printf("failed to fetch game data %s:", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Printf("failed to read response body: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 	err = response.Body.Close()
 	if err != nil {
 		log.Printf("failed to close body: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 	type GameJSON struct {
@@ -158,7 +158,7 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
 	if err != nil {
 		log.Printf("failed to decode json body: %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
 
@@ -169,15 +169,15 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(bodyBytes); err != nil {
 			log.Printf("failed to write response: %s", err)
-			errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+			errorutils.Write(w, "", http.StatusInternalServerError)
 			return
 		}
 	case 100:
 		log.Printf("Invalid API key %s", err)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	default:
 		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
-		errorutils.Write(w, "failed to fetch gamedata", http.StatusInternalServerError)
+		errorutils.Write(w, "", http.StatusInternalServerError)
 	}
 }

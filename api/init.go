@@ -121,11 +121,17 @@ func Router() *mux.Router {
 			if err != nil {
 				log.Printf("Failed to reset database: %v", err)
 				w.WriteHeader(500)
-				w.Write([]byte("Failed to reset database"))
+				_, err = w.Write([]byte("Failed to reset database"))
+				if err != nil {
+					log.Fatalf("failed to resed database")
+				}
 				return
 			}
 			w.WriteHeader(200)
-			w.Write([]byte("Database reset successfully"))
+			_, err = w.Write([]byte("Database reset successfully"))
+			if err != nil {
+				log.Fatalf("failed to reset database")
+			}
 		}).Methods("POST")
 	}
 
