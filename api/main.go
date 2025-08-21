@@ -11,14 +11,34 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 func main() {
 
-	var wait time.Duration
+	var (
+		wait time.Duration
+		mode string
+	)
 	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.StringVar(&mode, "mode", "development", "Application mode: development or production")
 	flag.Parse()
+
+	switch mode {
+	case "development":
+		if err := godotenv.Load(".env"); err != nil {
+			log.Fatal("Error loading .env file for development")
+		}
+		log.Println("Loaded .env (development mode)")
+	case "production":
+		if err := godotenv.Load(".env.production"); err != nil {
+			log.Fatal("Error loading .env.production file for production")
+		}
+		log.Println("Loaded .env.production (production mode)")
+	default:
+		log.Fatalf("Unknown flag %s", mode)
+	}
 
 	router := Router()
 	frontUrl := os.Getenv("VITE_FRONTEND_URL")

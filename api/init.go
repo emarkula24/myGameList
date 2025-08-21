@@ -15,7 +15,6 @@ import (
 	"example.com/mygamelist/utils"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 )
 
 // Defines application handlers.
@@ -77,21 +76,7 @@ func NewDatabase() *sql.DB {
 // Router creates a new router instance with subroutes.
 func Router() *mux.Router {
 
-	if err := godotenv.Load(".env"); err != nil {
-		log.Println("error loading env")
-	}
-	log.Println("Loaded env")
 	mode := os.Getenv("MODE")
-	// // Development: load from file
-	// if mode != "production" {
-	// 	if err := godotenv.Load(".env"); err != nil {
-	// 		log.Println("Running in development mode, local .env file needed")
-	// 	}
-	// } else {
-	// 	// Optional: print loaded mode
-	// 	log.Println("Running in production mode.")
-	// }
-
 	db := NewDatabase()
 	handlers := SetUp(db)
 	router := mux.NewRouter()
@@ -133,6 +118,8 @@ func Router() *mux.Router {
 				log.Fatalf("failed to reset database")
 			}
 		}).Methods("POST")
+	} else {
+		log.Println("running on production mode, /reset not available")
 	}
 
 	routes.CreateGameSubrouter(router, handlers.game)

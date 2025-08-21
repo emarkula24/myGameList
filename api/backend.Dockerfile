@@ -6,6 +6,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /api
 EXPOSE 8080
-CMD ["/api"]
+CMD ["/api", "--mode=production"]
 
 
