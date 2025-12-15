@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -92,6 +92,7 @@ func (h *ListHandler) UpdateList(w http.ResponseWriter, r *http.Request) {
 
 // GetList handles GET /list requests.
 func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 	username := r.URL.Query().Get("username")
 	if username == "" || username == "undefined" {
 		log.Printf("query parameter for username")
@@ -120,12 +121,13 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, gameListDb, err := h.ListService.GetGameList(username, page, limit)
+	response, gameListDb, err := h.ListService.GetGameList(ctx, username, page, limit)
 	if len(gameListDb) == 0 {
 		log.Printf("gamelist is empty: %s", err)
 		errorutils.Write(w, "gamelist is empty", http.StatusBadRequest)
 		return
 	}
+
 	if err != nil {
 		log.Printf("failed to get gamelist: %s", err)
 		errorutils.Write(w, "", http.StatusInternalServerError)
@@ -137,6 +139,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
+	log.Println(string(bodyBytes))
 	combinedApiResponse, err := utils.CombineGameListJSON(gameListDb, bodyBytes)
 	if err != nil {
 		log.Printf("failed to inject values in apiResp: %s", err)
@@ -149,6 +152,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
+	log.Println(string(finalResponse))
 	err = response.Body.Close()
 
 	if err != nil {
@@ -157,34 +161,12 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type GameJSON struct {
-		StatusCode int `json:"status_code"`
-	}
-	var gameJSON GameJSON
-
-	err = json.NewDecoder(bytes.NewReader(finalResponse)).Decode(&gameJSON)
-	if err != nil {
-		log.Printf("failed to decode json body: %s", err)
+	h.Cache.Set(cacheKey, finalResponse, cache.DefaultExpiration)
+	w.Header().Set("Content-Type", "application/json")
+	if _, err := w.Write(finalResponse); err != nil {
+		log.Printf("failed to write response: %s", err)
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
-	}
-
-	switch gameJSON.StatusCode {
-	case 1:
-		h.Cache.Set(cacheKey, finalResponse, cache.DefaultExpiration)
-		w.Header().Set("Content-Type", "application/json")
-		if _, err := w.Write(finalResponse); err != nil {
-			log.Printf("failed to write response: %s", err)
-			errorutils.Write(w, "", http.StatusInternalServerError)
-			return
-		}
-	case 100:
-		log.Printf("Invalid API key %s", err)
-		errorutils.Write(w, "", http.StatusInternalServerError)
-		return
-	default:
-		log.Printf("Gamebomb API status != 200: %d", gameJSON.StatusCode)
-		errorutils.Write(w, "", http.StatusInternalServerError)
 	}
 
 }

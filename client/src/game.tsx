@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import { type GameListEntry, type Game, type Games, type GameListEntries } from "./types/types"
+import { type GameListEntry, type Game, type GameListEntries, type SearchedGame } from "./types/types"
 import { UserNotLoggedInError } from "./utils/auth"
 import axiosAuthorizationInstance from "./utils/axios"
 
@@ -61,10 +61,10 @@ export const updateGame = async (gameId: number, status: number, username: strin
     }
 }
 // Fetches info on a game based on a guid
-export const fetchGame = async (guid: string): Promise<Game> => {
+export const fetchGame = async (guid: string): Promise<Game[]> => {
     try {
-        const response = await axios.get<{ results: Game }>(`/games/game?guid=${guid}`);
-        return response.data.results;
+        const response = await axios.get<Game[]>(`/games/game?guid=${guid}`);
+        return response.data;
     } catch (err) {
         if (err instanceof AxiosError) {
             const errStatus = err.response?.status
@@ -94,15 +94,16 @@ export const deleteGame = async (gameId: number, username: string | undefined): 
     }
 }
 // Fetches a list of games based on query string
-export const fetchGames = async (searchQuery: string): Promise<Games[]> => {
+export const fetchGames = async (searchQuery: string): Promise<SearchedGame[]> => {
     const encodedSearchQuery = encodeURIComponent(searchQuery)
     try {
         // An empty promise is called in order to create a delay between query changes and actual api calls
         // Rate limiting on the backend side will be implemented eventually
         await new Promise((r) => setTimeout(r, 500))
 
-        const response = await axios.get<{ results: Games[] }>(`/games/search?query=${encodedSearchQuery}`)
-        return response.data.results
+        const response = await axios.get<SearchedGame[]>(`/games/search?query=${encodedSearchQuery}`)
+        console.log(response.data)
+        return response.data
     } catch (err) {
         if (err instanceof AxiosError) {
             const errStatus = err.response?.status
@@ -118,8 +119,9 @@ export const fetchGames = async (searchQuery: string): Promise<Games[]> => {
 
 export const fetchGameList = async (username: string | undefined, page = 1, limit = 20): Promise<GameListEntries[]> => {
     try {
-        const response = await axios.get<{ results: GameListEntries[] }>(`/list?username=${username}&page=${page}&limit=${limit}`)
-        return response.data.results
+        const response = await axios.get<GameListEntries[]>(`/list?username=${username}&page=${page}&limit=${limit}`)
+        console.log(response.data)
+        return response.data
     } catch (err) {
         if (err instanceof AxiosError) {
             const errStatus = err.response?.status

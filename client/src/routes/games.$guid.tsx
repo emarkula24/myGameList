@@ -48,16 +48,18 @@ function GameComponent() {
   const auth = useAuth()
   const guid = Route.useParams().guid
   const { data: game } = useSuspenseQuery(gameQueryOptions(guid))
-  const gameListEntryQuery = useSuspenseQuery(gameListEntryQueryOptions(auth.user?.username, game.id))
+  const nonListGame = game[0]
+  console.log(nonListGame)
+  const gameListEntryQuery = useSuspenseQuery(gameListEntryQueryOptions(auth.user?.username, nonListGame.id))
   const gameListEntry = gameListEntryQuery.data
   const status = gameListEntry.gamedata?.status ?? false
 
-  const addMutation = useAddGameMutation(game.id, game.name)
-  const updateMutation = useUpdateGameMutation(auth.user?.username, game.id, game.name)
-
+  const addMutation = useAddGameMutation(nonListGame.id, nonListGame.name)
+  const updateMutation = useUpdateGameMutation(auth.user?.username, nonListGame.id, nonListGame.name)
+  const u = nonListGame.cover.url.replace("t_thumb", "t_cover_big")
   return (
     <div className="routeContainer">
-      <CommonDivider routeName={game.name} />
+      <CommonDivider routeName={nonListGame.name} />
       <div
         style={{
           width: "75%",
@@ -70,10 +72,15 @@ function GameComponent() {
 
         }}
       >
-        <img src={game.image?.medium_url} style={{ width: "100%", height: "auto", gridColumn: "1", gridRow: "1 / span 2"  }} />
+        <img src={u} style={{ width: "100%", height: "auto", gridColumn: "1", gridRow: "1 / span 2"  }} />
         <div style={{ gridColumn: "2", gridRow: "1", fontSize: "1em", }}>
-        <p>{game.deck}</p>
-        {/* <GamePlatformHeader game={game} /> */}
+        <p>{nonListGame.summary}</p>
+        {nonListGame.genres.map((genre) => (
+          <p key={genre.id}>{genre.name}</p>
+        ))}
+        {nonListGame.platforms.map((platform) => (
+          <p key={platform.id}>{platform.abbreviation}</p>
+        ))}
 
         {addMutation.isError && (
           <div style={{ color: 'red' }}>Error: {addMutation.error.message}</div>

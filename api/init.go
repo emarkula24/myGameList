@@ -26,7 +26,7 @@ type Handlers struct {
 
 // SetUp initializes new application handler dependencies.
 func SetUp(db *sql.DB) *Handlers {
-	client := &service.GiantBombClient{}
+	client := service.NewGiantBombClient()
 	auth := &utils.AuthService{}
 	repo := repository.NewRepository(db)
 	listRepo := repository.NewListRepository(db)

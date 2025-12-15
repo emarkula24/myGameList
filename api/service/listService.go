@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,7 +16,7 @@ type ListService struct {
 }
 
 type GameListFetcher interface {
-	SearchGameList(games []repository.Game, limit int) (*http.Response, error)
+	SearchGameList(ctx context.Context, games []repository.Game, limit int) (*http.Response, error)
 }
 
 // NewListService creates a list service controller.
@@ -34,17 +35,18 @@ func (s *ListService) PutGame(gameId, status int, username string) error {
 }
 
 // GetGameList returns list for a given user.
-func (s *ListService) GetGameList(username string, page, limit int) (*http.Response, []repository.Game, error) {
+func (s *ListService) GetGameList(ctx context.Context, username string, page, limit int) (*http.Response, []repository.Game, error) {
 	gamelist, err := s.ListRepository.FetchGames(username, page, limit)
 	if err != nil {
 		log.Printf("failed to fetch gamelist from database %s", err)
 		return nil, nil, fmt.Errorf("%w", err)
 	}
-	fullGameList, err := s.Cbc.SearchGameList(gamelist, limit)
+	fullGameList, err := s.Cbc.SearchGameList(ctx, gamelist, limit)
 	if err != nil {
 		log.Printf("failed to fetch gamelistdata from gamebomb %s", err)
 		return nil, nil, fmt.Errorf("%w", err)
 	}
+
 	return fullGameList, gamelist, nil
 
 }

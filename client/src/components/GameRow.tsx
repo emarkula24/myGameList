@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import GameUpdateDropdown from './GameUpdateDropdown'
 import { useUpdateGameMutation, useAddGameMutation, useDeleteGameMutation } from '../queryOptions'
 import { useAuth } from '../utils/auth'
-import type { Game } from '../types/types'
+import type { GameListEntries } from '../types/types'
 import GameAddButton from './GameAddButton'
 import styles from './GameRow.module.css'
 
@@ -24,7 +24,7 @@ const statusColors: Record<number, string> = {
 
 export default function GameRow({ index, game, username, isEditing, startEditing, stopEditing, isMissingFromLoggedInUserList }: {
     index: number
-    game: Game
+    game: GameListEntries
     username: string
     isEditing: boolean
     startEditing: (id: number) => void
@@ -43,14 +43,14 @@ export default function GameRow({ index, game, username, isEditing, startEditing
         }
     }, [updateMutation.isSuccess])
     const statusColor = statusColors[game.status] || "lightgray";
-
+    const u = game.cover.replace("t_thumb", "t_logo_med")
     return (
         <tr className={styles.block}>
             <td><div style={{ backgroundColor: statusColor }} className={styles.titleColor}></div></td>
             <td className={styles.indexNumber}>{index}</td>
-            <td className={styles.item}><img src={game.image.icon_url} /></td>
+            <td className={styles.item}><img src={u} /></td>
             <td>
-                <Link to="/games/$guid" params={{ guid: game.guid }} className={styles.title}>
+                <Link to="/games/$guid" params={{ guid: game.id.toString() }} className={styles.title}>
                     {game.name}
                 </Link>
             </td>

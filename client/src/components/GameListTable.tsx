@@ -1,4 +1,4 @@
-import type { Game } from '../types/types'
+import type { GameListEntries } from '../types/types'
 import GameRow from './GameRow'
 import GameTableHeaderRow from './GameTableHeaderRow'
 
@@ -10,7 +10,7 @@ export function GameListTable({
   stopEditing,
   loggedInGameIds
 }: {
-  games: Game[]
+  games: GameListEntries[]
   username: string
   editingGameIds: Set<number>
   startEditing: (id: number) => void

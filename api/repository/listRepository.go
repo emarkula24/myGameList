@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 // ListRepository defines a list repository.
@@ -55,8 +56,8 @@ func (r *ListRepository) UpdateGame(gameId, status int, username string) error {
 }
 
 type Game struct {
-	GameID int    `json:"id"`
-	Status string `json:"status"`
+	GameID int `json:"id"`
+	Status int `json:"status"`
 }
 
 func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, error) {
@@ -88,7 +89,7 @@ func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, e
 	if err := rows.Close(); err != nil {
 		return nil, err
 	}
-
+	log.Println(games)
 	return games, nil
 }
 func (r *ListRepository) FetchGame(username string, gameId int) *Game {

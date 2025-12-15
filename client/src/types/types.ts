@@ -6,70 +6,57 @@ export interface Location {
 export interface HeaderElementProps {
         location: Location;
 }
-
-export interface Games {
+interface Cover {
         id: number;
-        guid: string;
+        url: string ;
+}
+interface Platform {
+        id: number;
+        abbreviation: string;
+        platform_logo: PlatformLogo;
+}
+export interface SearchedGame {
+        id: number;
         name: string;
-        image: {
-                medium_url: string;
-                icon_url: string;
-                tiny_url: string;
-                thumb_url: string;
-                small_url: string;
-                super_url: string;
-        };
-        original_release_date: string;
-        platforms: { name: string }[];
-        deck: string;
-        site_detail_url: string;
+        cover: Cover;
+        platforms: Platform[];
+}
+
+interface Genre {
+  id: number;
+  name: string;
+}
+
+interface PlatformLogo {
+  id: number;
+  url: string;
+}
+
+
+interface ReleaseDate {
+  id: number;
+  human: string;
 }
 
 export interface Game {
-        id: number;
-        name: string;
-        guid: string;
-        status: number;
-        deck: string;
-        description: string;
-        image: {
-                medium_url: string;
-                icon_url: string;
-                tiny_url: string;
-                thumb_url: string;
-                small_url: string;
-        }
-        original_release_data: string;
-        platforms: { name: string }[];
-        publishers: object[];
-        similar_games: object[];
-        genres: object[];
-
-
+  id: number;
+  name: string;
+  genres: Genre[];
+  platforms: Platform[];
+  rating: number;
+  rating_count: number;
+  release_dates: ReleaseDate[];
+  similar_games: number[];
+  cover: Cover;
+  summary: string
 }
+
 export interface GameListEntries {
-        status: number;
-        id: number;
-        guid: string;
-        name: string;
-        deck: string;
-        description: string;
-        image: {
-                icon_url: string;
-                medium_url: string;
-                thumb_url: string;
-                tiny_url: string;
-                small_url: string;
-        }
-        original_release_data: string;
-        platforms: { name: string }[];
-        publishers: object[];
-        similar_games: object[];
-        genres: object[];
-
-}
-export interface GameList {
-        gamelist: GameListEntries
+  id: number;
+  name: string;
+  cover: string;
+  release_dates: ReleaseDate[];
+  status: number;
 }
 export interface GameData {
         id?: number;

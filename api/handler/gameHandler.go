@@ -1,8 +1,7 @@
 package handler
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"io"
 	"log"
 	"net/http"
@@ -15,9 +14,9 @@ import (
 )
 
 type GameService interface {
-	SearchGames(query string) (*http.Response, error)
-	SearchGame(guid string) (*http.Response, error)
-	SearchGameList(games []repository.Game, limit int) (*http.Response, error)
+	SearchGames(ctx context.Context, query string) (*http.Response, error)
+	SearchGame(ctx context.Context, guid string) (*http.Response, error)
+	SearchGameList(ctx context.Context, games []repository.Game, limit int) (*http.Response, error)
 }
 
 // Defines a game HTTP handler.
@@ -36,7 +35,7 @@ func NewGameHandler(gbc GameService) *GameHandler {
 // Search handles GET /games/search requests.
 // Requests GameBomb API for a list of game entries based on a query string and relays the received json to the client.
 func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
-
+	ctx := context.Background()
 	query := req.URL.Query().Get("query")
 	query = utils.ParseSearchQuery(query)
 
@@ -49,7 +48,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 		}
 		return
 	}
-	resp, err := h.Gbc.SearchGames(query)
+	resp, err := h.Gbc.SearchGames(ctx, query)
 	if err != nil {
 		log.Printf("Failed to fetch gamedata: %s", err)
 		errorutils.Write(w, "", http.StatusInternalServerError)
@@ -68,47 +67,20 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
+
 	err = resp.Body.Close()
 	if err != nil {
 		errorutils.Write(w, "", http.StatusInternalServerError)
 	}
 
-	type GameJSON struct {
-		StatusCode int `json:"status_code"`
-	}
-	var gameJSON GameJSON
-
-	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
-	if err != nil {
-		log.Printf("Failed to fetch gamedata: %s", err)
+	h.Cache.Set(query, bodyBytes, cache.DefaultExpiration)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(bodyBytes); err != nil {
+		log.Printf("failed to write response: %s", err)
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
-
-	// status_code received is not the HTTP status code, it is a code that the API sends with the JSON.
-	// It is safe to assume HTTP code 404 is not a likely scenario but countermeasures are taken.
-	// status_code 1 = success.
-	// status_code 100 = wrong api key.
-
-	switch gameJSON.StatusCode {
-	case 1:
-		h.Cache.Set(query, bodyBytes, cache.DefaultExpiration)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(bodyBytes); err != nil {
-			log.Printf("failed to write response: %s", err)
-			errorutils.Write(w, "", http.StatusInternalServerError)
-			return
-		}
-	case 100:
-		log.Printf("Invalid API key %s", err)
-		errorutils.Write(w, "", http.StatusInternalServerError)
-		return
-	default:
-		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
-		errorutils.Write(w, "", http.StatusInternalServerError)
-	}
-
 }
 
 // SearchGame handles GET /games/game requests.
@@ -116,7 +88,7 @@ func (h *GameHandler) Search(w http.ResponseWriter, req *http.Request) {
 // Uses go-cache to store response data due to the request amount to gamebomb API being limited
 func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 	guid := req.URL.Query().Get("guid")
-
+	ctx := context.Background()
 	if cachedResp, found := h.Cache.Get(guid); found {
 		log.Print("used the cache")
 		w.Header().Set("Content-Type", "application/json")
@@ -127,7 +99,7 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response, err := h.Gbc.SearchGame(guid)
+	response, err := h.Gbc.SearchGame(ctx, guid)
 	if err != nil {
 		log.Printf("failed to fetch game data %s:", err)
 		errorutils.Write(w, "", http.StatusInternalServerError)
@@ -146,38 +118,13 @@ func (h *GameHandler) SearchGame(w http.ResponseWriter, req *http.Request) {
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
 	}
-	type GameJSON struct {
-		StatusCode int `json:"status_code"`
-	}
-	var gameJSON GameJSON
 
-	// status_code received is not the HTTP status code, it is a code that the API sends with the JSON.
-	// It is safe to assume HTTP code 404 is not a likely scenario but countermeasures are taken.
-	// status_code 1 = success
-	// status_code 100 = wrong api key
-	err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&gameJSON)
-	if err != nil {
-		log.Printf("failed to decode json body: %s", err)
+	h.Cache.Set(guid, bodyBytes, cache.DefaultExpiration)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(bodyBytes); err != nil {
+		log.Printf("failed to write response: %s", err)
 		errorutils.Write(w, "", http.StatusInternalServerError)
 		return
-	}
-
-	switch gameJSON.StatusCode {
-	case 1:
-		h.Cache.Set(guid, bodyBytes, cache.DefaultExpiration)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(bodyBytes); err != nil {
-			log.Printf("failed to write response: %s", err)
-			errorutils.Write(w, "", http.StatusInternalServerError)
-			return
-		}
-	case 100:
-		log.Printf("Invalid API key %s", err)
-		errorutils.Write(w, "", http.StatusInternalServerError)
-		return
-	default:
-		log.Printf("Gamebomb API returned an unexpected code: %d", gameJSON.StatusCode)
-		errorutils.Write(w, "", http.StatusInternalServerError)
 	}
 }

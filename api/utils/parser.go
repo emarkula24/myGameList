@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"example.com/mygamelist/repository"
@@ -12,55 +13,63 @@ func ParseSearchQuery(query string) string {
 	return querysplice
 }
 
-type ApiImage struct {
-	IconURL     string `json:"icon_url"`
-	MediumURL   string `json:"medium_url"`
-	ScreenURL   string `json:"screen_url"`
-	ScreenLarge string `json:"screen_large_url"`
-	SmallURL    string `json:"small_url"`
-	SuperURL    string `json:"super_url"`
-	ThumbURL    string `json:"thumb_url"`
-	TinyURL     string `json:"tiny_url"`
-	OriginalURL string `json:"original_url"`
-	ImageTags   string `json:"image_tags"`
-}
-
 type ApiResult struct {
-	ID                  int      `json:"id"`
-	Guid                string   `json:"guid"`
-	Image               ApiImage `json:"image"`
-	Name                string   `json:"name"`
-	OriginalReleaseDate string   `json:"original_release_date"`
-	Status              string   `json:"status,omitempty"` // this value is injected into the ApiResponse
+	ID                  int    `json:"id"`
+	Cover               string `json:"cover"`
+	Name                string `json:"name"`
+	OriginalReleaseDate string `json:"original_release_date"`
+	Status              int    `json:"status,omitempty"` // this value is injected into the ApiResponse
 }
 
-type ApiResponse struct {
-	Error                string      `json:"error"`
-	Limit                int         `json:"limit"`
-	Offset               int         `json:"offset"`
-	NumberOfPageResults  int         `json:"number_of_page_results"`
-	NumberOfTotalResults int         `json:"number_of_total_results"`
-	StatusCode           int         `json:"status_code"`
-	Results              []ApiResult `json:"results"`
-	Version              string      `json:"version"`
+type igdbSearchResult struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Cover struct {
+		URL string `json:"url"`
+	} `json:"cover"`
+	ReleaseDates []struct {
+		Human string `json:"human"`
+	} `json:"release_dates"`
 }
 
 // Builds a struct that is used in response data, which contains status value from database.
-func CombineGameListJSON(gameListDb []repository.Game, bodyBytes []byte) (*ApiResponse, error) {
-	var apiResp ApiResponse
-	err := json.Unmarshal(bodyBytes, &apiResp)
-	if err != nil {
-		return nil, err
+func CombineGameListJSON(gameListDb []repository.Game, bodyBytes []byte) ([]ApiResult, error) {
+
+	var igdbResults []igdbSearchResult
+	if err := json.Unmarshal(bodyBytes, &igdbResults); err != nil {
+		return nil, fmt.Errorf("igdb unmarshal failed: %w", err)
 	}
-	statusMap := make(map[int]string)
+
+	statusMap := make(map[int]int)
 	for _, g := range gameListDb {
 		statusMap[g.GameID] = g.Status
 	}
 
-	for i := range apiResp.Results {
-		if status, ok := statusMap[apiResp.Results[i].ID]; ok {
-			apiResp.Results[i].Status = status
+	results := make([]ApiResult, 0, len(igdbResults))
+	for _, g := range igdbResults {
+		api := igdbToApiResult(g)
+
+		// Inject status if present
+		if status, ok := statusMap[g.ID]; ok {
+			api.Status = status
 		}
+
+		results = append(results, api)
 	}
-	return &apiResp, nil
+
+	return results, nil
+}
+
+func igdbToApiResult(src igdbSearchResult) ApiResult {
+	var release string
+	if len(src.ReleaseDates) > 0 {
+		release = src.ReleaseDates[len(src.ReleaseDates)-1].Human
+	}
+
+	return ApiResult{
+		ID:                  src.ID,
+		Name:                src.Name,
+		Cover:               src.Cover.URL,
+		OriginalReleaseDate: release,
+	}
 }
