@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter, type ErrorComponentProps } from '@tanstack/react-router'
 import { gameListQueryOptions } from '../queryOptions'
-import { useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useAuth } from '../utils/auth'
 import GameListFilterHeader from '../components/GameListFilterHeader'
@@ -56,8 +56,12 @@ function GameListComponent() {
 
   const username = Route.useParams().username
   const auth = useAuth()
+  const loggedInUsername = auth.user?.username
   const { data: gamelist } = useSuspenseQuery(gameListQueryOptions(username))
-  const { data: loggedInUserGameList } = useSuspenseQuery(gameListQueryOptions(auth.user?.username))
+  const { data: loggedInUserGameList = [] } = useQuery({
+    ...gameListQueryOptions(loggedInUsername),
+    enabled: Boolean(loggedInUsername)
+  })
   const [selectedFilter, setSelectedFilter] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
   const [editingGameIds, setEditingGameIds] = useState<Set<number>>(() => new Set())

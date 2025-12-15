@@ -83,7 +83,7 @@ export default function GameRow({ index, game, username, isEditing, startEditing
                     </div>
                 </td>
 
-            ) : isMissingFromLoggedInUserList && (
+            ) : isMissingFromLoggedInUserList && isLoggedInUser &&(
                 <td>
                     <GameAddButton
                         onNewListEntry={(status) => addMutation.mutate(status)}
