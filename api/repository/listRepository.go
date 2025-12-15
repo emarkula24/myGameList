@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
 )
 
 // ListRepository defines a list repository.
@@ -89,7 +88,7 @@ func (r *ListRepository) FetchGames(username string, page, limit int) ([]Game, e
 	if err := rows.Close(); err != nil {
 		return nil, err
 	}
-	log.Println(games)
+
 	return games, nil
 }
 func (r *ListRepository) FetchGame(username string, gameId int) *Game {

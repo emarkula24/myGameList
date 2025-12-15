@@ -124,7 +124,7 @@ func (h *ListHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	response, gameListDb, err := h.ListService.GetGameList(ctx, username, page, limit)
 	if len(gameListDb) == 0 {
 		log.Printf("gamelist is empty: %s", err)
-		errorutils.Write(w, "gamelist is empty", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -100,4 +101,34 @@ func (r *Repository) DeleteRefreshToken(userId int, jti string) error {
 	log.Println(rowsAffected)
 	log.Println(rows)
 	return err
+}
+
+type User struct {
+	Username string `json:"username"`
+	UserID   int    `json:"id"`
+}
+
+func (r *Repository) SelectUsers(ctx context.Context) ([]User, error) {
+	query := `
+			SELECT username, user_id
+			FROM users
+	`
+	rows, err := r.Db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select users")
+	}
+	var users []User
+	for rows.Next() {
+		var (
+			user User
+		)
+		if err := rows.Scan(&user.Username, &user.UserID); err != nil {
+			return nil, fmt.Errorf("failed to scan row")
+		}
+		users = append(users, user)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	return users, nil
 }

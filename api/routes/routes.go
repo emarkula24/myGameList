@@ -20,6 +20,7 @@ func CreateUserSubrouter(router *mux.Router, user *handler.UserHandler) *mux.Rou
 	s.HandleFunc("/login", user.Login).Methods("POST")
 	s.HandleFunc("/refresh", user.Refresh).Methods("POST")
 	s.HandleFunc("/logout", user.Logout).Methods("POST")
+	s.HandleFunc("/users", user.GetUsers).Methods("GET")
 	return s
 
 }

@@ -30,3 +30,9 @@ CREATE TABLE IF NOT EXISTS user_games (
     FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (game_id) REFERENCES games(game_id)
 );
+CREATE TABLE IF NOT EXISTS user_friends (
+    username VARCHAR(80) NOT NULL,
+    user_id INT UNSIGNED,
+    created_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+)

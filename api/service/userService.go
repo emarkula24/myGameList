@@ -1,11 +1,13 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
 
 	"example.com/mygamelist/errorutils"
+	"example.com/mygamelist/repository"
 	"example.com/mygamelist/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -18,6 +20,7 @@ type UserRepository interface {
 	InsertRefreshToken(userId int, refreshtoken, jti string) error
 	RefreshTokenById(userId int) (string, string, error)
 	DeleteRefreshToken(userId int, jti string) error
+	SelectUsers(ctx context.Context) ([]repository.User, error)
 }
 
 type AuthService interface {
@@ -116,4 +119,9 @@ func (s *UserService) FetchRefreshToken(username string, userId int) (string, er
 		return "", fmt.Errorf("failed to fetch refreshtoken: %w", err)
 	}
 	return jtiFromDb, nil
+}
+
+func (s *UserService) FetchUsers(ctx context.Context) ([]repository.User, error) {
+	return s.UserRepository.SelectUsers(ctx)
+
 }

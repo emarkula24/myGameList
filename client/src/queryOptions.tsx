@@ -1,6 +1,7 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addGame, deleteGame, fetchGame, fetchGameList, fetchGameListEntry, fetchGames, updateGame } from "./game";
 import { useAuth } from "./utils/auth";
+import { fetchUsers } from "./users";
 
 export const gameQueryOptions = (guid: string) =>
     queryOptions({
@@ -23,9 +24,13 @@ export const gameListEntryQueryOptions = (username: string | undefined, gameId: 
     queryOptions({
         queryKey: ["gamelistentry", { username, gameId }],
         queryFn: () => fetchGameListEntry(username, gameId),
-
-
     })
+
+export const usersQueryOptions = () =>
+    queryOptions({
+        queryKey: ["users"],
+        queryFn: () => fetchUsers()
+    }) 
 
 export function useAddGameMutation(gameId: number, gameName: string) {
     const queryClient = useQueryClient()

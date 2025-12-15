@@ -6,6 +6,10 @@ export interface Location {
 export interface HeaderElementProps {
         location: Location;
 }
+export interface Users {
+        username: string
+        id: number
+}
 interface Cover {
         id: number;
         url: string ;

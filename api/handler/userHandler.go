@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -331,4 +332,18 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		log.Printf("unexpected error: %s", err)
 		errorutils.Write(w, "authentication failed", http.StatusUnauthorized)
 	}
+}
+
+// GetUsers handles GET users requests.
+func (h *UserHandler) GetUsers(w http.ResponseWriter, req *http.Request) {
+	ctx := context.Background()
+
+	users, err := h.UserService.FetchUsers(ctx)
+	if err != nil {
+		log.Printf("failed to get users: %s", err)
+		errorutils.Write(w, "userfetch  failed", http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(users)
+
 }
