@@ -6,10 +6,9 @@ export default function RegisterForm({ handleSubmit, handleChange, registerFormD
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     registerFormData: { username: string, email: string, password: string, confirmPassword: string }
 }) {
-    const [match, setMatch] = React.useState(false);
-    React.useEffect(() => {
-        setMatch(registerFormData.password === registerFormData.confirmPassword);
-    }, [registerFormData.password, registerFormData.confirmPassword]);
+    const match =
+        registerFormData.password === registerFormData.confirmPassword &&
+        registerFormData.password.length >= 6
     return (
         <>
             <div style={{fontSize: "2em"}}>Password needs to be atleast 6 characters long. </div>

@@ -20,7 +20,7 @@ export function GameListTable({
   if (games.length === 0) {
     return <p style={{ fontSize: "2em", textAlign: "center" }}>This category is empty</p>
   }
-
+  
   return (
     <table style={{ borderCollapse: "collapse" }}>
       <thead>
