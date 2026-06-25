@@ -37,7 +37,7 @@ type ListRequest struct {
 	GameName string `json:"gamename"`
 }
 
-// InserToList handles POST /list/add requests.
+// InsertToList handles POST /list/add requests.
 func (h *ListHandler) InsertToList(w http.ResponseWriter, r *http.Request) {
 
 	var listReq ListRequest
